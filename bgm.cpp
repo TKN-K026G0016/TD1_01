@@ -4,7 +4,7 @@
 
 #include <Novice.h>
 
-
+aaaa
 
 struct BGM {
 	int aHandle = -1;
