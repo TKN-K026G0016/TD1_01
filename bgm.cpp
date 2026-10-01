@@ -36,8 +36,6 @@ struct BGMFader {
 };
 BGMFader bgmFader;
 
-11000
-
 static void BgmFade(void) {
 	switch (bgmFader.nowMode) {
 	case ModeBgmFade::FadeOut: {
