@@ -119,3 +119,9 @@ void DrawTextureUI(Texture texture, Vector2 centerPos, Vector2 size);
 /// <param name="size">サイズ</param>
 /// <param name="rate">ゲージの割合</param>
 void DrawGaugeAsObj(Texture texture, Vector2 centerPos, Vector2 size, float rate);
+
+/// <summary>
+/// アニメーション変更処理(通常)
+/// </summary>
+/// <param name="texture">テクスチャデータ</param>
+void UpdateAnimation(Texture& texture);

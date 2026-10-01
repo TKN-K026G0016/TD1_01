@@ -11,7 +11,7 @@ void InitTexture(void) {
 	Texture temp[ToInt(TextureType::Count)] = {
 
 		//サンプル
-		//テクスチャデータ, 参照サイズ, animChangeTimer(time, count), animLimit, animNum, color
+		//テクスチャデータ, 参照サイズ, animChangeTimer(time, count), animLimit(4枚アニメなら3), animNum, color
 		//{Novice::LoadTexture("./resources/player/player_body.png"), { 128, 128 }, {0, 0}, 0, 0, WHITE },
 
 		//===============
@@ -193,5 +193,23 @@ void DrawGaugeAsObj(Texture texture, Vector2 centerPos, Vector2 size, float rate
 		 texture.refSize.x * texture.animNum, 0, gaugeRefWidth, texture.refSize.y,
 		texture.tHandle, texture.color
 	);
+}
 
+/// <summary>
+/// アニメーション変更処理(通常)
+/// </summary>
+/// <param name="texture">テクスチャデータ</param>
+void UpdateAnimation(Texture& texture ) {
+	texture.animChangeTimer.count++;
+	if (texture.animChangeTimer.count >= texture.animChangeTimer.time) {
+		texture.animChangeTimer.count = 0;
+
+		if (texture.animNum < texture.animLimit) {
+			texture.animNum++;
+		}
+		else {
+			texture.animNum = 0;
+		}
+
+	}
 }
