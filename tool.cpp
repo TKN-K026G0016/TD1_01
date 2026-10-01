@@ -1,6 +1,7 @@
 #include "tool.h"
 #include "vector2.h"
 #include "common.h"
+#include "stage.h"
 
 #include <Novice.h>
 #define _USE_MATH_DEFINES
@@ -57,17 +58,18 @@ Vector2 SetVertex(Vector2 pos, Vector2 size, int vertexNum) {
 Vector2i ConvertPosWToS(Vector2 posW) {
 
 	Vector2 posS = { 0, 0 };
+	Vector2 cameraPos = GetCameraPos();
 	// まず通常のスクリーン座標へ変換
-	posS.x = (posW.x + kDelayBetweenWToS.x);
-	posS.y = (-posW.y + kDelayBetweenWToS.y /*+ GetScrollY()*/);
+	posS.x = (posW.x + kDelayBetweenWToS.x + cameraPos.x);
+	posS.y = (-posW.y + kDelayBetweenWToS.y + cameraPos.y);
 
 	// ウィンドウ中心
 	float centerX = kWindowSize.x / 2.0f;
 	float centerY = kWindowSize.y / 2.0f;
 
 	// 中心基準で拡縮
-	posS.x = (posS.x - centerX) * /*GetCameraZoom()*/ +centerX;
-	posS.y = (posS.y - centerY) * /*GetCameraZoom()*/ +centerY;
+	posS.x = (posS.x - centerX) * GetCameraZoom() +centerX;
+	posS.y = (posS.y - centerY) * GetCameraZoom() +centerY;
 
 	return { ToInt(posS.x), ToInt(posS.y) };
 }
@@ -89,18 +91,19 @@ Vector2i ConvertPosWToSUI(Vector2 posW) {
 /// <returns>スクリーン座標</returns>
 Vector2i ConvertPosWToSForBG(Vector2 posW, float scrollRate) {
 	Vector2 posS;
+	Vector2 cameraPos = GetCameraPos();
 
 	// まず通常のスクリーン座標へ変換
-	posS.x = (posW.x + kDelayBetweenWToS.x);
-	posS.y = (-posW.y + kDelayBetweenWToS.y /*+ GetScrollY()*/ * scrollRate);
+	posS.x = (posW.x + kDelayBetweenWToS.x + cameraPos.x * scrollRate);
+	posS.y = (-posW.y + kDelayBetweenWToS.y + cameraPos.y * scrollRate);
 
 	// ウィンドウ中心
 	float centerX = kWindowSize.x / 2.0f;
 	float centerY = kWindowSize.y / 2.0f;
 
 	// 中心基準で拡縮
-	posS.x = (posS.x - centerX) * /*GetCameraZoom()*/ +centerX;
-	posS.y = (posS.y - centerY) * /*GetCameraZoom()*/ +centerY;
+	posS.x = (posS.x - centerX) * GetCameraZoom() +centerX;
+	posS.y = (posS.y - centerY) * GetCameraZoom() +centerY;
 
 	return { ToInt(posS.x), ToInt(posS.y) };
 }

@@ -2,6 +2,9 @@
 #include "input.h"
 #include "scene_manager.h"
 
+#include "player.h"
+#include "stage.h"
+
 #include <Novice.h>
 
 static void Pause(void) {
@@ -12,14 +15,26 @@ static void Pause(void) {
 
 
 void InitPlay(void) {
+	InitPlayer();
 
+	InitStage();
 }
 
 void UpdatePlay(void) {
+
+	UpdatePlayer();
+
+	UpdateStage();
+
+
 	Pause();
 }
 
 void DrawPlay(void) {
+
+	DrawStage();
+	DrawPlay();
+
 #ifdef _DEBUG
 
 	Novice::ScreenPrintf(20, 20, "PlayScene");

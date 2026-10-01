@@ -47,6 +47,12 @@
     <Filter Include="audio\bgm">
       <UniqueIdentifier>{635bb1c1-6b62-45ad-bd37-8a8d1c07ede1}</UniqueIdentifier>
     </Filter>
+    <Filter Include="stage">
+      <UniqueIdentifier>{5c3e9900-8d0b-4ed9-bdfa-8497d54472b7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="player">
+      <UniqueIdentifier>{c7d9d157-80e8-479a-9aee-c9619a06ade1}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp" />
@@ -79,6 +85,12 @@
     </ClCompile>
     <ClCompile Include="scene_manager.cpp">
       <Filter>scene\scene_manager</Filter>
+    </ClCompile>
+    <ClCompile Include="stage.cpp">
+      <Filter>stage</Filter>
+    </ClCompile>
+    <ClCompile Include="player.cpp">
+      <Filter>player</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -192,6 +204,12 @@
     </ClInclude>
     <ClInclude Include="scene_manager.h">
       <Filter>scene\scene_manager</Filter>
+    </ClInclude>
+    <ClInclude Include="stage.h">
+      <Filter>stage</Filter>
+    </ClInclude>
+    <ClInclude Include="player.h">
+      <Filter>player</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
