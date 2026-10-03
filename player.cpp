@@ -1,9 +1,12 @@
 #include "player.h"
+#include "player_laser.h"
+
+#include "vector2.h"
+#include "tool.h"
 #include "input.h"
 #include "texture.h"
 
-#include "vector2.h"
-
+#define _USE_MATH_DEFINES
 #include <math.h>
 
 #pragma region データ
@@ -27,8 +30,13 @@ struct Player {
 
 	//<回転関係>
 	float rotateTheta = 0.0f;
+	//回転速度
+	float rotateSpeed = 0.05f;
+	//ロック状態フラグ
+	bool isLock = false;
 
-
+	//<射撃関係>
+	Timer shootTimer = { 4, 0 };
 
 	Texture texture = {};
 };
@@ -56,6 +64,16 @@ static void CheckInput(void) {
 		player.inputVec.y = -1;
 	} else {
 		player.inputVec.y = 0;
+	}
+
+#pragma endregion
+
+#pragma region ロック
+	if (CheckInputAction(InputAction::Lock)) {
+		player.isLock = true;
+	}
+	else {
+		player.isLock = false;
 	}
 
 #pragma endregion
@@ -138,6 +156,39 @@ static void MovePlayer(void) {
 #pragma endregion
 }
 
+static void RotatePlayer(void) {
+	if (player.isLock) return;
+
+	//入力なしならスキップ
+	if (player.inputVec.x == 0.0f && player.inputVec.y == 0.0f) return;
+
+	//入力方向の角度
+	float inputTheta = atan2f(player.inputVec.y, player.inputVec.x);
+	//現在の方向との差を求める
+	float diff = inputTheta - player.rotateTheta;
+
+	//差を-π~πに正規化
+	while (diff > ToFloat(M_PI)) {
+		diff -= ToFloat(M_PI) * 2;
+	} 
+	while (diff < -ToFloat(M_PI)) {
+		diff += ToFloat(M_PI) * 2;
+	}
+
+	player.rotateTheta += diff * player.rotateSpeed;
+}
+
+static void ShootLaser(void) {
+	if (!player.isAlive) return;
+
+	player.shootTimer.count++;
+	if (player.shootTimer.count >= player.shootTimer.time) {
+		player.shootTimer.count = 0;
+
+		ShootPlayerLaser(player.pos, player.rotateTheta);
+	}
+}
+
 #pragma endregion
 
 void InitPlayer(void) {
@@ -149,6 +200,8 @@ void UpdatePlayer(void) {
 	CheckInput();
 
 	MovePlayer();
+	RotatePlayer();
+	ShootLaser();
 }
 
 void DrawPlayer(void) {

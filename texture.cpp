@@ -30,6 +30,8 @@ void InitTexture(void) {
 		//Player
 		{ Novice::LoadTexture("./resources/texture/player/player.png"), { 128, 128 }, {0, 0}, 0, 0, WHITE },
 
+		{ Novice::LoadTexture("./resources/texture/player/laser1.png"), { 64, 64 }, {0, 0}, 0, 0, WHITE },
+
 		//Enemy
 
 		//MapChip

@@ -175,6 +175,7 @@ xcopy C:\KamataEngine\DirectXGame\Resources "$(OutDirFullPath)NoviceResources" /
     <ClCompile Include="pause.cpp" />
     <ClCompile Include="play.cpp" />
     <ClCompile Include="player.cpp" />
+    <ClCompile Include="player_laser.cpp" />
     <ClCompile Include="scene_manager.cpp" />
     <ClCompile Include="se.cpp" />
     <ClCompile Include="stage.cpp" />
@@ -217,6 +218,7 @@ xcopy C:\KamataEngine\DirectXGame\Resources "$(OutDirFullPath)NoviceResources" /
     <ClInclude Include="pause.h" />
     <ClInclude Include="play.h" />
     <ClInclude Include="player.h" />
+    <ClInclude Include="player_laser.h" />
     <ClInclude Include="scene_manager.h" />
     <ClInclude Include="se.h" />
     <ClInclude Include="stage.h" />

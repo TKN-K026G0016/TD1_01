@@ -3,6 +3,7 @@
 #include "scene_manager.h"
 
 #include "player.h"
+#include "player_laser.h"
 #include "stage.h"
 
 #include <Novice.h>
@@ -16,13 +17,14 @@ static void Pause(void) {
 
 void InitPlay(void) {
 	InitPlayer();
+	InitPlayerLaser();
 
 	InitStage();
 }
 
 void UpdatePlay(void) {
-
 	UpdatePlayer();
+	UpdatePlayerLaser();
 
 	UpdateStage();
 
@@ -31,9 +33,10 @@ void UpdatePlay(void) {
 }
 
 void DrawPlay(void) {
-
 	DrawStage();
+
 	DrawPlayer();
+	DrawPlayerLaser();
 
 #ifdef _DEBUG
 

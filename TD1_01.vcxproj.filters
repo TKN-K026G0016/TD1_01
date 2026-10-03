@@ -53,6 +53,9 @@
     <Filter Include="player">
       <UniqueIdentifier>{c7d9d157-80e8-479a-9aee-c9619a06ade1}</UniqueIdentifier>
     </Filter>
+    <Filter Include="player\player_laser">
+      <UniqueIdentifier>{7ec86daa-2385-4174-b23b-0689bf039f7a}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp" />
@@ -91,6 +94,9 @@
     </ClCompile>
     <ClCompile Include="player.cpp">
       <Filter>player</Filter>
+    </ClCompile>
+    <ClCompile Include="player_laser.cpp">
+      <Filter>player\player_laser</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -212,5 +218,8 @@
       <Filter>player</Filter>
     </ClInclude>
     <ClInclude Include="matrix.h" />
+    <ClInclude Include="player_laser.h">
+      <Filter>player\player_laser</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

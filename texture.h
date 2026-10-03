@@ -38,6 +38,8 @@ enum class TextureType {
 	//Player
 	Player,
 
+	PlayerLaser1,
+
 	//Enemy
 
 	//MapChip
