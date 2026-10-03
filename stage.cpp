@@ -8,6 +8,12 @@
 #include <Novice.h>
 #include <math.h>
 
+#pragma region データ: 可動域
+
+constexpr Vector2 movablePos[2] = { {0, 0}, {2560, 1440} };
+
+#pragma endregion
+
 #pragma region データ: カメラ関係
 struct Camera {
 	Vector2 pos = { 0, 0 };
@@ -17,10 +23,10 @@ struct Camera {
 	float zoomMin = 0.5f;
 
 	//<移動処理関係>
-	float moveSpeed = 6.0f;
+	float moveSpeed = 7.0f;
 	float moveSpeedDece = 1.0f;
 	//減速するまでの距離
-	float deceleratonDis = 40.0f;
+	float deceleratonDis = 60.0f;
 	//補間速度
 	float chaseLerpRate = 0.10f;
 	//デッドゾーン
@@ -42,7 +48,7 @@ struct BackGround {
 	Vector2 pos = { 1280, 720 };
 	Vector2 size = { 2560, 1440 };
 
-	float scrollRate = 0.8f;
+	float scrollRate = 1.0f;
 
 	Texture texture = {};
 };
@@ -138,6 +144,13 @@ void DrawStage(void) {
 
 }
 
+#pragma region 関数: 外部参照関係
+
+void GetMovablePos(Vector2 pos[2]) {
+	pos[0] = movablePos[0];
+	pos[1] = movablePos[1];
+}
+
 Vector2 GetCameraPos(void) {
 	return camera.pos;
 }
@@ -145,3 +158,5 @@ Vector2 GetCameraPos(void) {
 float GetCameraZoom(void) {
 	return camera.zoom;
 }
+
+#pragma endregion

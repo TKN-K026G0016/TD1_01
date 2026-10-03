@@ -6,6 +6,12 @@ void UpdateStage(void);
 void DrawStage(void);
 
 /// <summary>
+/// 可動域の取得
+/// </summary>
+/// <param name="pos">可動域を格納する配列</param>
+void GetMovablePos(Vector2 pos[2]);
+
+/// <summary>
 /// カメラの座標取得
 /// </summary>
 /// <param name=""></param>

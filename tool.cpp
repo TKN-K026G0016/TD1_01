@@ -112,11 +112,6 @@ Vector2i ConvertPosWToSUI(Vector2 posW) {
 	return { ToInt(posS.x), ToInt(posS.y) };
 }
 
-/// <summary>
-/// ワールド座標からスクリーン座標への変換(背景用)
-/// </summary>
-/// <param name="posW">ワールド座標</param>
-/// <returns>スクリーン座標</returns>
 Vector2i ConvertPosWToSForBG(Vector2 posW, float scrollRate) {
 	Vector2 posS;
 	Vector2 cameraPos = GetCameraPos();

@@ -1,5 +1,6 @@
 #include "player.h"
 #include "player_laser.h"
+#include "stage.h"
 
 #include "vector2.h"
 #include "tool.h"
@@ -41,6 +42,11 @@ struct Player {
 	Texture texture = {};
 };
 Player player;
+
+#pragma endregion
+
+#pragma region データ: 可動域
+Vector2 movablePos[2] = { {0, 0}, {0, 0} };
 
 #pragma endregion
 
@@ -156,6 +162,23 @@ static void MovePlayer(void) {
 #pragma endregion
 }
 
+static void ClampPlayerPos(void) {
+	//横
+	if (player.pos.x < movablePos[0].x) {
+		player.pos.x = movablePos[0].x;
+	}
+	else if (player.pos.x > movablePos[1].x) {
+		player.pos.x = movablePos[1].x;
+	}
+
+	//縦
+	if (player.pos.y < movablePos[0].y) {
+		player.pos.y = movablePos[0].y;
+	} else if (player.pos.y > movablePos[1].y) {
+		player.pos.y = movablePos[1].y;
+	}
+}
+
 static void RotatePlayer(void) {
 	if (player.isLock) return;
 
@@ -194,12 +217,15 @@ static void ShootLaser(void) {
 void InitPlayer(void) {
 	player = {};
 	player.texture = GetTexture(TextureType::Player);
+
+	GetMovablePos(movablePos);
 }
 
 void UpdatePlayer(void) {
 	CheckInput();
 
 	MovePlayer();
+	ClampPlayerPos();
 	RotatePlayer();
 	ShootLaser();
 }
