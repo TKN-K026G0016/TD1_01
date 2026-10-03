@@ -92,8 +92,8 @@ Vector2i ConvertPosWToS(Vector2 posW) {
 	posS.y = -(posW.y - cameraPos.y) + kWindowCenter.y;
 
 	// ウィンドウ中心
-	float centerX = kWindowCenter.x / 2.0f;
-	float centerY =  kWindowCenter.y / 2.0f;
+	float centerX = kWindowCenter.x;
+	float centerY =  kWindowCenter.y;
 
 	// 中心基準で拡縮
 	posS.x = (posS.x - centerX) * GetCameraZoom() + centerX;
@@ -122,8 +122,8 @@ Vector2i ConvertPosWToSForBG(Vector2 posW, float scrollRate) {
 	Vector2 cameraPos = GetCameraPos();
 
 	// まず通常のスクリーン座標へ変換
-	posS.x = (posW.x + kDelayBetweenWToS.x + cameraPos.x * scrollRate);
-	posS.y = (-posW.y + kDelayBetweenWToS.y + cameraPos.y * scrollRate);
+	posS.x = (posW.x - cameraPos.x) + kWindowCenter.x * scrollRate;
+	posS.y = -(posW.y - cameraPos.y) + kWindowCenter.y * scrollRate;
 
 	// ウィンドウ中心
 	float centerX = kWindowCenter.x;

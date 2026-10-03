@@ -1,7 +1,9 @@
 #include "stage.h"
 #include "player.h"
 
+#include "texture.h"
 #include "vector2.h"
+#include "common.h"
 
 #include <Novice.h>
 #include <math.h>
@@ -15,13 +17,36 @@ struct Camera {
 	float zoomMin = 0.5f;
 
 	//<移動処理関係>
-	float moveSpeed = 5.0f;
-	Vector2 moveVec = { 0, 0 };
+	float moveSpeed = 6.0f;
+	float moveSpeedDece = 1.0f;
+	//減速するまでの距離
+	float deceleratonDis = 40.0f;
 	//補間速度
-	float chaseLerpRate = 0.075f;
+	float chaseLerpRate = 0.10f;
+	//デッドゾーン
+	const float deadZone = 10.0f;
+
+	Vector2 moveVec = { 0, 0 };
+
+	//<カメラの可動域>
+	Vector2 minPos = { 0 + kWindowCenter.x, 0 + kWindowCenter.y };
+	Vector2 maxPos = { 2560 - kWindowCenter.x, 1440 - kWindowCenter.y };
 
 };
 Camera camera;
+
+#pragma endregion
+
+#pragma region データ: 背景
+struct BackGround {
+	Vector2 pos = { 1280, 720 };
+	Vector2 size = { 2560, 1440 };
+
+	float scrollRate = 0.8f;
+
+	Texture texture = {};
+};
+BackGround backGround;
 
 #pragma endregion
 
@@ -34,38 +59,74 @@ static void InitCamera(void) {
 static void MoveCameraPos(void) {
 	//追跡処理
 	Vector2 targetPos = GetPlayerPos();
+	//方向計算
+	Vector2 moveVec;
+	moveVec.x = targetPos.x - camera.pos.x;
+	moveVec.y = targetPos.y - camera.pos.y;
+	float moveVecLength = sqrtf(moveVec.x * moveVec.x + moveVec.y * moveVec.y);
 
-	//Vector2 moveVec;
+	//デッドゾーン判定
+	if (moveVecLength <= camera.deadZone) {
+		return;
+	}
 
-	//moveVec.x = playerPos.x - camera.pos.x;
-	//moveVec.y = playerPos.y - camera.pos.y;
-	//float moveVecLength = sqrtf(moveVec.x * moveVec.x + moveVec.y * moveVec.y);
-	//if (moveVecLength != 0) {
-	//	moveVec.x /= moveVecLength;
-	//	moveVec.y /= moveVecLength;
+	if (moveVecLength != 0) {
+		moveVec.x /= moveVecLength;
+		moveVec.y /= moveVecLength;
+	}
+	camera.moveVec.x = camera.moveVec.x * (1 - camera.chaseLerpRate) + moveVec.x * camera.chaseLerpRate;
+	camera.moveVec.y = camera.moveVec.y * (1 - camera.chaseLerpRate) + moveVec.y * camera.chaseLerpRate;
+
+	//移動速度
+	float moveSpeed = (moveVecLength > camera.deceleratonDis) ? camera.moveSpeed : camera.moveSpeedDece;
+
+	camera.pos.x += camera.moveVec.x * moveSpeed;
+	camera.pos.y += camera.moveVec.y * moveSpeed;
+
+}
+
+static void ClampCameraPos(void) {
+	//if (camera.pos.x < camera.minPos.x) {
+	//	camera.pos.x = camera.minPos.x;
+	//} else if (camera.pos.x > camera.maxPos.x) {
+	//	camera.pos.x = camera.maxPos.x;
 	//}
 
-	//camera.moveVec.x = camera.moveVec.x * (1 - camera.lerpRate) + moveVec.x * camera.lerpRate;
-	//camera.moveVec.y = camera.moveVec.y * (1 - camera.lerpRate) + moveVec.y * camera.lerpRate;
+	//if (camera.pos.y < camera.minPos.y) {
+	//	camera.pos.y = camera.minPos.y;
+	//} else if (camera.pos.y > camera.maxPos.y) {
+	//	camera.pos.y = camera.maxPos.y;
+	//}
+}
 
-	//camera.pos.x += camera.moveVec.x * camera.moveSpeed;
-	//camera.pos.y += camera.moveVec.y * camera.moveSpeed;
+#pragma endregion
 
-	camera.pos.x = camera.pos.x * (1 - camera.chaseLerpRate) + targetPos.x * camera.chaseLerpRate;
-	camera.pos.y = camera.pos.y * (1 - camera.chaseLerpRate) + targetPos.y * camera.chaseLerpRate;
+#pragma region 関数: 背景
+
+static void InitBackGround(void) {
+	backGround = {};
+	backGround.texture = GetTexture(TextureType::BackGround);
+}
+
+static void DrawBackGround(void) {
+	DrawTextureBG(backGround.texture, backGround.pos, backGround.size, backGround.scrollRate);
 }
 
 #pragma endregion
 
 void InitStage(void) {
 	InitCamera();
+	InitBackGround();
 }
 
 void UpdateStage(void) {
 	MoveCameraPos();
+	ClampCameraPos();
 }
 
 void DrawStage(void) {
+
+	DrawBackGround();
 
 #ifdef _DEBUG
 	Vector2 playerPos = GetPlayerPos();
