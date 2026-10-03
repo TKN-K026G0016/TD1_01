@@ -60,7 +60,7 @@ void SetVertexRotate(Vector2 pos, Vector2 size, Vector2 vertex[kVertexNum], floa
 
 	for (int i = 0; i < kVertexNum; i++) {
 		//ローカル座標(中心座標が原点の際)
-		Vector2 local;
+		Vector2 local = { 0, 0 };
 		switch (i) {
 		case 0:
 			local = { -size.x / 2.0f, size.y / 2.0f };
@@ -88,12 +88,12 @@ Vector2i ConvertPosWToS(Vector2 posW) {
 	Vector2 posS = { 0, 0 };
 	Vector2 cameraPos = GetCameraPos();
 	// まず通常のスクリーン座標へ変換
-	posS.x = (posW.x + kDelayBetweenWToS.x + cameraPos.x);
-	posS.y = (-posW.y + kDelayBetweenWToS.y + cameraPos.y);
+	posS.x = (posW.x - cameraPos.x)+ kWindowCenter.x;
+	posS.y = -(posW.y - cameraPos.y) + kWindowCenter.y;
 
 	// ウィンドウ中心
-	float centerX = kWindowSize.x / 2.0f;
-	float centerY = kWindowSize.y / 2.0f;
+	float centerX = kWindowCenter.x / 2.0f;
+	float centerY =  kWindowCenter.y / 2.0f;
 
 	// 中心基準で拡縮
 	posS.x = (posS.x - centerX) * GetCameraZoom() + centerX;
@@ -126,8 +126,8 @@ Vector2i ConvertPosWToSForBG(Vector2 posW, float scrollRate) {
 	posS.y = (-posW.y + kDelayBetweenWToS.y + cameraPos.y * scrollRate);
 
 	// ウィンドウ中心
-	float centerX = kWindowSize.x / 2.0f;
-	float centerY = kWindowSize.y / 2.0f;
+	float centerX = kWindowCenter.x;
+	float centerY = kWindowCenter.y;
 
 	// 中心基準で拡縮
 	posS.x = (posS.x - centerX) * GetCameraZoom() + centerX;

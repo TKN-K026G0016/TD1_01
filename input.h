@@ -11,6 +11,13 @@ enum class InputAction {
 
 	Pause,
 
+	MoveRight,
+	MoveLeft,
+	MoveUp,
+	MoveDown,
+
+	Lock,
+
 	Count,
 };
 

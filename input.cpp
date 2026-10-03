@@ -189,7 +189,7 @@ bool CheckInputAction(InputAction action) {
 		//キーボード
 		if (!isConnectGamePad) {
 
-			if (keys[DIK_A] && !preKeys[DIK_A]) {
+			if ((keys[DIK_A] && !preKeys[DIK_A]) || (keys[DIK_LEFTARROW] && !preKeys[DIK_LEFTARROW])) {
 				return true;
 			} else {
 				return false;
@@ -213,7 +213,7 @@ bool CheckInputAction(InputAction action) {
 		//キーボード
 		if (!isConnectGamePad) {
 
-			if (keys[DIK_D] && !preKeys[DIK_D]) {
+			if ((keys[DIK_D] && !preKeys[DIK_D]) || (keys[DIK_RIGHTARROW] && !preKeys[DIK_RIGHTARROW])) {
 				return true;
 			} else {
 				return false;
@@ -237,7 +237,7 @@ bool CheckInputAction(InputAction action) {
 		//キーボード
 		if (!isConnectGamePad) {
 
-			if (keys[DIK_W] && !preKeys[DIK_W]) {
+			if ((keys[DIK_W] && !preKeys[DIK_W]) || (keys[DIK_UPARROW] && !preKeys[DIK_UPARROW])) {
 				return true;
 			} else {
 				return false;
@@ -261,7 +261,7 @@ bool CheckInputAction(InputAction action) {
 		//キーボード
 		if (!isConnectGamePad) {
 
-			if (keys[DIK_S] && !preKeys[DIK_S]) {
+			if ((keys[DIK_S] && !preKeys[DIK_S]) || (keys[DIK_DOWNARROW] && !preKeys[DIK_DOWNARROW])) {
 				return true;
 			} else {
 				return false;
@@ -339,6 +339,125 @@ bool CheckInputAction(InputAction action) {
 		//ゲームパッド
 		else {
 			if (Novice::IsTriggerButton(0, kGamePadStartButton) || Novice::IsTriggerButton(0, kGamePadStartButton)) {
+				return true;
+			} else {
+				return false;
+			}
+		}
+
+		break;
+	}
+
+
+	case InputAction::MoveLeft: {
+		//キーボード
+		if (!isConnectGamePad) {
+
+			if (keys[DIK_A] || keys[DIK_LEFTARROW]) {
+				return true;
+			} else {
+				return false;
+			}
+
+		}
+		//ゲームパッド
+		else {
+			if (Novice::IsPressButton(0, kGamePadLeftButton) ||
+				(IsStickPassedDeadZone(stickInputL, StickDirection::Left))) {
+				return true;
+			} else {
+				return false;
+			}
+		}
+
+		break;
+	}
+
+	case InputAction::MoveRight: {
+		//キーボード
+		if (!isConnectGamePad) {
+
+			if (keys[DIK_D] || keys[DIK_RIGHTARROW]) {
+				return true;
+			} else {
+				return false;
+			}
+
+		}
+		//ゲームパッド
+		else {
+			if (Novice::IsPressButton(0, kGamePadRightButton) ||
+				(IsStickPassedDeadZone(stickInputL, StickDirection::Right))) {
+				return true;
+			} else {
+				return false;
+			}
+		}
+
+		break;
+	}
+
+	case InputAction::MoveUp: {
+		//キーボード
+		if (!isConnectGamePad) {
+
+			if (keys[DIK_W] || keys[DIK_UPARROW]) {
+				return true;
+			} else {
+				return false;
+			}
+
+		}
+		//ゲームパッド
+		else {
+			if (Novice::IsPressButton(0, kGamePadUpButton) ||
+				(IsStickPassedDeadZone(stickInputL, StickDirection::Up))) {
+				return true;
+			} else {
+				return false;
+			}
+		}
+
+		break;
+	}
+
+	case InputAction::MoveDown: {
+		//キーボード
+		if (!isConnectGamePad) {
+
+			if (keys[DIK_S] || keys[DIK_DOWNARROW]) {
+				return true;
+			} else {
+				return false;
+			}
+
+		}
+		//ゲームパッド
+		else {
+			if (Novice::IsPressButton(0, kGamePadDownButton) ||
+				(IsStickPassedDeadZone(stickInputL, StickDirection::Down))) {
+				return true;
+			} else {
+				return false;
+			}
+		}
+
+		break;
+	}
+
+	case InputAction::Lock: {
+		//キーボード
+		if (!isConnectGamePad) {
+
+			if (keys[DIK_SPACE]) {
+				return true;
+			} else {
+				return false;
+			}
+		}
+		//ゲームパッド
+		else {
+			if (Novice::IsPressButton(0, kGamePadAButton)) {
 				return true;
 			} else {
 				return false;

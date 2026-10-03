@@ -33,11 +33,11 @@ void UpdatePlay(void) {
 void DrawPlay(void) {
 
 	DrawStage();
-	DrawPlay();
+	DrawPlayer();
 
 #ifdef _DEBUG
 
-	Novice::ScreenPrintf(20, 20, "PlayScene");
+	//Novice::ScreenPrintf(20, 20, "PlayScene");
 
 #endif // _DEBUG
 }

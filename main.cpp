@@ -7,7 +7,7 @@
 #include "common.h"
 #include "scene_manager.h"
 
-const char kWindowTitle[] = "LC1A_14_タカノハヤト_究極レーザー";
+const char kWindowTitle[] = "LC1A_14_タカノハヤト_UltimateLaser";
 
 // Windowsアプリでのエントリーポイント(main関数)
 int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) 

@@ -36,12 +36,14 @@ enum class TextureType {
 	//Play
 	//===============
 	//Player
+	Player,
 
 	//Enemy
 
 	//MapChip
 
 	//background
+	BackGround,
 
 	//UI
 
@@ -93,6 +95,15 @@ void DrawTextureObj(Texture texture, Vector2 centerPos, Vector2 size);
 /// <param name="centerPos">中心座標</param>
 /// <param name="size">サイズ</param>
 void DrawTextureObjReverse(Texture texture, Vector2 centerPos, Vector2 size);
+
+/// <summary>
+/// 回転するオブジェクトの描画関数
+/// </summary>
+/// <param name="texture">テクスチャデータ</param>
+/// <param name="centerPos">中心座標</param>
+/// <param name="size">サイズ</param>
+/// <param name="rotateTheta">回転量</param>
+void DrawTextureRotateObj(Texture texture, Vector2 centerPos, Vector2 size, float rotateTheta);
 
 /// <summary>
 /// 背景の描画関数
