@@ -1,8 +1,9 @@
 #pragma once
 #include "vector2.h"
+#include "matrix.h"
 
 //頂点の数
-const int vertexLimit = 4;
+const int kVertexNum = 4;
 
 template <typename T>
 //static_cast<int>()の代わり
@@ -55,14 +56,9 @@ Vector2i ConvertPosWToSForBG(Vector2 posW, float scrollRate);
 /// <returns>スクリーン座標</returns>
 Vector2 ConvertPosWToSForUI(Vector2 posW);
 
-/// <summary>
-/// 頂点座標の設定
-/// </summary>
-/// <param name="pos">中心座標</param>
-/// <param name="size">大きさ</param>
-/// <param name="vertexNum">頂点の番号</param>
-/// <returns>頂点座標</returns>
-Vector2 SetVertex(Vector2 pos, Vector2 size, int vertexNum);
+void SetVertex(Vector2 pos, Vector2 size, Vector2 vertex[kVertexNum]);
+
+void SetVertexRotate(Vector2 pos, Vector2 size, Vector2 vertex[kVertexNum], float rotateTheta);
 
 /// <summary>
 /// CircleVSCircleの当たり判定
@@ -107,3 +103,7 @@ void DrawHitBox(Vector2 hitVertex0, Vector2 hitVertex1);
 /// <param name="targetDigit">取りたい桁(右端は0)</param>
 /// <returns>取りたい桁の数値</returns>
 int GetValueAtDigit(int targetNum, int targetDigit);
+
+Matrix2x2 MakeRotateMatrix(float theta);
+
+Vector2 MultplyVectorVSMatrix(Vector2 vector, Matrix2x2 matrix);

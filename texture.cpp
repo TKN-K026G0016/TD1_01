@@ -60,11 +60,12 @@ Texture GetTexture(TextureType type) {
 /// <param name="size">サイズ</param>
 void DrawTextureObj(Texture texture, Vector2 centerPos, Vector2 size) {
 
-	Vector2 vertexW[vertexLimit] = { 0, 0 };
-	Vector2i vertexS[vertexLimit] = { 0, 0 };
+	Vector2 vertexW[kVertexNum] = { 0, 0 };
+	Vector2i vertexS[kVertexNum] = { 0, 0 };
 
-	for (int i = 0; i < vertexLimit; i++) {
-		vertexW[i] = SetVertex(centerPos, size, i);
+	SetVertex(centerPos, size, vertexW);
+
+	for (int i = 0; i < kVertexNum; i++) {
 		vertexS[i] = ConvertPosWToS(vertexW[i]);
 	}
 
@@ -86,11 +87,12 @@ void DrawTextureObj(Texture texture, Vector2 centerPos, Vector2 size) {
 /// <param name="size">サイズ</param>
 void DrawTextureObjReverse(Texture texture, Vector2 centerPos, Vector2 size) {
 
-	Vector2 vertexW[vertexLimit] = { 0, 0 };
-	Vector2i vertexS[vertexLimit] = { 0, 0 };
+	Vector2 vertexW[kVertexNum] = { 0, 0 };
+	Vector2i vertexS[kVertexNum] = { 0, 0 };
 
-	for (int i = 0; i < vertexLimit; i++) {
-		vertexW[i] = SetVertex(centerPos, size, i);
+	SetVertex(centerPos, size, vertexW);
+
+	for (int i = 0; i < kVertexNum; i++) {
 		vertexS[i] = ConvertPosWToS(vertexW[i]);
 	}
 
@@ -105,6 +107,34 @@ void DrawTextureObjReverse(Texture texture, Vector2 centerPos, Vector2 size) {
 }
 
 /// <summary>
+/// 回転するオブジェクトの描画関数
+/// </summary>
+/// <param name="texture">テクスチャデータ</param>
+/// <param name="centerPos">中心座標</param>
+/// <param name="size">サイズ</param>
+/// <param name="rotateTheta">回転量</param>
+void DrawTextureRotateObj(Texture texture, Vector2 centerPos, Vector2 size, float rotateTheta) {
+
+	Vector2 vertexW[kVertexNum] = { 0, 0 };
+	Vector2i vertexS[kVertexNum] = { 0, 0 };
+	//頂点座標を更新
+	SetVertexRotate(centerPos, size, vertexW, rotateTheta);
+	//ワールド座標からスクリーン座標に変換
+	for (int i = 0; i < kVertexNum; i++) {
+		vertexS[i] = ConvertPosWToS(vertexW[i]);
+	}
+
+	Novice::DrawQuad(
+		vertexS[0].x, vertexS[0].y,
+		vertexS[1].x, vertexS[1].y,
+		vertexS[2].x, vertexS[2].y,
+		vertexS[3].x, vertexS[3].y,
+		texture.refSize.x * texture.animNum, 0, texture.refSize.x, texture.refSize.y,
+		texture.tHandle, texture.color
+	);
+}
+
+/// <summary>
 /// 背景の描画関数
 /// </summary>
 /// <param name="texture">テクスチャデータ</param>
@@ -113,11 +143,12 @@ void DrawTextureObjReverse(Texture texture, Vector2 centerPos, Vector2 size) {
 /// <param name="scrollRate">スクロール倍率</param>
 void DrawTextureBG(Texture texture, Vector2 centerPos, Vector2 size, float scrollRate) {
 
-	Vector2 vertexW[vertexLimit] = { 0, 0 };
-	Vector2i vertexS[vertexLimit] = { 0, 0 };
+	Vector2 vertexW[kVertexNum] = { 0, 0 };
+	Vector2i vertexS[kVertexNum] = { 0, 0 };
 
-	for (int i = 0; i < vertexLimit; i++) {
-		vertexW[i] = SetVertex(centerPos, size, i);
+	SetVertex(centerPos, size, vertexW);
+
+	for (int i = 0; i < kVertexNum; i++) {
 		vertexS[i] = ConvertPosWToSForBG(vertexW[i], scrollRate);
 	}
 
@@ -138,11 +169,12 @@ void DrawTextureBG(Texture texture, Vector2 centerPos, Vector2 size, float scrol
 /// <param name="centerPos">中心座標</param>
 /// <param name="size">サイズ</param>
 void DrawTextureUI(Texture texture, Vector2 centerPos, Vector2 size) {
-	Vector2 vertexW[vertexLimit] = { 0, 0 };
-	Vector2i vertexS[vertexLimit] = { 0, 0 };
+	Vector2 vertexW[kVertexNum] = { 0, 0 };
+	Vector2i vertexS[kVertexNum] = { 0, 0 };
 
-	for (int i = 0; i < vertexLimit; i++) {
-		vertexW[i] = SetVertex(centerPos, size, i);
+	SetVertex(centerPos, size, vertexW);
+
+	for (int i = 0; i < kVertexNum; i++) {
 		vertexS[i] = ConvertPosWToSUI(vertexW[i]);
 	}
 
@@ -169,12 +201,12 @@ void DrawGaugeAsObj(Texture texture, Vector2 centerPos, Vector2 size, float rate
 	float gaugeWidth = size.x * rate;
 	int gaugeRefWidth = ToInt(texture.refSize.x * rate);
 
-	Vector2 vertexW[vertexLimit] = { 0, 0 };
-	Vector2i vertexS[vertexLimit] = { 0, 0 };
+	Vector2 vertexW[kVertexNum] = { 0, 0 };
+	Vector2i vertexS[kVertexNum] = { 0, 0 };
 
-	for (int i = 0; i < vertexLimit; i++) {
-		vertexW[i] = SetVertex(centerPos, size, i);
+	SetVertex(centerPos, size, vertexW);
 
+	for (int i = 0; i < kVertexNum; i++) {
 		//右側の頂点をrateに合わせてx座標更新
 		if (i == 1) {
 			vertexW[i].x = vertexW[0].x + gaugeWidth;

@@ -211,5 +211,6 @@
     <ClInclude Include="player.h">
       <Filter>player</Filter>
     </ClInclude>
+    <ClInclude Include="matrix.h" />
   </ItemGroup>
 </Project>

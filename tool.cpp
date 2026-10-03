@@ -1,5 +1,6 @@
 #include "tool.h"
 #include "vector2.h"
+#include "matrix.h"
 #include "common.h"
 #include "stage.h"
 
@@ -19,40 +20,67 @@ int GetRand(int min, int max) {
 	return (rand() % (max - min + 1)) + min;
 };
 
-Vector2 SetVertex(Vector2 pos, Vector2 size, int vertexNum) {
-	Vector2 vertexPos = { 0, 0 };
+/// <summary>
+/// 頂点座標の更新
+/// </summary>
+/// <param name="pos">中心座標</param>
+/// <param name="size">サイズ</param>
+/// <param name="vertex">頂点座標</param>
+void SetVertex(Vector2 pos, Vector2 size, Vector2 vertex[kVertexNum]) {
+	for (int i = 0; i < kVertexNum; i++) {
+		switch (i) {
+		case 0:
+			vertex[i] = { pos.x - size.x / 2, pos.y + size.y / 2 };
+			break;
 
-	switch (vertexNum) {
-	case 0:
-	{
-		vertexPos = { pos.x - size.x / 2, pos.y + size.y / 2 };
+		case 1:
+			vertex[i] = { pos.x + size.x / 2, pos.y + size.y / 2 };
+			break;
 
-		break;
+		case 2:
+			vertex[i] = { pos.x - size.x / 2, pos.y - size.y / 2 };
+			break;
+
+		case 3:
+			vertex[i] = { pos.x + size.x / 2, pos.y - size.y / 2 };
+			break;
+		}
 	}
-	case 1:
-	{
-		vertexPos = { pos.x + size.x / 2, pos.y + size.y / 2 };
+}
 
-		break;
+/// <summary>
+/// 回転する頂点座標の更新
+/// </summary>
+/// <param name="pos">中心座標</param>
+/// <param name="size">サイズ</param>
+/// <param name="vertex">頂点座標</param>
+/// <param name="rotateTheta">回転量</param>
+void SetVertexRotate(Vector2 pos, Vector2 size, Vector2 vertex[kVertexNum], float rotateTheta) {
+	Matrix2x2 rotateMatrix = MakeRotateMatrix(rotateTheta);
+
+	for (int i = 0; i < kVertexNum; i++) {
+		//ローカル座標(中心座標が原点の際)
+		Vector2 local;
+		switch (i) {
+		case 0:
+			local = { -size.x / 2.0f, size.y / 2.0f };
+			break;
+		case 1:
+			local = { size.x / 2.0f, size.y / 2.0f };
+			break;
+		case 2:
+			local = { -size.x / 2.0f, -size.y / 2.0f };
+			break;
+		case 3:
+			local = { size.x / 2.0f, -size.y / 2.0f };
+			break;
+		}
+
+		//ローカル座標が回転後の座標
+		Vector2 rotatedVertex = MultplyVectorVSMatrix(local, rotateMatrix);
+		//ワールド座標に戻して、変更
+		vertex[i] = { pos.x + rotatedVertex.x, pos.y + rotatedVertex.y };
 	}
-	case 2:
-	{
-		vertexPos = { pos.x - size.x / 2, pos.y - size.y / 2 };
-
-		break;
-	}
-	case 3:
-	{
-		vertexPos = { pos.x + size.x / 2, pos.y - size.y / 2 };
-
-		break;
-	}
-	}
-
-	//vertexPos.x *= cameraZoom;
-	//vertexPos.y *= cameraZoom;
-
-	return vertexPos;
 }
 
 Vector2i ConvertPosWToS(Vector2 posW) {
@@ -68,8 +96,8 @@ Vector2i ConvertPosWToS(Vector2 posW) {
 	float centerY = kWindowSize.y / 2.0f;
 
 	// 中心基準で拡縮
-	posS.x = (posS.x - centerX) * GetCameraZoom() +centerX;
-	posS.y = (posS.y - centerY) * GetCameraZoom() +centerY;
+	posS.x = (posS.x - centerX) * GetCameraZoom() + centerX;
+	posS.y = (posS.y - centerY) * GetCameraZoom() + centerY;
 
 	return { ToInt(posS.x), ToInt(posS.y) };
 }
@@ -102,8 +130,8 @@ Vector2i ConvertPosWToSForBG(Vector2 posW, float scrollRate) {
 	float centerY = kWindowSize.y / 2.0f;
 
 	// 中心基準で拡縮
-	posS.x = (posS.x - centerX) * GetCameraZoom() +centerX;
-	posS.y = (posS.y - centerY) * GetCameraZoom() +centerY;
+	posS.x = (posS.x - centerX) * GetCameraZoom() + centerX;
+	posS.y = (posS.y - centerY) * GetCameraZoom() + centerY;
 
 	return { ToInt(posS.x), ToInt(posS.y) };
 }
@@ -274,4 +302,32 @@ int GetValueAtDigit(int targetNum, int targetDigit) {
 	digit %= 10;
 
 	return digit;
+}
+
+/// <summary>
+/// rotateMatrixの作成
+/// </summary>
+/// <param name="theta">回転量</param>
+/// <returns>rotateMatrix</returns>
+Matrix2x2 MakeRotateMatrix(float theta) {
+	Matrix2x2 rotateMatrix;
+	rotateMatrix.m[0][0] = cosf(theta);
+	rotateMatrix.m[0][1] = sinf(theta);
+	rotateMatrix.m[1][0] = -sinf(theta);
+	rotateMatrix.m[1][1] = cosf(theta);
+
+	return rotateMatrix;
+}
+
+/// <summary>
+/// ベクトルとマトリックスの掛け算
+/// </summary>
+/// <param name="vector">ベクトル</param>
+/// <param name="matrix">マトリックス</param>
+/// <returns>ベクトル</returns>
+Vector2 MultplyVectorVSMatrix(Vector2 vector, Matrix2x2 matrix) {
+	Vector2 result;
+	result.x = vector.x * matrix.m[0][0] + vector.y * matrix.m[1][0];
+	result.y = vector.x * matrix.m[0][1] + vector.y * matrix.m[1][1];
+	return result;
 }
