@@ -37,7 +37,7 @@ struct Player {
 	bool isLock = false;
 
 	//<射撃関係>
-	Timer shootTimer = { 4, 0 };
+	Timer shootTimer = { 2, 0 };
 
 	Texture texture = {};
 };
@@ -238,6 +238,10 @@ void DrawPlayer(void) {
 
 Vector2 GetPlayerPos(void) {
 	return player.pos;
+}
+
+float GetPlayerRotateTheta(void) {
+	return player.rotateTheta;
 }
 
 #pragma endregion

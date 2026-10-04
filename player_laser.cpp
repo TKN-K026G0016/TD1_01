@@ -1,4 +1,5 @@
 #include "player_laser.h"
+#include "player.h"
 
 #include "vector2.h"
 #include "timer.h"
@@ -9,11 +10,11 @@
 
 #pragma region データ
 
-constexpr int kLaserLimit = 30;
+constexpr int kLaserLimit = 60;
 
 struct Laser {
 	Vector2 pos = { 0, 0 };
-	Vector2 size = { 30, 30 };
+	Vector2 size = { 50, 20 };
 
 	//<移動関係>
 	float moveSpeed = 20.0f;
@@ -34,6 +35,9 @@ Texture laserTexture = {};
 
 #pragma region 関数
 
+/// <summary>
+/// 移動処理
+/// </summary>
 static void MoveLaser(void) {
 	for (int i = 0; i < kLaserLimit; i++) {
 		if (!laser[i].isShoot) {
@@ -45,11 +49,33 @@ static void MoveLaser(void) {
 	}
 }
 
+/// <summary>
+/// 回転処理
+/// </summary>
+static void RotateLaser(void) {
+	float theta = GetPlayerRotateTheta();
+	for (int i = 0; i < kLaserLimit; i++) {
+		if (!laser[i].isShoot) {
+			continue;
+		}
+
+		laser[i].moveTheta = theta;
+	}
+}
+
+/// <summary>
+/// 消滅処理
+/// </summary>
+/// <param name="index">番号</param>
 static void BreakLaser(int index) {
 	laser[index].isShoot = false;
 	laser[index].breakTimer.count = 0;
 }
 
+/// <summary>
+/// 自壊タイマーのカウント処理
+/// </summary>
+/// <param name=""></param>
 static void BreakLaserItSelf(void) {
 	for (int i = 0; i < kLaserLimit; i++) {
 		if (!laser[i].isShoot) {
@@ -76,6 +102,7 @@ void InitPlayerLaser(void) {
 
 void UpdatePlayerLaser(void) {
 	MoveLaser();
+	RotateLaser();
 	BreakLaserItSelf();
 }
 
