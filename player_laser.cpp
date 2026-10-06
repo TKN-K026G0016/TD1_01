@@ -132,7 +132,7 @@ void DrawPlayerLaser(void) {
 	}
 }
 
-void ShootPlayerLaser(Vector2 pos, float moveTheta) {
+void ShootPlayerLaser(Vector2 pos, float moveTheta, float firstDisLength) {
 	int level = ToInt(GetPlayerNowLaserLevel());
 	LaserSpec& spec = laserSpec[level];
 
@@ -144,7 +144,7 @@ void ShootPlayerLaser(Vector2 pos, float moveTheta) {
 		laser[i].pos = pos;
 		laser[i].rotateTheta = moveTheta;
 
-		laser[i].disToPlayer = 0.0f;
+		laser[i].disToPlayer = firstDisLength;
 
 		//レベルごとの性能を適用
 		laser[i].level = spec.Level;

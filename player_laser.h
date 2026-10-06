@@ -46,7 +46,8 @@ void DrawPlayerLaser(void);
 /// </summary>
 /// <param name="pos">発射元の座標</param>
 /// <param name="moveTheta">進行方向</param>
-void ShootPlayerLaser(Vector2 pos, float moveTheta);
+/// <param name="firstDisLength">最初のプレイヤーとの距離</param>
+void ShootPlayerLaser(Vector2 pos, float moveTheta, float firstDisLength);
 
 PlayerLaser* GetPlayerLaserArray(void);
 

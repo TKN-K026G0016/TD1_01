@@ -16,7 +16,7 @@
 //ロックオンスイッチ
 bool lockOnSwitch = true;
 
-#pragma region データ
+#pragma region データ: player本体
 struct Player {
 	Vector2 pos = { 600, 600 };
 	Vector2 size = { 32, 32 };
@@ -98,8 +98,15 @@ Vector2 movablePos[2] = { {0, 0}, {0, 0} };
 enum class LockTargetType {
 	None = -1,
 	Boss = -2,
-	ENemy1 = 0,
+	Enemy1 = 0,
 };
+
+#pragma endregion
+
+#pragma region データ: 射撃関係
+
+//プレイヤーの中心からの発射位置の距離
+constexpr float kShootDisLength = 15.0f;
 
 #pragma endregion
 
@@ -380,7 +387,12 @@ static void ShootLaser(void) {
 	if (player.shootTimer.count >= player.shootTimer.time) {
 		player.shootTimer.count = 0;
 
-		ShootPlayerLaser(player.pos, player.rotateTheta);
+		//射撃位置設定
+		Vector2 shootPos;
+		shootPos.x = player.pos.x + kShootDisLength * cosf(player.rotateTheta);
+		shootPos.y = player.pos.y + kShootDisLength * sinf(player.rotateTheta);
+
+		ShootPlayerLaser(shootPos, player.rotateTheta, kShootDisLength);
 	}
 }
 
