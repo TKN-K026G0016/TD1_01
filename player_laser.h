@@ -4,6 +4,12 @@
 #include "texture.h"
 #include "tool.h"
 
+enum class LaserLevel {
+	Level0,
+	Level1,
+	Level2,
+};
+
 struct PlayerLaser {
 	Vector2 pos = { 0, 0 };
 	Vector2 size = { 0, 0 };
@@ -11,13 +17,16 @@ struct PlayerLaser {
 	//<移動関係>
 	float moveSpeed = 20.0f;
 	float rotateTheta = 0.0f;
-
+	//playerとの距離
 	float disToPlayer = 0.0f;
 
 	//射撃フラグ
 	bool isShoot = false;
 	//自壊タイマー
 	Timer breakTimer = { 120, 0 };
+
+	//レベル
+	LaserLevel level = LaserLevel::Level0;
 
 	//攻撃力
 	int pow = 0;

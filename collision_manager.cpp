@@ -26,7 +26,10 @@ static void CheckCollisionLaserVSEnemy(void) {
 			if (!laser[j].isShoot) continue;
 
 			if (CheckCollisionOBBvsCircle(enemy1[i].pos, enemy1[i].hitRadius, laser[j].hitBoxVertex)) {
-				BreakLaser(j);
+				//Lv2は敵を貫通
+				if (laser[j].level != LaserLevel::Level2) {
+					BreakLaser(j);
+				}
 
 				enemy1[i].hp -= laser[j].pow;
 			}

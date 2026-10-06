@@ -68,7 +68,7 @@ struct Player {
 	//エネルギー上限
 	float energyLimit = 100.0f;
 	//エネルギー消費量(レベルごと)
-	float consumptionEnergy[ToInt(PlayerLaserLevel::Count)] = { 0.0f, 0.15f, 0.7f };
+	float consumptionEnergy[ToInt(PlayerLaserLevel::Count)] = { 0.0f, 0.15f, 0.55f };
 
 	//<レベル関係>
 	//レーザーのレベル

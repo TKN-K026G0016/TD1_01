@@ -13,17 +13,22 @@ static constexpr int kPlayerLaserLimit = 60;
 
 //レベルごとの性能
 struct LaserSpec {
+	LaserLevel Level;
+
 	Vector2 size;
+
 	int pow;
+
 	Texture texture = {};
 };
+
 LaserSpec laserSpec[kLaserLevel] = {
 	//level0
-	{{50, 20}, 1, {}},
+	{ LaserLevel::Level0, {50, 20}, 1, { }},
 	//level1
-	{{50, 40}, 2, {}},
+	{ LaserLevel::Level1, {50, 40}, 2, {} },
 	//level2
-	{{50, 80}, 3, {}},
+	{ LaserLevel::Level2, {50, 80}, 3, {} },
 };
 
 #pragma region データ
@@ -52,15 +57,6 @@ static void MoveLaser(void) {
 
 		laser[i].pos.x = playerPos.x + laser[i].disToPlayer * cosf(laser[i].rotateTheta);
 		laser[i].pos.y = playerPos.y + laser[i].disToPlayer * sinf(laser[i].rotateTheta);
-
-		//laser[i].pos.x += cosf(laser[i].rotateTheta) * laser[i].moveSpeed;
-		//laser[i].pos.y += sinf(laser[i].rotateTheta) * laser[i].moveSpeed;
-
-		//laser[i].length += laser[i].moveSpeed;
-		//if (laser[i].length > laser[i].lengthMax) {
-		//	laser[i].length = laser[i].lengthMax;
-		//}
-
 	}
 }
 
@@ -151,6 +147,7 @@ void ShootPlayerLaser(Vector2 pos, float moveTheta) {
 		laser[i].disToPlayer = 0.0f;
 
 		//レベルごとの性能を適用
+		laser[i].level = spec.Level;
 		laser[i].size = spec.size;
 		laser[i].pow = spec.pow;
 		laser[i].texture = spec.texture;
