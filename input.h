@@ -17,6 +17,7 @@ enum class InputAction {
 	MoveDown,
 
 	Lock,
+	TriggerLock,
 
 	Count,
 };

@@ -466,6 +466,28 @@ bool CheckInputAction(InputAction action) {
 
 		break;
 	}
+
+	case InputAction::TriggerLock: {
+		//キーボード
+		if (!isConnectGamePad) {
+
+			if (keys[DIK_SPACE] && !preKeys[DIK_SPACE]) {
+				return true;
+			} else {
+				return false;
+			}
+		}
+		//ゲームパッド
+		else {
+			if (Novice::IsTriggerButton(0, kGamePadAButton)) {
+				return true;
+			} else {
+				return false;
+			}
+		}
+
+		break;
+	}
 	}
 
 	return false;
