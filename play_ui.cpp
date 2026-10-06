@@ -110,6 +110,14 @@ static void UpdateBossHpGauge(void) {
 static void DrawBossHpGauge(void) {
 	DrawTextureUI(bossHpGaugeFrame.texture, bossHpGaugeFrame.pos, bossHpGaugeFrame.size);
 	DrawGaugeAsUI(bossHpGaugeMeter.texture, bossHpGaugeFrame.pos, bossHpGaugeFrame.size, bossHpGaugeMeter.gaugeRate);
+
+#ifdef _DEBUG
+
+	DrawTextureUI(lifeIcon.texture, GetBossHpGaugeEndPos(), lifeIcon.size);
+
+#endif // _DEBUG
+
+
 }
 
 #pragma endregion
@@ -130,3 +138,21 @@ void DrawPlayUI(void) {
 	DrawEnergyGauge();
 	DrawBossHpGauge();
 }
+
+#pragma region 関数: 外部参照関係
+
+Vector2 GetEnergyGaugeEndPos(void) {
+	float posX = energyGaugeFrame.pos.x - energyGaugeFrame.size.x / 2 + energyGaugeFrame.size.x * energyGaugeMeter.gaugeRate;
+	float posY = energyGaugeFrame.pos.y - energyGaugeFrame.size.y / 2;
+
+	return { posX, posY };
+}
+
+Vector2 GetBossHpGaugeEndPos(void) {
+	float posX = bossHpGaugeFrame.pos.x - bossHpGaugeFrame.size.x / 2 + bossHpGaugeFrame.size.x * bossHpGaugeMeter.gaugeRate;
+	float posY = bossHpGaugeFrame.pos.y - bossHpGaugeFrame.size.y / 2;
+
+	return { posX, posY };
+}
+
+#pragma endregion
