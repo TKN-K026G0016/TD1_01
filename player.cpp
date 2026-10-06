@@ -25,8 +25,14 @@ struct Player {
 	bool isAlive = true;
 	//当たり判定の大きさ
 	float hitRadius = 10.0f;
-	int hp = 200;
-	int hpMax = 200;
+	int hp = 5;
+	int hpMax = 5;
+
+	//<無敵関係>
+	//無敵フラグ
+	bool isInvincible = false;
+	//無敵の持続時間
+	Timer invincibleTimer = { 100, 0 };
 
 
 	//<移動関係>
@@ -73,6 +79,11 @@ struct Player {
 	Texture texture = {};
 };
 Player player;
+
+//<無敵時の点滅関係>
+//点滅のスパン
+static bool isInvisible = false;
+static Timer invisibleTimer = { 5, 0 };
 
 #pragma endregion
 
@@ -364,6 +375,45 @@ static void ConsumptionEnergy(void) {
 
 #pragma region 関数: その他
 
+/// <summary>
+/// 無敵時の処理
+/// </summary>
+/// <param name=""></param>
+static void UpdateInvinciblePlayer(void) {
+	if(!player.isInvincible) return;
+		
+#pragma region 点滅処理
+
+	invisibleTimer.count++;
+	if (invisibleTimer.count >= invisibleTimer.time) {
+		invisibleTimer.count = 0;
+		if (!isInvisible) {
+			isInvisible = true;
+		}
+		else {
+			isInvisible = false;
+		}
+	}
+
+#pragma endregion
+
+	//制限時間のカウント処理
+	player.invincibleTimer.count++;
+	if (player.invincibleTimer.count >= player.invincibleTimer.time) {
+		player.invincibleTimer.count = 0;
+
+		//無敵フラグを折る
+		player.isInvincible = false;
+		
+		//透明処理をリセット
+		isInvisible = false;
+		invisibleTimer.count = 0;
+	}
+}
+
+/// <summary>
+/// 死亡判定の処理
+/// </summary>
 static void DeadPlayer(void) {
 	if (player.hp <= 0) {
 		player.hp = 0;
@@ -409,13 +459,14 @@ void UpdatePlayer(void) {
 	LevelUp();
 	ConsumptionEnergy();
 
+	UpdateInvinciblePlayer();
 	DeadPlayer();
 
 	ReplenishmentEnergy();
 }
 
 void DrawPlayer(void) {
-	if (!player.isAlive) return;
+	if (!player.isAlive || isInvisible) return;
 
 	DrawTextureRotateObj(player.texture, player.pos, player.size, player.rotateTheta);
 
@@ -437,7 +488,7 @@ float GetPlayerHitRadius(void) {
 	return player.hitRadius;
 }
 
-int GetPlayerRemainLife(void) {
+int GetPlayerHp(void) {
 	return player.hp;
 }
 
@@ -469,7 +520,16 @@ PlayerLaserLevel GetPlayerNowLaserLevel(void) {
 }
 
 void PlayerDamage(void) {
+	if (!player.isAlive || player.isInvincible) return;
+	
+	//体力減らす
 	player.hp--;
+
+	if (player.hp > 0) {
+		//無敵開始
+		player.isInvincible = true;
+
+	}
 }
 
 #pragma endregion

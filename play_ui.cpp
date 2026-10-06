@@ -65,7 +65,7 @@ static void InitLifeIcon(void) {
 }
 
 static void DrawLifeIcon(void) {
-	int remainLife = GetPlayerRemainLife();
+	int remainLife = GetPlayerHp();
 
 	for (int i = 0; i < remainLife; i++) {
 		Vector2 posS = { lifeIcon.startPos.x  + (lifeIcon.size.x + lifeIcon.intervalX) * i, lifeIcon.startPos.y };
@@ -113,7 +113,7 @@ static void DrawBossHpGauge(void) {
 
 #ifdef _DEBUG
 
-	DrawTextureUI(lifeIcon.texture, GetBossHpGaugeEndPos(), lifeIcon.size);
+	//DrawTextureUI(lifeIcon.texture, GetEnergyGaugeEndPos(), lifeIcon.size);
 
 #endif // _DEBUG
 

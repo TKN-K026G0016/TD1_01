@@ -28,7 +28,7 @@ float GetPlayerHitRadius(void);
 /// playerの体力取得
 /// </summary>
 /// <returns>player.remainLife</returns>
-int GetPlayerRemainLife(void);
+int GetPlayerHp(void);
 
 /// <summary>
 /// playerの生存フラグ取得
