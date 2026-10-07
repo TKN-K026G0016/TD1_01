@@ -46,7 +46,7 @@ BossBom bossBom[6]{};
 struct StatesTimer {
 	Timer normal = { 300,0 };
 	Timer attack1 = { 120,0 };
-	Timer attack2 = { 180,0 };
+	Timer attack2 = { 360,0 };
 };
 StatesTimer statesTimer;
 

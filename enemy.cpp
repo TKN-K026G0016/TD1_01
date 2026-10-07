@@ -21,7 +21,7 @@ constexpr int kEnemy2Limit = 10;
 static Enemy2 enemy2[kEnemy2Limit];
 
 struct Spawner {
-	Timer spawnTimer = { 20, 0 };
+	Timer spawnTimer = { 300, 0 };
 
 	Vector2 spawnPos = {};
 };
