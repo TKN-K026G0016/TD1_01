@@ -176,6 +176,14 @@ void ShootEnemyLaser(Vector2 pos, float moveTheta, float firstDisLength) {;
 	}
 }
 
+EnemyLaser* GetEnemyLaserArray(void) {
+	return enemyLaser;
+}
+
+int GetEnemyLaserLimit(void) {
+	return kEnemyLaserLimit;
+}
+
 /// <summary>
 /// 消滅処理
 /// </summary>

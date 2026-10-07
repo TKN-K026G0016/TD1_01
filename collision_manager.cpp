@@ -15,6 +15,9 @@ static void CheckCollisionLaserVSEnemy(void) {
 	Enemy1* enemy1 = GetEnemy1Array();
 	int enemy1Limit = GetEnemy1Limit();
 
+	Enemy2* enemy2 = GetEnemy2Array();
+	int enemy2Limit = GetEnemy2Limit();
+
 	PlayerLaser* laser = GetPlayerLaserArray();
 	int laserLimit = GetPlayerLaserLimit();
 
@@ -34,6 +37,29 @@ static void CheckCollisionLaserVSEnemy(void) {
 				int pow = GetLaserPow(j);
 
 				enemy1[i].hp -= pow;
+			}
+		}
+	}
+
+
+#pragma endregion
+
+#pragma region VSEnemy2
+	for (int i = 0; i < enemy2Limit; i++) {
+		if (!enemy2[i].isAlive) continue;
+
+		for (int j = 0; j < laserLimit; j++) {
+			if (!laser[j].isShoot) continue;
+
+			if (CheckCollisionOBBvsCircle(enemy2[i].pos, enemy2[i].hitRadius, laser[j].hitBoxVertex)) {
+				//Lv2は敵を貫通
+				if (laser[j].level != LaserLevel::Level2) {
+					BreakLaser(j);
+				}
+
+				int pow = GetLaserPow(j);
+
+				enemy2[i].hp -= pow;
 			}
 		}
 	}
@@ -73,6 +99,36 @@ static void CheckCollisionPlayerVSEnemyBullet(void) {
 	}
 }
 
+/// <summary>
+/// PlayerとenemyBulletの判定
+/// </summary>
+static void CheckCollisionPlayerVSEnemyLaser(void) {
+	if (!GetPlayerIsAlive()) return;
+	Vector2 playerPos = GetPlayerPos();
+	float playerHitRadius = GetPlayerHitRadius();
+	float playerDodgeCloseRadius = GetPlayerDodgeCloseRadius();
+
+	EnemyLaser* eLaser = GetEnemyLaserArray();
+	int eLaserLimit = GetEnemyLaserLimit();
+
+	for (int i = 0; i < eLaserLimit; i++) {
+		if (!eLaser[i].isShoot) continue;
+
+		//ギリ避け判定
+		if (GetDodgeCloseSwitch()) {
+			if (CheckCollisionOBBvsCircle(playerPos, playerDodgeCloseRadius, eLaser[i].hitBoxVertex)) {
+				TriggerDodgeClose(eLaser[i].pos);
+			}
+		}
+
+		//被弾判定
+		if (CheckCollisionOBBvsCircle(playerPos, playerHitRadius, eLaser[i].hitBoxVertex)) {
+			PlayerDamage();
+		}
+
+	}
+}
+
 
 /// <summary>
 /// PlayerLaserとBossEnemyの判定
@@ -102,4 +158,5 @@ void UpdateCollision() {
 	CheckCollisionLaserVSEnemy();
 	CheckCollisionPlayerVSEnemyBullet();
 	CheckCollisionLaserVSBossEnemy();
+	CheckCollisionPlayerVSEnemyLaser();
 }

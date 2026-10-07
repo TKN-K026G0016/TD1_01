@@ -60,4 +60,8 @@ int GetEnemyBulletLimit(void);
 
 void ShootEnemyLaser(Vector2 pos, float moveTheta, float firstDisLength);
 
+EnemyLaser* GetEnemyLaserArray(void);
+
+int GetEnemyLaserLimit(void);
+
 void BreakEnemyLaser(int index);

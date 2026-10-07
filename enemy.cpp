@@ -235,4 +235,12 @@ int GetEnemy1Limit(void) {
 	return kEnemy1Limit;
 }
 
+Enemy2* GetEnemy2Array(void) {
+	return enemy2;
+}
+
+int GetEnemy2Limit(void) {
+	return kEnemy2Limit;
+}
+
 #pragma endregion

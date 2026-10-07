@@ -63,3 +63,7 @@ void SpawnEnemy(Vector2 pos, EnemyType type);
 Enemy1* GetEnemy1Array(void);
 
 int GetEnemy1Limit(void);
+
+Enemy2* GetEnemy2Array(void);
+
+int GetEnemy2Limit(void);
