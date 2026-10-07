@@ -23,10 +23,10 @@ struct BossBom {
 
 	//<爆発関係>
 	//爆発までの時間
-	Timer barst = { 0,0 };
+	Timer burst = { 0,0 };
 	//爆発範囲
-	float barstRadius = 128.0f;
-
+	float burstRadius = 128.0f;
+	Vector2 bustSize = { 256,256 };
 	//<移動関係>
 	//速度
 	Vector2 velocity = { 0.0f, 0.0f };
@@ -35,10 +35,11 @@ struct BossBom {
 	//加速度
 	float accleretionSpeed = 0.05f;
 	//スピード上限
-	float moveSpeedLimit = 2.0f;
+	float moveSpeedLimit = 6.0f;
 	//減速度
-	float decelerationSpeed = 0.12f;
+	float decelerationSpeed = 0.05f;
 	Texture texture = {};
+	Texture burstTexture = {};
 };
 BossBom bossBom[6]{};
 
@@ -67,7 +68,7 @@ void StatesCount(void) {
 		stateTimer.nomal.count++;
 		if (stateTimer.nomal.count == stateTimer.nomal.time) {
 			stateTimer.nomal.count = 0;
-			bossEnemy.nowsSates = ToInt(GetRand(1,2));
+			bossEnemy.nowsSates = ToInt(GetRand(1, 2));
 		}
 	}
 	else if (bossEnemy.nowsSates == BossStates::Attack1) {
@@ -96,10 +97,10 @@ void MoveNomal(void) {
 		bossEnemy.rotateTheta = atan2f(DiffY, DiffX);
 		if (distance < bossEnemy.viewRange) {
 			if (DiffX != 0) {
-				bossEnemy.velocity.x = -1*(DiffX / distance);
+				bossEnemy.velocity.x = -1 * (DiffX / distance);
 			}
 			if (DiffY != 0) {
-				bossEnemy.velocity.y = -1*(DiffY / distance);
+				bossEnemy.velocity.y = -1 * (DiffY / distance);
 			}
 			bossEnemy.nowSpeed += bossEnemy.accleretionSpeed;
 			if (bossEnemy.nowSpeed > bossEnemy.moveSpeedLimit) {
@@ -131,7 +132,7 @@ void MoveAttack1(void) {
 				if (bossBom[i].isAlive == false) {
 					bossBom[i].isAlive = true;
 					bossBom[i].pos = bossEnemy.pos;
-					bossBom[i].nowSpeed = GetRand(10, 30) / 10;
+					bossBom[i].nowSpeed = ToFloat(GetRand(30, 60)) / 10;
 					bossBom[i].velocity = { ToFloat(GetRand(-10, 10)),ToFloat(GetRand(-10,10)) };
 					if (bossBom[i].velocity.x != 0) {
 						bossBom[i].velocity.x /= 10;
@@ -139,34 +140,32 @@ void MoveAttack1(void) {
 					if (bossBom[i].velocity.y != 0) {
 						bossBom[i].velocity.y /= 10;
 					}
-					bossBom[i].barst.time = GetRand(100, 200);
+					bossBom[i].burst.time = GetRand(100, 200);
 					break;
 				}
 			}
 		}
-		for (int i = 0;i < 6;i++) {
-			if (bossBom[i].isAlive == true) {
-				bossBom[i].nowSpeed -= bossBom[i].decelerationSpeed;
-				if (bossBom[i].nowSpeed <= 0) {
-					bossBom[i].nowSpeed = 0;
-				}
-				bossBom[i].pos.x += bossBom[i].velocity.x * bossBom[i].nowSpeed;
-				bossBom[i].pos.y += bossBom[i].velocity.y * bossBom[i].nowSpeed;
+	}
+	for (int i = 0;i < 6;i++) {
+		if (bossBom[i].isAlive == true) {
+			bossBom[i].nowSpeed -= bossBom[i].decelerationSpeed;
+			if (bossBom[i].nowSpeed <= 0) {
+				bossBom[i].nowSpeed = 0;
 			}
-			bossBom[i].barst.count++;
-			if (bossBom[i].barst.count >= bossBom[i].barst.time - 60) {
-				Novice::DrawEllipse(bossBom[i].pos.x, bossBom[i].pos.y, static_cast<int>(bossBom[i].barstRadius), static_cast<int>(bossBom[i].barstRadius), 0.0f, 0x88FF0000, kFillModeSolid);
-			}
-			if (bossBom[i].barst.count == bossBom[i].barst.time) {
+			bossBom[i].pos.x += bossBom[i].velocity.x * bossBom[i].nowSpeed;
+			bossBom[i].pos.y += bossBom[i].velocity.y * bossBom[i].nowSpeed;
+
+			bossBom[i].burst.count++;
+			if (bossBom[i].burst.count == bossBom[i].burst.time) {
 				float DiffX = bossBom[i].pos.x - playerPos.x;
 				float DiffY = bossBom[i].pos.y - playerPos.y;
 				float distance = sqrtf(DiffX * DiffX + DiffY * DiffY);
-				if (distance <= bossBom[i].barstRadius) {
+				if (distance <= bossBom[i].burstRadius) {
 					PlayerDamage();
 				}
+				bossBom[i].isAlive = false;
 			}
 		}
-
 	}
 }
 
@@ -187,6 +186,12 @@ void DeathBossEnemy(void) {
 void InitBossEnemy(void) {
 	bossEnemy = {};
 	bossEnemy.texture = GetTexture(TextureType::BossEnemy);
+	for (int i = 0;i < 6;i++) {
+		bossBom[i] = {};
+		bossBom[i].texture = GetTexture(TextureType::BossBom);
+		bossBom[i].burstTexture = GetTexture(TextureType::BossBomBurstRange);
+	}
+
 }
 
 void UpdateBossEnemy(void) {
@@ -195,12 +200,20 @@ void UpdateBossEnemy(void) {
 	MoveNomal();
 	MoveAttack1();
 	MoveAttack2();
-	
+
 	DeathBossEnemy();
 };
 void DrawBossEnemy(void) {
 	if (bossEnemy.isAlive == true) {
-		DrawTextureRotateObj(bossEnemy.texture, bossEnemy.pos, bossEnemy.size,bossEnemy.rotateTheta);
+		DrawTextureRotateObj(bossEnemy.texture, bossEnemy.pos, bossEnemy.size, bossEnemy.rotateTheta);
+	}
+	for (int i = 0;i < 6;i++) {
+		if (bossBom[i].isAlive == true) {
+			DrawTextureObj(bossBom[i].texture, bossBom[i].pos, bossBom[i].size);
+			if (bossBom[i].burst.count >= bossBom[i].burst.time - 60) {
+				DrawTextureObj(bossBom[i].burstTexture, bossBom[i].pos, bossBom[i].bustSize);
+			}
+		}
 	}
 }
 

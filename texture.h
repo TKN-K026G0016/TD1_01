@@ -63,6 +63,9 @@ enum class TextureType {
 	//BossEnemy
 	BossEnemy,
 
+	BossBom,
+	BossBomBurstRange,
+
 	//MapChip
 
 	//background
