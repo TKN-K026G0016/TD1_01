@@ -63,12 +63,12 @@ void DrawPlay(void) {
 	DrawPlayerLaser();
 	DrawGem();
 
-	DrawPlayer();
-
 	DrawEnemy();
 	DrawEnemyBullet();
 
 	DrawBossEnemy();
+
+	DrawPlayer();
 
 
 	DrawPlayUI();
