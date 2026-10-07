@@ -60,15 +60,16 @@ void StatesCount(void) {
 void MoveNomal(void) {
 	if (bossEnemy.nowsSates == BossStates::Nomal) {
 		playerPos = GetPlayerPos();
-		float DiffX = bossEnemy.pos.x - playerPos.x;
-		float DiffY = bossEnemy.pos.y - playerPos.y;
+		float DiffX = playerPos.x - bossEnemy.pos.x;
+		float DiffY = playerPos.y - bossEnemy.pos.y;
 		float distance = sqrtf(DiffX * DiffX + DiffY * DiffY);
+		bossEnemy.rotateTheta = atan2f(DiffY, DiffX);
 		if (distance < bossEnemy.viewRange) {
 			if (DiffX != 0) {
-				bossEnemy.velocity.x = (DiffX / distance);
+				bossEnemy.velocity.x = -1*(DiffX / distance);
 			}
 			if (DiffY != 0) {
-				bossEnemy.velocity.y = (DiffY / distance);
+				bossEnemy.velocity.y = -1*(DiffY / distance);
 			}
 			bossEnemy.nowSpeed += bossEnemy.accleretionSpeed;
 			if (bossEnemy.nowSpeed > bossEnemy.moveSpeedLimit) {
@@ -77,10 +78,10 @@ void MoveNomal(void) {
 		}
 		else {
 			if (DiffX != 0) {
-				bossEnemy.velocity.x = -1 * (DiffX / distance);
+				bossEnemy.velocity.x = (DiffX / distance);
 			}
 			if (DiffY != 0) {
-				bossEnemy.velocity.y = -1 * (DiffY / distance);
+				bossEnemy.velocity.y = (DiffY / distance);
 			}
 			bossEnemy.nowSpeed += bossEnemy.accleretionSpeed;
 			if (bossEnemy.nowSpeed > bossEnemy.moveSpeedLimit) {
@@ -132,7 +133,7 @@ void UpdateBossEnemy(void) {
 };
 void DrawBossEnemy(void) {
 	if (bossEnemy.isAlive == true) {
-		DrawTextureObj(bossEnemy.texture, bossEnemy.pos, bossEnemy.size);
+		DrawTextureRotateObj(bossEnemy.texture, bossEnemy.pos, bossEnemy.size,bossEnemy.rotateTheta);
 	}
 }
 
