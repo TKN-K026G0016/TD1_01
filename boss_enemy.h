@@ -43,6 +43,17 @@ struct BossEnemy {
 	int nowsSates=BossStates::Attack1;
 };
 
+struct Attack2Pos {
+	Vector2 enemy2[6] = {
+		{150, -50},
+		{150, 0},
+		{150, 50},
+		{200, -25},
+		{200, 25},
+		{250, 0},
+	};
+};
+
 
 bool GetBossEnemyIsAlive(void);
 Vector2 GetBossEnemyPos(void);

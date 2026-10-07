@@ -149,11 +149,24 @@ static void DrawEnemy2(void) {
 }
 
 static void SpawnEnemy2(void) {
+	Attack2Pos attack2Pos;
 	int bossEnemyNouStates = GetBossEnemyNowStates();
+	Vector2 bossEnemyPos = GetBossEnemyPos();
+	float bossEnemyRotateTheta = GetBossEnemyRotateTheta();
+	int enemyCount = 0;
 	if (bossEnemyNouStates == Attack2) {
 		for (int i = 0;i < kEnemy2Limit;i++) {
 			if (enemy2[i].isAlive)continue;
-
+			enemy2[i].isAlive = true;
+			enemyCount++;
+			if (enemyCount == 6)break;
+		}
+		for (int i = 0;i < kEnemy2Limit;i++) {
+			if (!enemy2[i].isAlive)continue;
+			enemy2[i].pos.x = sinf(bossEnemyRotateTheta) * attack2Pos.enemy2[enemyCount].x + bossEnemyPos.x;
+			enemy2[i].pos.y = cosf(bossEnemyRotateTheta) * attack2Pos.enemy2[enemyCount].y + bossEnemyPos.y;
+			enemyCount++;
+			if (enemyCount == 6)break;
 		}
 	}
 }
@@ -178,6 +191,7 @@ void UpdateEnemy(void) {
 	ShootEnemyBullet1();
 	ShootEnemyBullet2();
 	ReSpawnEnemy();
+	SpawnEnemy2();
 }
 
 void DrawEnemy(void) {
