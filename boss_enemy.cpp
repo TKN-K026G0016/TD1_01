@@ -84,21 +84,21 @@ void StatesCount(void) {
 		stateTimer.attack1.count++;
 		if (stateTimer.attack1.count == stateTimer.attack1.time) {
 			stateTimer.attack1.count = 0;
-			bossEnemy.nowsSates = BossStates::Normal;
+			bossEnemy.nowsSates = BossStates::Nomal;
 		}
 	}
 	else if (bossEnemy.nowsSates == BossStates::Attack2) {
 		stateTimer.attack2.count++;
 		if (stateTimer.attack2.count == stateTimer.attack2.time) {
 			stateTimer.attack2.count = 0;
-			bossEnemy.nowsSates = BossStates::Normal;
+			bossEnemy.nowsSates = BossStates::Nomal;
 		}
 	}
 }
 
 
 void MoveNomal(void) {
-	if (bossEnemy.nowsSates == BossStates::Normal) {
+	if (bossEnemy.nowsSates == BossStates::Nomal) {
 		playerPos = GetPlayerPos();
 		float DiffX = playerPos.x - bossEnemy.pos.x;
 		float DiffY = playerPos.y - bossEnemy.pos.y;
