@@ -3,7 +3,9 @@
 #include "matrix.h"
 
 //頂点の数
-const int kVertexNum = 4;
+constexpr int kVertexNum = 4;
+//当たり判定の透明度
+constexpr unsigned int kDebugHitColor = 0xAA;
 
 template <typename T>
 //static_cast<int>()の代わり
