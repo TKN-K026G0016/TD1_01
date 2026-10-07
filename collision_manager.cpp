@@ -145,7 +145,7 @@ void CheckCollisionLaserVSBossEnemy(void) {
 
 			int pow = GetLaserPow(i);
 
-			boss->remainLife -= pow;
+			boss->remainLife -= pow-1;
 		}
 	}
 }

@@ -16,12 +16,15 @@ constexpr int kEnemy1Limit = 10;
 
 static Enemy1 enemy1[kEnemy1Limit];
 
+int nowEnemy1IsAliveCount = 0;
+
+
 constexpr int kEnemy2Limit = 10;
 
 static Enemy2 enemy2[kEnemy2Limit];
 
 struct Spawner {
-	Timer spawnTimer = { 300, 0 };
+	Timer spawnTimer = { 0, 0 };
 
 	Vector2 spawnPos = {};
 };
@@ -60,6 +63,8 @@ static void ShootEnemyBullet1(void) {
 static void DeadEnemy1(int index) {
 	enemy1[index].isAlive = false;
 	enemy1[index].hp = enemy1[index].hpMax;
+	nowEnemy1IsAliveCount--;
+	spawner.spawnTimer.time = 60 * nowEnemy1IsAliveCount;
 }
 
 static void CheckDeadEnemy1(void) {
@@ -85,7 +90,7 @@ static void DrawEnemy1(void) {
 
 void ReSpawnEnemy(void) {
 	spawner.spawnTimer.count++;
-	if (spawner.spawnTimer.count == spawner.spawnTimer.time) {
+	if (spawner.spawnTimer.count >= spawner.spawnTimer.time) {
 		spawner.spawnTimer.count = 0;
 		spawner.spawnPos = { ToFloat(GetRand(0, 2000)), ToFloat(GetRand(0, 1300)) };
 		SpawnEnemy(spawner.spawnPos, EnemyType::Enemy1);
@@ -218,7 +223,8 @@ void SpawnEnemy(Vector2 pos, EnemyType type) {
 			if (enemy1[i].isAlive) continue;
 			enemy1[i].isAlive = true;
 			enemy1[i].pos = pos;
-
+			nowEnemy1IsAliveCount++;
+			spawner.spawnTimer.time = 60 * nowEnemy1IsAliveCount;
 			break;
 		}
 
