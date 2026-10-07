@@ -80,6 +80,9 @@
     <Filter Include="boss_enemy">
       <UniqueIdentifier>{42cd5ca2-53de-4c8a-b2f3-9965af696d4e}</UniqueIdentifier>
     </Filter>
+    <Filter Include="effect">
+      <UniqueIdentifier>{d44ed254-1db2-459c-945f-a25e6cd08a72}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp" />
@@ -145,6 +148,9 @@
     </ClCompile>
     <ClCompile Include="boss_enemy.cpp">
       <Filter>boss_enemy</Filter>
+    </ClCompile>
+    <ClCompile Include="effect.cpp">
+      <Filter>effect</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -292,6 +298,9 @@
     </ClInclude>
     <ClInclude Include="boss_enemy.h">
       <Filter>boss_enemy</Filter>
+    </ClInclude>
+    <ClInclude Include="effect.h">
+      <Filter>effect</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
