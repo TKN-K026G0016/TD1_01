@@ -203,10 +203,10 @@ void DrawStage(void) {
 	DrawBackGround();
 
 #ifdef _DEBUG
-	Vector2 playerPos = GetPlayerPos();
-	Novice::ScreenPrintf(1000, 20, "PlayerPos:(%.2f, %.2f)", playerPos.x, playerPos.y);
+	//Vector2 playerPos = GetPlayerPos();
+	//Novice::ScreenPrintf(1000, 20, "PlayerPos:(%.2f, %.2f)", playerPos.x, playerPos.y);
 
-	Novice::ScreenPrintf(1000, 40, "CameraPos:(%.2f, %.2f)", camera.pos.x, camera.pos.y);
+	//Novice::ScreenPrintf(1000, 40, "CameraPos:(%.2f, %.2f)", camera.pos.x, camera.pos.y);
 
 #endif // _DEBUG
 
