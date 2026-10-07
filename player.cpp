@@ -61,8 +61,7 @@ struct Player {
 	//<ロックオン関係>
 	//ロック状態フラグ
 	bool isLock = false;
-	//ターゲットの番号
-	int targetIndex = -1;
+
 	//回転速度
 	float lockOnRotateSpeed = 0.1f;
 
@@ -106,7 +105,11 @@ enum class LockTargetType {
 	None = -1,
 	Boss = -2,
 	Enemy1 = 0,
+	Enemy2 = 1,
 };
+LockTargetType nowTargetType = LockTargetType::None;
+//ターゲットの番号
+int targetIndex = -1;
 
 struct LockOnSign {
 	Vector2 pos = {};
@@ -327,25 +330,35 @@ static void RotatePlayerByLockOn(void) {
 	if (!player.isLock) return;
 
 	Enemy1* enemy1 = GetEnemy1Array();
+	Enemy2* enemy2 = GetEnemy2Array();
 	BossEnemy* boss = GetBossEnemy();
 
 	// ターゲットが死んだらロック解除
-	if (player.targetIndex == ToInt(LockTargetType::None)) return;
+	if (nowTargetType == LockTargetType::None) return;
 
-	Vector2 targetPos;
+	Vector2 targetPos = {};
 
-	if (player.targetIndex == ToInt(LockTargetType::Boss)) {
+	//ボス
+	if (nowTargetType == LockTargetType::Boss) {
 		if (!boss->isAlive) {
-			player.targetIndex = ToInt(LockTargetType::None);
+			nowTargetType = LockTargetType::None;
 			return;
 		}
 		targetPos = boss->pos;
-	} else {
-		if (!enemy1[player.targetIndex].isAlive) {
-			player.targetIndex = ToInt(LockTargetType::None);
+	} 
+	else if (nowTargetType == LockTargetType::Enemy1) {
+		if (!enemy1[targetIndex].isAlive) {
+			nowTargetType = LockTargetType::None;
 			return;
 		}
-		targetPos = enemy1[player.targetIndex].pos;
+		targetPos = enemy1[targetIndex].pos;
+	}
+	else if (nowTargetType == LockTargetType::Enemy2) {
+		if (!enemy2[targetIndex].isAlive) {
+			nowTargetType = LockTargetType::None;
+			return;
+		}
+		targetPos = enemy2[targetIndex].pos;
 	}
 
 	// 回転処理
@@ -375,7 +388,8 @@ static void LockOn(void) {
 	if (!player.isAlive) return;
 
 	float closestDis = 99999.0f;
-	player.targetIndex = ToInt(LockTargetType::None);
+	nowTargetType = LockTargetType::None;
+	targetIndex = -1;
 
 	Enemy1* enemy1 = GetEnemy1Array();
 	int enemy1Limit = GetEnemy1Limit();
@@ -390,7 +404,25 @@ static void LockOn(void) {
 
 		if (dis < closestDis) {
 			closestDis = dis;
-			player.targetIndex = i;
+			targetIndex = i;
+			nowTargetType = LockTargetType::Enemy1;
+		}
+	}
+
+	Enemy2* enemy2 = GetEnemy2Array();
+	int enemy2Limit = GetEnemy2Limit();
+
+	for (int i = 0; i < enemy2Limit; i++) {
+		if (!enemy2[i].isAlive) continue;
+
+		float dx = enemy2[i].pos.x - player.pos.x;
+		float dy = enemy2[i].pos.y - player.pos.y;
+		float dis = sqrtf(dx * dx + dy * dy);
+
+		if (dis < closestDis) {
+			closestDis = dis;
+			targetIndex = i;
+			nowTargetType = LockTargetType::Enemy2;
 		}
 	}
 
@@ -403,7 +435,8 @@ static void LockOn(void) {
 
 		if (dis < closestDis) {
 			closestDis = dis;
-			player.targetIndex = ToInt(LockTargetType::Boss);
+			targetIndex = 0;
+			nowTargetType = LockTargetType::Boss;
 		}
 	}
 
@@ -420,24 +453,29 @@ static void InitLockSign(void) {
 }
 
 static void UpdateLockOnSign(void) {
-	if (!player.isLock || player.targetIndex == ToInt(LockTargetType::None)) return;
+	if (!player.isLock || nowTargetType == LockTargetType::None) return;
 
 	//ボスの場合、
-	if (player.targetIndex == ToInt(LockTargetType::Boss)) {
+	if (nowTargetType == LockTargetType::Boss) {
 		BossEnemy* boss = GetBossEnemy();
 
 		lockOnSign.pos = boss->pos;
 	}
-	//ザコの場合
-	else {
+	//enemy1
+	else if (nowTargetType == LockTargetType::Enemy1) {
 		Enemy1* enemy1 = GetEnemy1Array();
-		lockOnSign.pos = enemy1[player.targetIndex].pos;
+		lockOnSign.pos = enemy1[targetIndex].pos;
+	}
+	//enemy2
+	else if (nowTargetType == LockTargetType::Enemy2){
+		Enemy2* enemy2 = GetEnemy2Array();
+		lockOnSign.pos = enemy2[targetIndex].pos;
 	}
 
 }
 
 static void DrawLockOnSign(void) {
-	if (!player.isLock || player.targetIndex == ToInt(LockTargetType::None)) return;
+	if (!player.isLock || nowTargetType == LockTargetType::None) return;
 
 	DrawTextureObj(lockOnSign.texture, lockOnSign.pos, lockOnSign.size);
 }
