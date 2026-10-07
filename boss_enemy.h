@@ -43,7 +43,7 @@ struct BossEnemy {
 	float rotateSpeed = 0.05f;
 
 	//状態
-	int nowsSates=BossStates::Attack1;
+	int nowsSates=BossStates::Attack2;
 
 	Texture texture = {};
 };
@@ -58,3 +58,5 @@ void UpdateBossEnemy(void);
 void DrawBossEnemy(void);
 
 BossEnemy* GetBossEnemy(void);
+Vector2 GetBossEnemyPos(void);
+float GetBossEnemyRotateTheta(void);

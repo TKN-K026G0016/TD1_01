@@ -2,6 +2,7 @@
 #include "vector2.h"
 #include "timer.h"
 #include "texture.h"
+#include "tool.h"
 
 struct EnemyBullet {
 	Vector2 pos = {};
@@ -15,6 +16,27 @@ struct EnemyBullet {
 
 	bool isShoot = false;
 	Timer breakTimer = { 200, 0 };
+
+	Texture texture = {};
+};
+
+struct EnemyLaser {
+	Vector2 pos = { 0, 0 };
+	Vector2 size = { 30, 15 };
+
+	//<移動関係>
+	float moveSpeed = 20.0f;
+	float rotateTheta = 0.0f;
+	//playerとの距離
+	float disToBoss = 0.0f;
+
+	//射撃フラグ
+	bool isShoot = false;
+	//自壊タイマー
+	Timer breakTimer = { 120, 0 };
+
+	//当たり判定の頂点座標
+	Vector2 hitBoxVertex[kVertexNum] = {};
 
 	Texture texture = {};
 };
@@ -35,3 +57,7 @@ void BreakEnemyBullet(int index);
 EnemyBullet* GetEnemyBulletArray(void);
 
 int GetEnemyBulletLimit(void);
+
+void ShootEnemyLaser(Vector2 pos, float moveTheta, float firstDisLength);
+
+void BreakEnemyLaser(int index);

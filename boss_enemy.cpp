@@ -2,6 +2,7 @@
 #include "player.h"
 #include "player_laser.h"
 #include "stage.h"
+#include "enemy_bullet.h"
 
 #include "vector2.h"
 #include "tool.h"
@@ -80,13 +81,18 @@ struct DataShootLaser {
 
 	//テレポート終了から射撃開始までの時間
 	Timer readyShootTimer = { 100, 0 };
+	//射撃準備中の回転速度
+	float rotatateSpeedReadyShoot = 0.05f;
+	//射撃準備中の狙いのずれ
+	float targetThetaOffset = ToFloat(M_PI) / 10.0f;
 
 	//射撃時間
 	Timer shootTimer = { 300, 0 };
 	//回転が始まるまでの時間
 	int startRotateTime = 60;
 	//レーザーの射撃スパン
-	Timer shootLaserTimer = { 3, 0 };
+	Timer shootLaserTimer = { 2, 0 };
+
 
 	//現在の回転速度
 	float nowRotateSpeed = 0.0f;
@@ -109,20 +115,18 @@ void StatesCount(void) {
 			stateTimer.nomal.count = 0;
 			bossEnemy.nowsSates = ToInt(GetRand(1, 2));
 		}
-	}
-	else if (bossEnemy.nowsSates == BossStates::Attack1) {
+	} else if (bossEnemy.nowsSates == BossStates::Attack1) {
 		stateTimer.attack1.count++;
 		if (stateTimer.attack1.count == stateTimer.attack1.time) {
 			stateTimer.attack1.count = 0;
 			bossEnemy.nowsSates = BossStates::Normal;
 		}
-	}
-	else if (bossEnemy.nowsSates == BossStates::Attack2) {
-		stateTimer.attack2.count++;
-		if (stateTimer.attack2.count == stateTimer.attack2.time) {
-			stateTimer.attack2.count = 0;
-			bossEnemy.nowsSates = BossStates::Normal;
-		}
+	} else if (bossEnemy.nowsSates == BossStates::Attack2) {
+		//stateTimer.attack2.count++;
+		//if (stateTimer.attack2.count == stateTimer.attack2.time) {
+		//	stateTimer.attack2.count = 0;
+		//	bossEnemy.nowsSates = BossStates::Normal;
+		//}
 	}
 }
 
@@ -144,8 +148,7 @@ void MoveNormal(void) {
 			if (bossEnemy.nowSpeed > bossEnemy.moveSpeedLimit) {
 				bossEnemy.nowSpeed = bossEnemy.moveSpeedLimit;
 			}
-		}
-		else {
+		} else {
 			if (DiffX != 0) {
 				bossEnemy.velocity.x = (DiffX / distance);
 			}
@@ -228,11 +231,36 @@ void MoveAttack2(void) {
 		}
 		case ModeShootLaser::ReadyShoot: {
 			data.readyShootTimer.count++;
+
 			if (data.readyShootTimer.count >= data.readyShootTimer.time) {
 				data.readyShootTimer.count = 0;
 
 				data.nowMode = ModeShootLaser::Shoot;
 			}
+
+#pragma region 回転処理
+			//少しplayerからズレた場所を向く
+			playerPos = GetPlayerPos();
+
+			//プレイヤーを追跡するように回転
+			float disX = playerPos.x - bossEnemy.pos.x;
+			float disY = playerPos.y - bossEnemy.pos.y;
+			float targetTheta = atan2f(disY, disX);
+
+			//現在の方向との差を求める
+			float diff = targetTheta + data.targetThetaOffset  - bossEnemy.rotateTheta;
+
+			//差を-π~πに正規化
+			while (diff > ToFloat(M_PI)) {
+				diff -= ToFloat(M_PI) * 2;
+			}
+			while (diff < -ToFloat(M_PI)) {
+				diff += ToFloat(M_PI) * 2;
+			}
+
+			bossEnemy.rotateTheta += diff * data.rotatateSpeedReadyShoot;
+
+#pragma endregion
 
 			break;
 		}
@@ -240,10 +268,43 @@ void MoveAttack2(void) {
 		case ModeShootLaser::ShootAndRotate: {
 
 			//射撃処理
-
+			data.shootLaserTimer.count++;
+			if (data.shootLaserTimer.count >= data.shootLaserTimer.time) {
+				data.shootLaserTimer.count = 0;
+				ShootEnemyLaser(bossEnemy.pos, bossEnemy.rotateTheta, 0.0f);
+			}
 
 
 			//回転処理
+			if (data.nowMode == ModeShootLaser::ShootAndRotate) {
+				playerPos = GetPlayerPos();
+
+				//プレイヤーを追跡するように回転
+				float disX = playerPos.x - bossEnemy.pos.x;
+				float disY = playerPos.y - bossEnemy.pos.y;
+				float targetTheta = atan2f(disY, disX);
+
+				//現在の方向との差を求める
+				float diff = targetTheta - bossEnemy.rotateTheta;
+
+				//差を-π~πに正規化
+				while (diff > ToFloat(M_PI)) {
+					diff -= ToFloat(M_PI) * 2;
+				}
+				while (diff < -ToFloat(M_PI)) {
+					diff += ToFloat(M_PI) * 2;
+				}
+
+				bossEnemy.rotateTheta += diff * data.nowRotateSpeed;
+
+				//回転の加速処理
+				data.nowRotateSpeed += data.rotateAccelerationSpeed;
+				if (data.nowRotateSpeed > data.rotateSpeedMax) {
+					data.nowRotateSpeed = data.rotateSpeedMax;
+				}
+
+			}
+
 
 			//射撃時間
 			data.shootTimer.count++;
@@ -318,6 +379,14 @@ void DrawBossEnemy(void) {
 
 BossEnemy* GetBossEnemy(void) {
 	return &bossEnemy;
+}
+
+Vector2 GetBossEnemyPos(void) {
+	return bossEnemy.pos;
+}
+
+float GetBossEnemyRotateTheta(void) {
+	return bossEnemy.rotateTheta;
 }
 
 bool GetBossEnemyIsAlive(void) {

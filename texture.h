@@ -59,6 +59,7 @@ enum class TextureType {
 	Enemy1,
 
 	EnemyBullet,
+	EnemyLaser,
 
 	//BossEnemy
 	BossEnemy,
