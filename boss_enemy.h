@@ -51,7 +51,7 @@ struct BossEnemy {
 	float rotateSpeed = 0.05f;
 
 	//状態
-	int nowsSates=BossStates::Attack2;
+	int nowsSates=BossStates::Attack3;
 
 	Texture texture = {};
 };

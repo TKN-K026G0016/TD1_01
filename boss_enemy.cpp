@@ -247,6 +247,12 @@ void MoveAttack2(void) {
 		bossEnemy.pos.x += bossEnemy.velocity.x * bossEnemy.nowSpeed;
 		bossEnemy.pos.y += bossEnemy.velocity.y * bossEnemy.nowSpeed;
 
+	}
+}
+
+void MoveAttack3(void) {
+	if (bossEnemy.nowsSates == BossStates::Attack3) {
+
 		DataShootLaser& data = dataShootLaser;
 
 		switch (data.nowMode) {
@@ -281,7 +287,7 @@ void MoveAttack2(void) {
 			float targetTheta = atan2f(disY, disX);
 
 			//現在の方向との差を求める
-			float diff = targetTheta + data.targetThetaOffset  - bossEnemy.rotateTheta;
+			float diff = targetTheta + data.targetThetaOffset - bossEnemy.rotateTheta;
 
 			//差を-π~πに正規化
 			while (diff > ToFloat(M_PI)) {
@@ -355,9 +361,6 @@ void MoveAttack2(void) {
 			break;
 		}
 		}
-
-
-
 	}
 }
 
@@ -391,6 +394,7 @@ void UpdateBossEnemy(void) {
 	MoveNormal();
 	MoveAttack1();
 	MoveAttack2();
+	MoveAttack3();
 
 	DeathBossEnemy();
 };
