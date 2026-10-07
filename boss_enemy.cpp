@@ -77,9 +77,9 @@ Timer GetAttack2Timer(void) {
 
 void StatesCount(void) {
 	if (bossEnemy.nowsSates == BossStates::Normal) {
-		stateTimer.normal.count++;
-		if (stateTimer.normal.count == stateTimer.normal.time) {
-			stateTimer.normal.count = 0;
+		statesTimer.normal.count++;
+		if (statesTimer.normal.count == statesTimer.normal.time) {
+			statesTimer.normal.count = 0;
 			bossEnemy.nowsSates = ToInt(GetRand(1, 2));
 		}
 	}
