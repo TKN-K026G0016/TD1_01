@@ -26,7 +26,7 @@ enum class TextureType {
 	//Common
 	//===============
 	White1x1,
-	
+
 	//===============
 	//Menu
 	//===============
@@ -49,8 +49,11 @@ enum class TextureType {
 	PlayerLaser1,
 	PlayerLaser2,
 
+	LockOnSign,
+
 	//Item
 	Gem,
+	GemSmall,
 
 	//Enemy
 	Enemy1,

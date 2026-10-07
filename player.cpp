@@ -13,6 +13,7 @@
 #define _USE_MATH_DEFINES
 #include <math.h>
 
+
 //ロックオンスイッチ
 bool lockOnSwitch = true;
 
@@ -107,6 +108,15 @@ enum class LockTargetType {
 
 //プレイヤーの中心からの発射位置の距離
 constexpr float kShootDisLength = 15.0f;
+
+//Lv2レーザーの持続時間
+int sustainLv2Count = 0;
+//Lv2レーザーの攻撃力倍率
+float laserPowRate = 1.0f;
+constexpr float kLaserPowRateMin = 1.0f;
+constexpr float kLaserPowRateMax = 6.0f;
+//火力の上昇速度
+constexpr float kLaserPowRateIncreaseSpeed = 0.1f;
 
 #pragma endregion
 
@@ -380,6 +390,9 @@ static void LockOn(void) {
 
 #pragma region 関数: 射撃・エネルギー関係
 
+/// <summary>
+/// レーザーの射撃処理
+/// </summary>
 static void ShootLaser(void) {
 	if (!player.isAlive) return;
 
@@ -396,13 +409,16 @@ static void ShootLaser(void) {
 	}
 }
 
+/// <summary>
+/// レベルアップ処理
+/// </summary>
 static void LevelUp(void) {
 	if (!player.isAlive) return;
 
 	int level = ToInt(player.laserLevel);
 
 	//レベル2以上はレベルアップなし
-	if (level >= 2) return;
+	if (level >= ToInt(PlayerLaserLevel::Level2)) return;
 
 	float levelUpLine = player.levelUpLine[level + 1];
 	if (player.remainEnergy >= levelUpLine) {
@@ -426,6 +442,28 @@ static void ConsumptionEnergy(void) {
 	if (player.remainEnergy <= 0.0f) {
 		player.laserLevel = PlayerLaserLevel::Level0;
 		player.remainEnergy = 0.0f;
+	}
+}
+
+/// <summary>
+/// Lv2継続ボーナス関係の処理
+/// </summary>
+/// <param name=""></param>
+static void UpdateSustainLv2Bonus(void) {
+	if (!player.isAlive) return;
+	//Lv2状態時のみ実行
+	if (player.laserLevel == PlayerLaserLevel::Level2) {
+		sustainLv2Count++;
+
+		//初期値 + (maxまでの数値 * (1.0f - 指数関数(0に近づく)))
+		laserPowRate = kLaserPowRateMin + 
+			(kLaserPowRateMax - kLaserPowRateMin) * (1.0f - expf(-kLaserPowRateIncreaseSpeed * sustainLv2Count));
+
+	} 
+	//それ以外の状態時、攻撃力の倍率を戻す
+	else {
+		sustainLv2Count = 0;
+		laserPowRate = kLaserPowRateMin;
 	}
 }
 
@@ -518,6 +556,7 @@ void UpdatePlayer(void) {
 
 	LevelUp();
 	ConsumptionEnergy();
+	UpdateSustainLv2Bonus();
 
 	UpdateInvinciblePlayer();
 	DeadPlayer();
@@ -562,6 +601,10 @@ float GetPlayerRemainEnergy(void) {
 
 float GetPlayerEnergyLimit(void) {
 	return player.energyLimit;
+}
+
+float GetPlayerLaserPowRate(void) {
+	return laserPowRate;
 }
 
 void RecoveryEnergy(float recoveryValue) {

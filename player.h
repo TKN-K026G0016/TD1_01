@@ -44,11 +44,18 @@ bool GetPlayerIsAlive(void);
 float GetPlayerRemainEnergy(void);
 
 /// <summary>
-/// 
+/// エネルギーの最大値取得
 /// </summary>
 /// <param name=""></param>
 /// <returns></returns>
 float GetPlayerEnergyLimit(void);
+
+/// <summary>
+/// 現在のレーザーの火力倍率取得
+/// </summary>
+/// <param name=""></param>
+/// <returns></returns>
+float GetPlayerLaserPowRate(void);
 
 /// <summary>
 /// エネルギー回復処理
