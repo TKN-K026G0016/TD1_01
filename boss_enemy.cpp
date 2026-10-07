@@ -119,7 +119,7 @@ void StatesCount(void) {
 		statesTimer.normal.count++;
 		if (statesTimer.normal.count == statesTimer.normal.time) {
 			statesTimer.normal.count = 0;
-			bossEnemy.nowsSates = ToInt(GetRand(1, 2));
+			bossEnemy.nowsSates = ToInt(GetRand(1, 3));
 		}
 	}
 	else if (bossEnemy.nowsSates == BossStates::Attack1) {

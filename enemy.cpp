@@ -27,6 +27,8 @@ struct Spawner {
 	Timer spawnTimer = { 0, 0 };
 
 	Vector2 spawnPos = {};
+
+	int kSpawnTime = 20;
 };
 Spawner spawner;
 
@@ -64,7 +66,7 @@ static void DeadEnemy1(int index) {
 	enemy1[index].isAlive = false;
 	enemy1[index].hp = enemy1[index].hpMax;
 	nowEnemy1IsAliveCount--;
-	spawner.spawnTimer.time = 60 * nowEnemy1IsAliveCount;
+	spawner.spawnTimer.time = spawner.kSpawnTime * nowEnemy1IsAliveCount;
 }
 
 static void CheckDeadEnemy1(void) {
@@ -224,7 +226,7 @@ void SpawnEnemy(Vector2 pos, EnemyType type) {
 			enemy1[i].isAlive = true;
 			enemy1[i].pos = pos;
 			nowEnemy1IsAliveCount++;
-			spawner.spawnTimer.time = 60 * nowEnemy1IsAliveCount;
+			spawner.spawnTimer.time = spawner.kSpawnTime * nowEnemy1IsAliveCount;
 			break;
 		}
 
