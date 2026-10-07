@@ -175,14 +175,14 @@ void MoveNormal(void) {
 }
 
 void MoveAttack1(void) {
-	if (bossEnemy.nowsSates == BossStates::Attack1) {
 		playerPos = GetPlayerPos();
+	if (bossEnemy.nowsSates == BossStates::Attack1) {
 		if (statesTimer.attack1.count == 30 || statesTimer.attack1.count == 60 || statesTimer.attack1.count == 90) {
 			for (int i = 0;i < 6;i++) {
 				if (bossBomb[i].isAlive == false) {
 					bossBomb[i].isAlive = true;
 					bossBomb[i].pos = bossEnemy.pos;
-					bossBomb[i].nowSpeed = ToFloat(GetRand(60, 120)) / 10;
+					bossBomb[i].nowSpeed = ToFloat(GetRand(100, 170)) / 10;
 					bossBomb[i].velocity = { ToFloat(GetRand(-10, 10)),ToFloat(GetRand(-10,10)) };
 					if (bossBomb[i].velocity.x != 0) {
 						bossBomb[i].velocity.x /= 10;
@@ -190,7 +190,7 @@ void MoveAttack1(void) {
 					if (bossBomb[i].velocity.y != 0) {
 						bossBomb[i].velocity.y /= 10;
 					}
-					bossBomb[i].burst.time = GetRand(100, 200);
+					bossBomb[i].burst.time = GetRand(200, 600);
 					bossBomb[i].burst.count = 0;
 					break;
 				}
@@ -205,6 +205,22 @@ void MoveAttack1(void) {
 			}
 			bossBomb[i].pos.x += bossBomb[i].velocity.x * bossBomb[i].nowSpeed;
 			bossBomb[i].pos.y += bossBomb[i].velocity.y * bossBomb[i].nowSpeed;
+			if (bossBomb[i].pos.x <= 0) {
+				bossBomb[i].pos.x = 0;
+				bossBomb[i].velocity.x *= -1;
+			}
+			else if (bossBomb[i].pos.x >= 2560) {
+				bossBomb[i].pos.x = 2560;
+				bossBomb[i].velocity.x *= -1;
+			}
+			if (bossBomb[i].pos.y <= 0) {
+				bossBomb[i].pos.y = 0;
+				bossBomb[i].velocity.y *= -1;
+			}
+			else if (bossBomb[i].pos.y >= 1440) {
+				bossBomb[i].pos.y = 1440;
+				bossBomb[i].velocity.y *= -1;
+			}
 
 			bossBomb[i].burst.count++;
 			if (bossBomb[i].burst.count == bossBomb[i].burst.time) {
