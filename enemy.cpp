@@ -99,7 +99,7 @@ static void InitEnemy2(void) {
 	for (int i = 0;i < kEnemy2Limit;i++) {
 		enemy2[i] = {};
 
-		enemy2[i].texture = GetTexture(TextureType::Enemy1);
+		enemy2[i].texture = GetTexture(TextureType::Enemy2);
 	}
 }
 

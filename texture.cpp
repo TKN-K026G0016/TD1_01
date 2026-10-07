@@ -49,6 +49,7 @@ void InitTexture(void) {
 
 		//Enemy
 		{ Novice::LoadTexture("./resources/texture/enemy/enemy1.png"), { 128, 128 }, {0, 0}, 0, 0, WHITE },
+		{ Novice::LoadTexture("./resources/texture/enemy/enemy2.png"), { 128, 128 }, {0, 0}, 0, 0, WHITE },
 
 		{ Novice::LoadTexture("./resources/texture/enemy/enemy_bullet1.png"), { 32, 32 }, {6, 0}, 3, 0, WHITE },
 		{ Novice::LoadTexture("./resources/texture/player/laser2.png"), { 64, 64 }, {0, 0}, 0, 0, WHITE },
