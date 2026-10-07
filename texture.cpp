@@ -55,6 +55,9 @@ void InitTexture(void) {
 		//BossEnemy
 		{ Novice::LoadTexture("./resources/texture/enemy/bossEnemy.png"), { 512, 512 }, {0, 0}, 0, 0, WHITE },
 
+		{Novice::LoadTexture("./resources/texture/enemy/bossBom.png"), { 128, 128 }, {0, 0}, 0, 0, WHITE},
+		{Novice::LoadTexture("./resources/texture/enemy/bossBomBurstRange.png"), { 128, 128 }, {0, 0}, 0, 0, WHITE},
+
 		//MapChip
 
 		//background
@@ -250,7 +253,8 @@ void DrawGaugeAsObj(Texture texture, Vector2 centerPos, Vector2 size, float rate
 		//右側の頂点をrateに合わせてx座標更新
 		if (i == 1) {
 			vertexW[i].x = vertexW[0].x + gaugeWidth;
-		} else if (i == 3) {
+		}
+		else if (i == 3) {
 			vertexW[i].x = vertexW[2].x + gaugeWidth;
 		}
 
@@ -262,7 +266,7 @@ void DrawGaugeAsObj(Texture texture, Vector2 centerPos, Vector2 size, float rate
 		vertexS[1].x, vertexS[1].y,
 		vertexS[2].x, vertexS[2].y,
 		vertexS[3].x, vertexS[3].y,
-		 texture.refSize.x * texture.animNum, 0, gaugeRefWidth, texture.refSize.y,
+		texture.refSize.x * texture.animNum, 0, gaugeRefWidth, texture.refSize.y,
 		texture.tHandle, texture.color
 	);
 }
@@ -289,7 +293,8 @@ void DrawGaugeAsUI(Texture texture, Vector2 centerPos, Vector2 size, float rate)
 		//右側の頂点をrateに合わせてx座標更新
 		if (i == 1) {
 			vertexW[i].x = vertexW[0].x + gaugeWidth;
-		} else if (i == 3) {
+		}
+		else if (i == 3) {
 			vertexW[i].x = vertexW[2].x + gaugeWidth;
 		}
 
@@ -301,7 +306,7 @@ void DrawGaugeAsUI(Texture texture, Vector2 centerPos, Vector2 size, float rate)
 		vertexS[1].x, vertexS[1].y,
 		vertexS[2].x, vertexS[2].y,
 		vertexS[3].x, vertexS[3].y,
-		 texture.refSize.x * texture.animNum, 0, gaugeRefWidth, texture.refSize.y,
+		texture.refSize.x * texture.animNum, 0, gaugeRefWidth, texture.refSize.y,
 		texture.tHandle, texture.color
 	);
 }
@@ -310,7 +315,7 @@ void DrawGaugeAsUI(Texture texture, Vector2 centerPos, Vector2 size, float rate)
 /// アニメーション変更処理(通常)
 /// </summary>
 /// <param name="texture">テクスチャデータ</param>
-void UpdateAnimation(Texture& texture ) {
+void UpdateAnimation(Texture& texture) {
 	texture.animChangeTimer.count++;
 	if (texture.animChangeTimer.count >= texture.animChangeTimer.time) {
 		texture.animChangeTimer.count = 0;
