@@ -119,6 +119,15 @@ int UpdateValueByEasing(int startNum, int endNum, float t, EasingMode mode);
 void DrawHitBox(Vector2 hitVertex0, Vector2 hitVertex1);
 
 /// <summary>
+/// 円の当たり判定表示
+/// </summary>
+/// <param name="centerPos">中心座標</param>
+/// <param name="radius">半径</param>
+/// <param name="color">色</param>
+/// <param name="solidSwitch">塗りつぶしスイッチ</param>
+void DrawHitEllipse(Vector2 centerPos, float radius, unsigned int color, bool solidSwitch);
+
+/// <summary>
 /// 指定の桁の数値を取得
 /// </summary>
 /// <param name="targetNum">目的の数値</param>
