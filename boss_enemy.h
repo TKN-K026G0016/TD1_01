@@ -4,7 +4,7 @@
 
 
 enum BossStates {
-	Nomal,
+	Normal,
 	Attack1,
 	Attack2,
 
