@@ -112,6 +112,11 @@ void DrawGem(void) {
 		if (!gem[i].isAlive) continue;
 
 		DrawTextureObj(gem[i].texture, gem[i].pos, gem[i].size);
+
+#ifdef _DEBUG
+		DrawHitEllipse(gem[i].pos, gem[i].hitRadius, RED, true);
+#endif // _DEBUG
+
 	}
 }
 

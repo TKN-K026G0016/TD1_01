@@ -316,6 +316,24 @@ void DrawHitBox(Vector2 hitVertex0, Vector2 hitVertex1) {
 	);
 }
 
+void DrawHitEllipse(Vector2 centerPos, float radius, unsigned int color, bool solidSwitch) {
+	Vector2i posS = ConvertPosWToS(centerPos);
+	int viewRadius = ToInt(radius);
+
+	unsigned int viewColor = (color & 0xFFFFFF00) | 0x33;
+
+	if (solidSwitch) {
+		Novice::DrawEllipse(
+			posS.x, posS.y, viewRadius, viewRadius, 0.0f, viewColor, kFillModeSolid
+		);
+	} else {
+		Novice::DrawEllipse(
+	posS.x, posS.y, viewRadius, viewRadius, 0.0f, viewColor, kFillModeWireFrame
+		);
+	}
+
+}
+
 /// <summary>
 /// 指定の桁の数値を取得
 /// </summary>
