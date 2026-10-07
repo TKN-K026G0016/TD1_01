@@ -37,7 +37,7 @@ struct BossBom {
 	//スピード上限
 	float moveSpeedLimit = 6.0f;
 	//減速度
-	float decelerationSpeed = 0.05f;
+	float decelerationSpeed = 0.1f;
 	Texture texture = {};
 	Texture burstTexture = {};
 };
@@ -132,7 +132,7 @@ void MoveAttack1(void) {
 				if (bossBom[i].isAlive == false) {
 					bossBom[i].isAlive = true;
 					bossBom[i].pos = bossEnemy.pos;
-					bossBom[i].nowSpeed = ToFloat(GetRand(30, 60)) / 10;
+					bossBom[i].nowSpeed = ToFloat(GetRand(60, 120)) / 10;
 					bossBom[i].velocity = { ToFloat(GetRand(-10, 10)),ToFloat(GetRand(-10,10)) };
 					if (bossBom[i].velocity.x != 0) {
 						bossBom[i].velocity.x /= 10;
@@ -141,6 +141,7 @@ void MoveAttack1(void) {
 						bossBom[i].velocity.y /= 10;
 					}
 					bossBom[i].burst.time = GetRand(100, 200);
+					bossBom[i].burst.count = 0;
 					break;
 				}
 			}
