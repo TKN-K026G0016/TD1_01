@@ -45,8 +45,11 @@ struct BossEnemy {
 
 
 bool GetBossEnemyIsAlive(void);
+Vector2 GetBossEnemyPos(void);
+float GetBossEnemyRotateTheta(void);
 int GetBossEnemyRemainLife(void);
 int GetBossEnemyRemainLifeMax(void);
+int GetBossEnemyNowStates(void);
 
 void InitBossEnemy(void);
 void UpdateBossEnemy(void);	

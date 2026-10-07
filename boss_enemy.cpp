@@ -56,11 +56,20 @@ Vector2 playerPos;
 bool GetBossEnemyIsAlive(void) {
 	return bossEnemy.isAlive;
 }
+Vector2 GetBossEnemyPos(void) {
+	return bossEnemy.pos;
+}
+float GetBossEnemyRotateTheta(void) {
+	return bossEnemy.rotateTheta;
+}
 int GetBossEnemyRemainLife(void) {
 	return bossEnemy.remainLife;
 }
 int GetBossEnemyRemainLifeMax(void) {
 	return bossEnemy.remainLifeMax;
+}
+int GetBossEnemyNowStates(void) {
+	return bossEnemy.nowsSates;
 }
 
 void StatesCount(void) {
