@@ -17,12 +17,14 @@ enum BossStates {
 struct BossEnemy {
 	Vector2 pos = { 500, 500 };
 	Vector2 size = { 256, 256 };
+
 	//<生存関係>
 	bool isAlive = true;
 	//当たり判定の大きさ
 	float hitRadius =	128.0f;
 	int remainLife = 1000;
 	int remainLifeMax = 1000;
+
 	//<移動関係>
 	// 視界
 	float viewRange = 400.0f;
@@ -37,10 +39,15 @@ struct BossEnemy {
 	//減速度
 	float decelerationSpeed = 0.12f;
 	Vector2 inputVec = { 0, 0 };
+
 	//<回転関係>
 	float rotateTheta = 0.0f;
 	//回転速度
 	float rotateSpeed = 0.05f;
+
+	//状態
+	int nowsSates=BossStates::Attack2;
+
 	Texture texture = {};
 	//状態
 	int nowsSates=BossStates::Attack2;
@@ -79,3 +86,5 @@ void UpdateBossEnemy(void);
 void DrawBossEnemy(void);
 
 BossEnemy* GetBossEnemy(void);
+Vector2 GetBossEnemyPos(void);
+float GetBossEnemyRotateTheta(void);

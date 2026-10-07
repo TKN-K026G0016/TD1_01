@@ -1,6 +1,8 @@
 #include "boss_enemy.h"
 #include "player.h"
 #include "player_laser.h"
+#include "stage.h"
+#include "enemy_bullet.h"
 
 #include "vector2.h"
 #include "tool.h"
@@ -13,7 +15,9 @@
 
 BossEnemy bossEnemy;
 
-struct BossBom {
+#pragma region データ: Bomb攻撃
+
+struct BossBomb {
 	Vector2 pos = { 0, 0 };
 	Vector2 size = { 64, 64 };
 	//<生存関係>
@@ -41,7 +45,7 @@ struct BossBom {
 	Texture texture = {};
 	Texture burstTexture = {};
 };
-BossBom bossBom[6]{};
+BossBomb bossBomb[6]{};
 
 struct StatesTimer {
 	Timer normal = { 300,0 };
@@ -50,8 +54,9 @@ struct StatesTimer {
 };
 StatesTimer statesTimer;
 
-Vector2 playerPos;
+#pragma endregion
 
+#pragma region データ: レーザー攻撃
 
 bool GetBossEnemyIsAlive(void) {
 	return bossEnemy.isAlive;
@@ -74,6 +79,55 @@ int GetBossEnemyNowStates(void) {
 Timer GetAttack2Timer(void) {
 	return statesTimer.attack2;
 }
+enum class ModeShootLaser {
+	//テレポート状態
+	Teleport,
+	//射撃準備段階
+	ReadyShoot,
+	//射撃状態
+	Shoot,
+	ShootAndRotate,
+};
+//レーザー攻撃の形態
+ModeShootLaser nowModeShootLaser = ModeShootLaser::Teleport;
+
+struct DataShootLaser {
+
+	ModeShootLaser nowMode = ModeShootLaser::Teleport;
+
+	//テレポート準備にかかる時間
+	Timer readyTeleportTimer = { 60, 0 };
+	//テレポート後の座標
+	Vector2 teleportTargetPos = {};
+
+	//テレポート終了から射撃開始までの時間
+	Timer readyShootTimer = { 100, 0 };
+	//射撃準備中の回転速度
+	float rotatateSpeedReadyShoot = 0.05f;
+	//射撃準備中の狙いのずれ
+	float targetThetaOffset = ToFloat(M_PI) / 10.0f;
+
+	//射撃時間
+	Timer shootTimer = { 300, 0 };
+	//回転が始まるまでの時間
+	int startRotateTime = 60;
+	//レーザーの射撃スパン
+	Timer shootLaserTimer = { 2, 0 };
+
+
+	//現在の回転速度
+	float nowRotateSpeed = 0.0f;
+	//回転速度の加速度
+	float rotateAccelerationSpeed = 0.01f;
+	//回転速度の上限
+	float rotateSpeedMax = 0.1f;
+};
+DataShootLaser dataShootLaser;
+
+#pragma endregion
+
+Vector2 playerPos;
+
 
 void StatesCount(void) {
 	if (bossEnemy.nowsSates == BossStates::Normal) {
@@ -99,8 +153,7 @@ void StatesCount(void) {
 	}
 }
 
-
-void MoveNomal(void) {
+void MoveNormal(void) {
 	if (bossEnemy.nowsSates == BossStates::Normal) {
 		playerPos = GetPlayerPos();
 		float DiffX = playerPos.x - bossEnemy.pos.x;
@@ -118,8 +171,7 @@ void MoveNomal(void) {
 			if (bossEnemy.nowSpeed > bossEnemy.moveSpeedLimit) {
 				bossEnemy.nowSpeed = bossEnemy.moveSpeedLimit;
 			}
-		}
-		else {
+		} else {
 			if (DiffX != 0) {
 				bossEnemy.velocity.x = (DiffX / distance);
 			}
@@ -141,42 +193,42 @@ void MoveAttack1(void) {
 		playerPos = GetPlayerPos();
 		if (statesTimer.attack1.count == 30 || statesTimer.attack1.count == 60 || statesTimer.attack1.count == 90) {
 			for (int i = 0;i < 6;i++) {
-				if (bossBom[i].isAlive == false) {
-					bossBom[i].isAlive = true;
-					bossBom[i].pos = bossEnemy.pos;
-					bossBom[i].nowSpeed = ToFloat(GetRand(60, 120)) / 10;
-					bossBom[i].velocity = { ToFloat(GetRand(-10, 10)),ToFloat(GetRand(-10,10)) };
-					if (bossBom[i].velocity.x != 0) {
-						bossBom[i].velocity.x /= 10;
+				if (bossBomb[i].isAlive == false) {
+					bossBomb[i].isAlive = true;
+					bossBomb[i].pos = bossEnemy.pos;
+					bossBomb[i].nowSpeed = ToFloat(GetRand(60, 120)) / 10;
+					bossBomb[i].velocity = { ToFloat(GetRand(-10, 10)),ToFloat(GetRand(-10,10)) };
+					if (bossBomb[i].velocity.x != 0) {
+						bossBomb[i].velocity.x /= 10;
 					}
-					if (bossBom[i].velocity.y != 0) {
-						bossBom[i].velocity.y /= 10;
+					if (bossBomb[i].velocity.y != 0) {
+						bossBomb[i].velocity.y /= 10;
 					}
-					bossBom[i].burst.time = GetRand(100, 200);
-					bossBom[i].burst.count = 0;
+					bossBomb[i].burst.time = GetRand(100, 200);
+					bossBomb[i].burst.count = 0;
 					break;
 				}
 			}
 		}
 	}
 	for (int i = 0;i < 6;i++) {
-		if (bossBom[i].isAlive == true) {
-			bossBom[i].nowSpeed -= bossBom[i].decelerationSpeed;
-			if (bossBom[i].nowSpeed <= 0) {
-				bossBom[i].nowSpeed = 0;
+		if (bossBomb[i].isAlive == true) {
+			bossBomb[i].nowSpeed -= bossBomb[i].decelerationSpeed;
+			if (bossBomb[i].nowSpeed <= 0) {
+				bossBomb[i].nowSpeed = 0;
 			}
-			bossBom[i].pos.x += bossBom[i].velocity.x * bossBom[i].nowSpeed;
-			bossBom[i].pos.y += bossBom[i].velocity.y * bossBom[i].nowSpeed;
+			bossBomb[i].pos.x += bossBomb[i].velocity.x * bossBomb[i].nowSpeed;
+			bossBomb[i].pos.y += bossBomb[i].velocity.y * bossBomb[i].nowSpeed;
 
-			bossBom[i].burst.count++;
-			if (bossBom[i].burst.count == bossBom[i].burst.time) {
-				float DiffX = bossBom[i].pos.x - playerPos.x;
-				float DiffY = bossBom[i].pos.y - playerPos.y;
+			bossBomb[i].burst.count++;
+			if (bossBomb[i].burst.count == bossBomb[i].burst.time) {
+				float DiffX = bossBomb[i].pos.x - playerPos.x;
+				float DiffY = bossBomb[i].pos.y - playerPos.y;
 				float distance = sqrtf(DiffX * DiffX + DiffY * DiffY);
-				if (distance <= bossBom[i].burstRadius) {
+				if (distance <= bossBomb[i].burstRadius) {
 					PlayerDamage();
 				}
-				bossBom[i].isAlive = false;
+				bossBomb[i].isAlive = false;
 			}
 		}
 	}
@@ -216,6 +268,117 @@ void MoveAttack2(void) {
 		bossEnemy.pos.x += bossEnemy.velocity.x * bossEnemy.nowSpeed;
 		bossEnemy.pos.y += bossEnemy.velocity.y * bossEnemy.nowSpeed;
 
+		DataShootLaser& data = dataShootLaser;
+
+		switch (data.nowMode) {
+		case ModeShootLaser::Teleport: {
+			data.readyTeleportTimer.count++;
+			if (data.readyTeleportTimer.count >= data.readyTeleportTimer.time) {
+				data.readyTeleportTimer.count = 0;
+
+				//ワープする
+				bossEnemy.pos = data.teleportTargetPos;
+				data.nowMode = ModeShootLaser::ReadyShoot;
+			}
+
+			break;
+		}
+		case ModeShootLaser::ReadyShoot: {
+			data.readyShootTimer.count++;
+
+			if (data.readyShootTimer.count >= data.readyShootTimer.time) {
+				data.readyShootTimer.count = 0;
+
+				data.nowMode = ModeShootLaser::Shoot;
+			}
+
+#pragma region 回転処理
+			//少しplayerからズレた場所を向く
+			playerPos = GetPlayerPos();
+
+			//プレイヤーを追跡するように回転
+			float disX = playerPos.x - bossEnemy.pos.x;
+			float disY = playerPos.y - bossEnemy.pos.y;
+			float targetTheta = atan2f(disY, disX);
+
+			//現在の方向との差を求める
+			float diff = targetTheta + data.targetThetaOffset  - bossEnemy.rotateTheta;
+
+			//差を-π~πに正規化
+			while (diff > ToFloat(M_PI)) {
+				diff -= ToFloat(M_PI) * 2;
+			}
+			while (diff < -ToFloat(M_PI)) {
+				diff += ToFloat(M_PI) * 2;
+			}
+
+			bossEnemy.rotateTheta += diff * data.rotatateSpeedReadyShoot;
+
+#pragma endregion
+
+			break;
+		}
+		case ModeShootLaser::Shoot:
+		case ModeShootLaser::ShootAndRotate: {
+
+			//射撃処理
+			data.shootLaserTimer.count++;
+			if (data.shootLaserTimer.count >= data.shootLaserTimer.time) {
+				data.shootLaserTimer.count = 0;
+				ShootEnemyLaser(bossEnemy.pos, bossEnemy.rotateTheta, 0.0f);
+			}
+
+
+			//回転処理
+			if (data.nowMode == ModeShootLaser::ShootAndRotate) {
+				playerPos = GetPlayerPos();
+
+				//プレイヤーを追跡するように回転
+				float disX = playerPos.x - bossEnemy.pos.x;
+				float disY = playerPos.y - bossEnemy.pos.y;
+				float targetTheta = atan2f(disY, disX);
+
+				//現在の方向との差を求める
+				float diff = targetTheta - bossEnemy.rotateTheta;
+
+				//差を-π~πに正規化
+				while (diff > ToFloat(M_PI)) {
+					diff -= ToFloat(M_PI) * 2;
+				}
+				while (diff < -ToFloat(M_PI)) {
+					diff += ToFloat(M_PI) * 2;
+				}
+
+				bossEnemy.rotateTheta += diff * data.nowRotateSpeed;
+
+				//回転の加速処理
+				data.nowRotateSpeed += data.rotateAccelerationSpeed;
+				if (data.nowRotateSpeed > data.rotateSpeedMax) {
+					data.nowRotateSpeed = data.rotateSpeedMax;
+				}
+
+			}
+
+
+			//射撃時間
+			data.shootTimer.count++;
+			//回転の開始
+			if (data.nowMode != ModeShootLaser::ShootAndRotate && data.shootTimer.count >= data.startRotateTime) {
+				data.nowMode = ModeShootLaser::ShootAndRotate;
+			}
+			//攻撃の終了
+			if (data.shootTimer.count >= data.shootTimer.time) {
+				data.shootTimer.count = 0;
+				data.nowMode = ModeShootLaser::Teleport;
+				bossEnemy.nowsSates = BossStates::Normal;
+			}
+
+			break;
+		}
+		}
+
+
+
 	}
 }
 
@@ -228,11 +391,17 @@ void DeathBossEnemy(void) {
 
 void InitBossEnemy(void) {
 	bossEnemy = {};
+
+	//ステージの中心座標を取得(shootLaser時のため)
+	Vector2 movablePos[2];
+	GetMovablePos(movablePos);
+	dataShootLaser.teleportTargetPos = { (movablePos[1].x - movablePos[0].x) / 2, (movablePos[1].y - movablePos[0].y) / 2 };
+
 	bossEnemy.texture = GetTexture(TextureType::BossEnemy);
 	for (int i = 0;i < 6;i++) {
-		bossBom[i] = {};
-		bossBom[i].texture = GetTexture(TextureType::BossBom);
-		bossBom[i].burstTexture = GetTexture(TextureType::BossBomBurstRange);
+		bossBomb[i] = {};
+		bossBomb[i].texture = GetTexture(TextureType::BossBom);
+		bossBomb[i].burstTexture = GetTexture(TextureType::BossBomBurstRange);
 	}
 
 }
@@ -240,7 +409,7 @@ void InitBossEnemy(void) {
 void UpdateBossEnemy(void) {
 	StatesCount();
 
-	MoveNomal();
+	MoveNormal();
 	MoveAttack1();
 	MoveAttack2();
 
@@ -251,15 +420,37 @@ void DrawBossEnemy(void) {
 		DrawTextureRotateObj(bossEnemy.texture, bossEnemy.pos, bossEnemy.size, bossEnemy.rotateTheta);
 	}
 	for (int i = 0;i < 6;i++) {
-		if (bossBom[i].isAlive == true) {
-			DrawTextureObj(bossBom[i].texture, bossBom[i].pos, bossBom[i].size);
-			if (bossBom[i].burst.count >= bossBom[i].burst.time - 60) {
-				DrawTextureObj(bossBom[i].burstTexture, bossBom[i].pos, bossBom[i].bustSize);
+		if (bossBomb[i].isAlive == true) {
+			DrawTextureObj(bossBomb[i].texture, bossBomb[i].pos, bossBomb[i].size);
+			if (bossBomb[i].burst.count >= bossBomb[i].burst.time - 60) {
+				DrawTextureObj(bossBomb[i].burstTexture, bossBomb[i].pos, bossBomb[i].bustSize);
 			}
 		}
 	}
 }
 
+#pragma region 関数: 外部参照関係
+
 BossEnemy* GetBossEnemy(void) {
 	return &bossEnemy;
 }
+
+Vector2 GetBossEnemyPos(void) {
+	return bossEnemy.pos;
+}
+
+float GetBossEnemyRotateTheta(void) {
+	return bossEnemy.rotateTheta;
+}
+
+bool GetBossEnemyIsAlive(void) {
+	return bossEnemy.isAlive;
+}
+int GetBossEnemyRemainLife(void) {
+	return bossEnemy.remainLife;
+}
+int GetBossEnemyRemainLifeMax(void) {
+	return bossEnemy.remainLifeMax;
+}
+
+#pragma endregion
