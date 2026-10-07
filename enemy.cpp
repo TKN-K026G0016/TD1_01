@@ -2,6 +2,7 @@
 #include "player.h"
 #include "enemy_bullet.h"
 #include "gem.h"
+#include "boss_enemy.h"
 
 #include "vector2.h"
 #include "timer.h"
@@ -13,6 +14,10 @@
 constexpr int kEnemy1Limit = 10;
 
 static Enemy1 enemy1[kEnemy1Limit];
+
+constexpr int kEnemy2Limit = 10;
+
+static Enemy2 enemy2[kEnemy2Limit];
 
 struct Spawner {
 	Timer spawnTimer = { 20, 0 };
@@ -31,7 +36,7 @@ static void InitEnemy1(void) {
 	}
 }
 
-static void ShootEnemyBullet(void) {
+static void ShootEnemyBullet1(void) {
 	for (int i = 0; i < kEnemy1Limit; i++) {
 		if (!enemy1[i].isAlive) continue;
 
@@ -56,7 +61,7 @@ static void DeadEnemy1(int index) {
 	enemy1[index].hp = enemy1[index].hpMax;
 }
 
-static void CheckDeadEnemy(void) {
+static void CheckDeadEnemy1(void) {
 	for (int i = 0; i < kEnemy1Limit; i++) {
 		if (!enemy1[i].isAlive) continue;
 
@@ -87,8 +92,77 @@ void ReSpawnEnemy(void) {
 }
 #pragma endregion
 
+#pragma region 関数: enemy2
+
+static void InitEnemy2(void) {
+	for (int i = 0;i < kEnemy2Limit;i++) {
+		enemy2[i] = {};
+
+		enemy2[i].texture = GetTexture(TextureType::Enemy1);
+	}
+}
+
+static void ShootEnemyBullet2(void) {
+	for (int i = 0; i < kEnemy2Limit; i++) {
+		if (!enemy2[i].isAlive) continue;
+
+		enemy2[i].shootTimer.count++;
+		if (enemy2[i].shootTimer.count >= enemy2[i].shootTimer.time) {
+			enemy2[i].shootTimer.count = 0;
+
+			Vector2 playerPos = GetPlayerPos();
+
+			float disX = playerPos.x - enemy2[i].pos.x;
+			float disY = playerPos.y - enemy2[i].pos.y;
+			float shootTheta = atan2f(disY, disX);
+			ShootEnemyBullet(enemy2[i].pos, shootTheta);
+
+		}
+
+	}
+}
+
+static void DeadEnemy2(int index) {
+	enemy2[index].isAlive = false;
+	enemy2[index].hp = enemy2[index].hpMax;
+}
+
+static void CheckDeadEnemy2(void) {
+	for (int i = 0; i < kEnemy2Limit; i++) {
+		if (!enemy2[i].isAlive) continue;
+
+		if (enemy2[i].hp <= 0) {
+			DeadEnemy2(i);
+
+			//ジェムの生成処理
+			SpawnGem(enemy2[i].pos, GemType::M);
+		}
+	}
+}
+
+static void DrawEnemy2(void) {
+	for (int i = 0; i < kEnemy2Limit; i++) {
+		if (!enemy2[i].isAlive) continue;
+
+		DrawTextureObj(enemy2[i].texture, enemy2[i].pos, enemy2[i].size);
+	}
+}
+
+static void SpawnEnemy2(void) {
+	int bossEnemyNouStates = GetBossEnemyNowStates();
+	if (bossEnemyNouStates == Attack2) {
+		for (int i = 0;i < kEnemy2Limit;i++) {
+			if (enemy2[i].isAlive)continue;
+
+		}
+	}
+}
+
+#pragma endregion
+
 void InitEnemy(void) {
 	InitEnemy1();
+	InitEnemy2();
 
 	for (int i = 0; i < 5; i++) {
 		Vector2 pos = { ToFloat(GetRand(0, 2000)), ToFloat(GetRand(0, 1300)) };
@@ -99,13 +173,16 @@ void InitEnemy(void) {
 }
 
 void UpdateEnemy(void) {
-	CheckDeadEnemy();
-	ShootEnemyBullet();
+	CheckDeadEnemy1();
+	CheckDeadEnemy2();
+	ShootEnemyBullet1();
+	ShootEnemyBullet2();
 	ReSpawnEnemy();
 }
 
 void DrawEnemy(void) {
 	DrawEnemy1();
+	DrawEnemy2();
 }
 
 #pragma region 関数: 外部参照関係
