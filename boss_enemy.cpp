@@ -13,7 +13,9 @@
 
 BossEnemy bossEnemy;
 
-struct BossBom {
+#pragma region データ: Bomb攻撃
+
+struct BossBomb {
 	Vector2 pos = { 0, 0 };
 	Vector2 size = { 64, 64 };
 	//<生存関係>
@@ -41,7 +43,7 @@ struct BossBom {
 	Texture texture = {};
 	Texture burstTexture = {};
 };
-BossBom bossBom[6]{};
+BossBomb bossBomb[6]{};
 
 struct StatesTimer {
 	Timer nomal = { 300,0 };
@@ -50,18 +52,46 @@ struct StatesTimer {
 };
 StatesTimer stateTimer;
 
+#pragma endregion
+
+#pragma region データ: レーザー攻撃
+
+enum class ModeShootLaser {
+	//テレポート状態
+	Teleport,
+	//射撃準備段階
+	ReadyShoot,
+	//射撃状態
+	Shoot,
+	ShootAndRotate,
+};
+//レーザー攻撃の形態
+ModeShootLaser nowModeShootLaser = ModeShootLaser::Teleport;
+
+struct DataShootLaser {
+	//テレポート準備にかかる時間
+	Timer readyTeleportTimer = { 60, 0 };
+	//テレポート終了から射撃開始までの時間
+	Timer readyShootTimer = { 100, 0 };
+
+	//射撃時間
+	Timer shootTimer = { 300, 0 };
+	//回転が始まるまでの時間
+	int startRotateTime = 60;
+
+	//現在の回転速度
+	float nowRotateSpeed = 0.0f;
+	//回転速度の加速度
+	float rotateAccelerationSpeed = 0.01f;
+	//回転速度の上限
+	float rotateSpeedMax = 0.1f;
+};
+DataShootLaser dataShootLaser;
+
+#pragma endregion
+
 Vector2 playerPos;
 
-
-bool GetBossEnemyIsAlive(void) {
-	return bossEnemy.isAlive;
-}
-int GetBossEnemyRemainLife(void) {
-	return bossEnemy.remainLife;
-}
-int GetBossEnemyRemainLifeMax(void) {
-	return bossEnemy.remainLifeMax;
-}
 
 void StatesCount(void) {
 	if (bossEnemy.nowsSates == BossStates::Normal) {
@@ -87,8 +117,7 @@ void StatesCount(void) {
 	}
 }
 
-
-void MoveNomal(void) {
+void MoveNormal(void) {
 	if (bossEnemy.nowsSates == BossStates::Normal) {
 		playerPos = GetPlayerPos();
 		float DiffX = playerPos.x - bossEnemy.pos.x;
@@ -129,42 +158,42 @@ void MoveAttack1(void) {
 		playerPos = GetPlayerPos();
 		if (stateTimer.attack1.count == 30 || stateTimer.attack1.count == 60 || stateTimer.attack1.count == 90) {
 			for (int i = 0;i < 6;i++) {
-				if (bossBom[i].isAlive == false) {
-					bossBom[i].isAlive = true;
-					bossBom[i].pos = bossEnemy.pos;
-					bossBom[i].nowSpeed = ToFloat(GetRand(60, 120)) / 10;
-					bossBom[i].velocity = { ToFloat(GetRand(-10, 10)),ToFloat(GetRand(-10,10)) };
-					if (bossBom[i].velocity.x != 0) {
-						bossBom[i].velocity.x /= 10;
+				if (bossBomb[i].isAlive == false) {
+					bossBomb[i].isAlive = true;
+					bossBomb[i].pos = bossEnemy.pos;
+					bossBomb[i].nowSpeed = ToFloat(GetRand(60, 120)) / 10;
+					bossBomb[i].velocity = { ToFloat(GetRand(-10, 10)),ToFloat(GetRand(-10,10)) };
+					if (bossBomb[i].velocity.x != 0) {
+						bossBomb[i].velocity.x /= 10;
 					}
-					if (bossBom[i].velocity.y != 0) {
-						bossBom[i].velocity.y /= 10;
+					if (bossBomb[i].velocity.y != 0) {
+						bossBomb[i].velocity.y /= 10;
 					}
-					bossBom[i].burst.time = GetRand(100, 200);
-					bossBom[i].burst.count = 0;
+					bossBomb[i].burst.time = GetRand(100, 200);
+					bossBomb[i].burst.count = 0;
 					break;
 				}
 			}
 		}
 	}
 	for (int i = 0;i < 6;i++) {
-		if (bossBom[i].isAlive == true) {
-			bossBom[i].nowSpeed -= bossBom[i].decelerationSpeed;
-			if (bossBom[i].nowSpeed <= 0) {
-				bossBom[i].nowSpeed = 0;
+		if (bossBomb[i].isAlive == true) {
+			bossBomb[i].nowSpeed -= bossBomb[i].decelerationSpeed;
+			if (bossBomb[i].nowSpeed <= 0) {
+				bossBomb[i].nowSpeed = 0;
 			}
-			bossBom[i].pos.x += bossBom[i].velocity.x * bossBom[i].nowSpeed;
-			bossBom[i].pos.y += bossBom[i].velocity.y * bossBom[i].nowSpeed;
+			bossBomb[i].pos.x += bossBomb[i].velocity.x * bossBomb[i].nowSpeed;
+			bossBomb[i].pos.y += bossBomb[i].velocity.y * bossBomb[i].nowSpeed;
 
-			bossBom[i].burst.count++;
-			if (bossBom[i].burst.count == bossBom[i].burst.time) {
-				float DiffX = bossBom[i].pos.x - playerPos.x;
-				float DiffY = bossBom[i].pos.y - playerPos.y;
+			bossBomb[i].burst.count++;
+			if (bossBomb[i].burst.count == bossBomb[i].burst.time) {
+				float DiffX = bossBomb[i].pos.x - playerPos.x;
+				float DiffY = bossBomb[i].pos.y - playerPos.y;
 				float distance = sqrtf(DiffX * DiffX + DiffY * DiffY);
-				if (distance <= bossBom[i].burstRadius) {
+				if (distance <= bossBomb[i].burstRadius) {
 					PlayerDamage();
 				}
-				bossBom[i].isAlive = false;
+				bossBomb[i].isAlive = false;
 			}
 		}
 	}
@@ -188,9 +217,9 @@ void InitBossEnemy(void) {
 	bossEnemy = {};
 	bossEnemy.texture = GetTexture(TextureType::BossEnemy);
 	for (int i = 0;i < 6;i++) {
-		bossBom[i] = {};
-		bossBom[i].texture = GetTexture(TextureType::BossBom);
-		bossBom[i].burstTexture = GetTexture(TextureType::BossBomBurstRange);
+		bossBomb[i] = {};
+		bossBomb[i].texture = GetTexture(TextureType::BossBom);
+		bossBomb[i].burstTexture = GetTexture(TextureType::BossBomBurstRange);
 	}
 
 }
@@ -198,7 +227,7 @@ void InitBossEnemy(void) {
 void UpdateBossEnemy(void) {
 	StatesCount();
 
-	MoveNomal();
+	MoveNormal();
 	MoveAttack1();
 	MoveAttack2();
 
@@ -209,15 +238,29 @@ void DrawBossEnemy(void) {
 		DrawTextureRotateObj(bossEnemy.texture, bossEnemy.pos, bossEnemy.size, bossEnemy.rotateTheta);
 	}
 	for (int i = 0;i < 6;i++) {
-		if (bossBom[i].isAlive == true) {
-			DrawTextureObj(bossBom[i].texture, bossBom[i].pos, bossBom[i].size);
-			if (bossBom[i].burst.count >= bossBom[i].burst.time - 60) {
-				DrawTextureObj(bossBom[i].burstTexture, bossBom[i].pos, bossBom[i].bustSize);
+		if (bossBomb[i].isAlive == true) {
+			DrawTextureObj(bossBomb[i].texture, bossBomb[i].pos, bossBomb[i].size);
+			if (bossBomb[i].burst.count >= bossBomb[i].burst.time - 60) {
+				DrawTextureObj(bossBomb[i].burstTexture, bossBomb[i].pos, bossBomb[i].bustSize);
 			}
 		}
 	}
 }
 
+#pragma region 関数: 外部参照関係
+
 BossEnemy* GetBossEnemy(void) {
 	return &bossEnemy;
 }
+
+bool GetBossEnemyIsAlive(void) {
+	return bossEnemy.isAlive;
+}
+int GetBossEnemyRemainLife(void) {
+	return bossEnemy.remainLife;
+}
+int GetBossEnemyRemainLifeMax(void) {
+	return bossEnemy.remainLifeMax;
+}
+
+#pragma endregion
