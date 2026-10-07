@@ -13,6 +13,35 @@
 
 BossEnemy bossEnemy;
 
+struct BossBom {
+	Vector2 pos = { 0, 0 };
+	Vector2 size = { 64, 64 };
+	//<生存関係>
+	bool isAlive = false;
+	//当たり判定の大きさ
+	float hitRadius = 32.0f;
+
+	//<爆発関係>
+	//爆発までの時間
+	Timer barst = { 0,0 };
+	//爆発範囲
+	float barstRadius = 128.0f;
+
+	//<移動関係>
+	//速度
+	Vector2 velocity = { 0.0f, 0.0f };
+	//スピード
+	float nowSpeed = 0.0f;
+	//加速度
+	float accleretionSpeed = 0.05f;
+	//スピード上限
+	float moveSpeedLimit = 2.0f;
+	//減速度
+	float decelerationSpeed = 0.12f;
+	Texture texture = {};
+};
+BossBom bossBom[6]{};
+
 struct StatesTimer {
 	Timer nomal = { 300,0 };
 	Timer attack1 = { 120,0 };
@@ -21,6 +50,7 @@ struct StatesTimer {
 StatesTimer stateTimer;
 
 Vector2 playerPos;
+
 
 bool GetBossEnemyIsAlive(void) {
 	return bossEnemy.isAlive;
@@ -87,11 +117,6 @@ void MoveNomal(void) {
 			if (bossEnemy.nowSpeed > bossEnemy.moveSpeedLimit) {
 				bossEnemy.nowSpeed = bossEnemy.moveSpeedLimit;
 			}
-			/*bossEnemy.nowSpeed -= bossEnemy.accleretionSpeed;
-			bossEnemy.nowSpeed -= bossEnemy.accleretionSpeed;
-			if (bossEnemy.nowSpeed < 0) {
-				bossEnemy.nowSpeed = 0;
-			}*/
 		}
 		bossEnemy.pos.x += bossEnemy.velocity.x * bossEnemy.nowSpeed;
 		bossEnemy.pos.y += bossEnemy.velocity.y * bossEnemy.nowSpeed;
@@ -100,13 +125,55 @@ void MoveNomal(void) {
 
 void MoveAttack1(void) {
 	if (bossEnemy.nowsSates == BossStates::Attack1) {
-		bossEnemy.nowsSates = BossStates::Nomal;
+		playerPos = GetPlayerPos();
+		if (stateTimer.attack1.count == 30 || stateTimer.attack1.count == 60 || stateTimer.attack1.count == 90) {
+			for (int i = 0;i < 6;i++) {
+				if (bossBom[i].isAlive == false) {
+					bossBom[i].isAlive = true;
+					bossBom[i].pos = bossEnemy.pos;
+					bossBom[i].nowSpeed = GetRand(10, 30) / 10;
+					bossBom[i].velocity = { ToFloat(GetRand(-10, 10)),ToFloat(GetRand(-10,10)) };
+					if (bossBom[i].velocity.x != 0) {
+						bossBom[i].velocity.x /= 10;
+					}
+					if (bossBom[i].velocity.y != 0) {
+						bossBom[i].velocity.y /= 10;
+					}
+					bossBom[i].barst.time = GetRand(100, 200);
+					break;
+				}
+			}
+		}
+		for (int i = 0;i < 6;i++) {
+			if (bossBom[i].isAlive == true) {
+				bossBom[i].nowSpeed -= bossBom[i].decelerationSpeed;
+				if (bossBom[i].nowSpeed <= 0) {
+					bossBom[i].nowSpeed = 0;
+				}
+				bossBom[i].pos.x += bossBom[i].velocity.x * bossBom[i].nowSpeed;
+				bossBom[i].pos.y += bossBom[i].velocity.y * bossBom[i].nowSpeed;
+			}
+			bossBom[i].barst.count++;
+			if (bossBom[i].barst.count >= bossBom[i].barst.time - 60) {
+				Novice::DrawEllipse(bossBom[i].pos.x, bossBom[i].pos.y, static_cast<int>(bossBom[i].barstRadius), static_cast<int>(bossBom[i].barstRadius), 0.0f, 0x88FF0000, kFillModeSolid);
+			}
+			if (bossBom[i].barst.count == bossBom[i].barst.time) {
+				float DiffX = bossBom[i].pos.x - playerPos.x;
+				float DiffY = bossBom[i].pos.y - playerPos.y;
+				float distance = sqrtf(DiffX * DiffX + DiffY * DiffY);
+				if (distance <= bossBom[i].barstRadius) {
+					PlayerDamage();
+				}
+			}
+		}
+
 	}
 }
 
 void MoveAttack2(void) {
 	if (bossEnemy.nowsSates == BossStates::Attack2) {
-		bossEnemy.nowsSates = BossStates::Nomal;
+
+
 	}
 }
 
