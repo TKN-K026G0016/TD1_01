@@ -44,7 +44,7 @@ struct BossBom {
 BossBom bossBom[6]{};
 
 struct StatesTimer {
-	Timer nomal = { 300,0 };
+	Timer normal = { 300,0 };
 	Timer attack1 = { 120,0 };
 	Timer attack2 = { 180,0 };
 };
@@ -74,9 +74,9 @@ int GetBossEnemyNowStates(void) {
 
 void StatesCount(void) {
 	if (bossEnemy.nowsSates == BossStates::Normal) {
-		stateTimer.nomal.count++;
-		if (stateTimer.nomal.count == stateTimer.nomal.time) {
-			stateTimer.nomal.count = 0;
+		stateTimer.normal.count++;
+		if (stateTimer.normal.count == stateTimer.normal.time) {
+			stateTimer.normal.count = 0;
 			bossEnemy.nowsSates = ToInt(GetRand(1, 2));
 		}
 	}
