@@ -48,7 +48,7 @@ struct StatesTimer {
 	Timer attack1 = { 120,0 };
 	Timer attack2 = { 180,0 };
 };
-StatesTimer stateTimer;
+StatesTimer statesTimer;
 
 Vector2 playerPos;
 
@@ -71,26 +71,29 @@ int GetBossEnemyRemainLifeMax(void) {
 int GetBossEnemyNowStates(void) {
 	return bossEnemy.nowsSates;
 }
+Timer GetAttack2Timer(void) {
+	return statesTimer.attack2;
+}
 
 void StatesCount(void) {
 	if (bossEnemy.nowsSates == BossStates::Normal) {
-		stateTimer.nomal.count++;
-		if (stateTimer.nomal.count == stateTimer.nomal.time) {
-			stateTimer.nomal.count = 0;
+		statesTimer.nomal.count++;
+		if (statesTimer.nomal.count == statesTimer.nomal.time) {
+			statesTimer.nomal.count = 0;
 			bossEnemy.nowsSates = ToInt(GetRand(1, 2));
 		}
 	}
 	else if (bossEnemy.nowsSates == BossStates::Attack1) {
-		stateTimer.attack1.count++;
-		if (stateTimer.attack1.count == stateTimer.attack1.time) {
-			stateTimer.attack1.count = 0;
+		statesTimer.attack1.count++;
+		if (statesTimer.attack1.count == statesTimer.attack1.time) {
+			statesTimer.attack1.count = 0;
 			bossEnemy.nowsSates = BossStates::Normal;
 		}
 	}
 	else if (bossEnemy.nowsSates == BossStates::Attack2) {
-		stateTimer.attack2.count++;
-		if (stateTimer.attack2.count == stateTimer.attack2.time) {
-			stateTimer.attack2.count = 0;
+		statesTimer.attack2.count++;
+		if (statesTimer.attack2.count == statesTimer.attack2.time) {
+			statesTimer.attack2.count = 0;
 			bossEnemy.nowsSates = BossStates::Normal;
 		}
 	}
@@ -136,7 +139,7 @@ void MoveNomal(void) {
 void MoveAttack1(void) {
 	if (bossEnemy.nowsSates == BossStates::Attack1) {
 		playerPos = GetPlayerPos();
-		if (stateTimer.attack1.count == 30 || stateTimer.attack1.count == 60 || stateTimer.attack1.count == 90) {
+		if (statesTimer.attack1.count == 30 || statesTimer.attack1.count == 60 || statesTimer.attack1.count == 90) {
 			for (int i = 0;i < 6;i++) {
 				if (bossBom[i].isAlive == false) {
 					bossBom[i].isAlive = true;
@@ -181,7 +184,37 @@ void MoveAttack1(void) {
 
 void MoveAttack2(void) {
 	if (bossEnemy.nowsSates == BossStates::Attack2) {
-
+		playerPos = GetPlayerPos();
+		float DiffX = playerPos.x - bossEnemy.pos.x;
+		float DiffY = playerPos.y - bossEnemy.pos.y;
+		float distance = sqrtf(DiffX * DiffX + DiffY * DiffY);
+		bossEnemy.rotateTheta = atan2f(DiffY, DiffX);
+		if (distance < bossEnemy.viewRange) {
+			if (DiffX != 0) {
+				bossEnemy.velocity.x = -1 * (DiffX / distance);
+			}
+			if (DiffY != 0) {
+				bossEnemy.velocity.y = -1 * (DiffY / distance);
+			}
+			bossEnemy.nowSpeed += bossEnemy.accleretionSpeed;
+			if (bossEnemy.nowSpeed > bossEnemy.moveSpeedLimit) {
+				bossEnemy.nowSpeed = bossEnemy.moveSpeedLimit;
+			}
+		}
+		else {
+			if (DiffX != 0) {
+				bossEnemy.velocity.x = (DiffX / distance);
+			}
+			if (DiffY != 0) {
+				bossEnemy.velocity.y = (DiffY / distance);
+			}
+			bossEnemy.nowSpeed += bossEnemy.accleretionSpeed;
+			if (bossEnemy.nowSpeed > bossEnemy.moveSpeedLimit) {
+				bossEnemy.nowSpeed = bossEnemy.moveSpeedLimit;
+			}
+		}
+		bossEnemy.pos.x += bossEnemy.velocity.x * bossEnemy.nowSpeed;
+		bossEnemy.pos.y += bossEnemy.velocity.y * bossEnemy.nowSpeed;
 
 	}
 }

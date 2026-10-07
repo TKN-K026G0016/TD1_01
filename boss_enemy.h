@@ -2,6 +2,9 @@
 #include "vector2.h"
 #include "texture.h"
 
+#define _USE_MATH_DEFINES
+#include <math.h>
+
 
 enum BossStates {
 	Normal,
@@ -40,17 +43,25 @@ struct BossEnemy {
 	float rotateSpeed = 0.05f;
 	Texture texture = {};
 	//状態
-	int nowsSates=BossStates::Attack1;
+	int nowsSates=BossStates::Attack2;
 };
 
-struct Attack2Pos {
-	Vector2 enemy2[6] = {
-		{150, -50},
-		{150, 0},
-		{150, 50},
-		{200, -25},
-		{200, 25},
-		{250, 0},
+struct Attack2Enemy2Pos {
+	float dstance[6] = {
+		175,
+		150,
+		175,
+		225,
+		225,
+		250,
+	};
+	float theta[6] = {
+		(1.0f / 4.0f) * float(M_PI),
+		0,
+		(-1.0f/4.0f)*float(M_PI),
+		(1.0f/8.0f)*float(M_PI),
+		(-1.0f/8.0f)*float(M_PI),
+		0
 	};
 };
 
@@ -61,6 +72,7 @@ float GetBossEnemyRotateTheta(void);
 int GetBossEnemyRemainLife(void);
 int GetBossEnemyRemainLifeMax(void);
 int GetBossEnemyNowStates(void);
+Timer GetAttack2Timer(void);
 
 void InitBossEnemy(void);
 void UpdateBossEnemy(void);	

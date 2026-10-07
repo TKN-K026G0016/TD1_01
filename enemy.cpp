@@ -9,6 +9,7 @@
 #include "tool.h"
 #include "texture.h"
 
+#define _USE_MATH_DEFINES
 #include <math.h>
 
 constexpr int kEnemy1Limit = 10;
@@ -148,25 +149,34 @@ static void DrawEnemy2(void) {
 	}
 }
 
-static void SpawnEnemy2(void) {
-	Attack2Pos attack2Pos;
+static void Attack2Enemy2Move(void) {
+	Attack2Enemy2Pos attack2Pos;
 	int bossEnemyNouStates = GetBossEnemyNowStates();
+	Timer attack2Timer = GetAttack2Timer();
 	Vector2 bossEnemyPos = GetBossEnemyPos();
 	float bossEnemyRotateTheta = GetBossEnemyRotateTheta();
 	int enemyCount = 0;
 	if (bossEnemyNouStates == Attack2) {
-		for (int i = 0;i < kEnemy2Limit;i++) {
-			if (enemy2[i].isAlive)continue;
-			enemy2[i].isAlive = true;
-			enemyCount++;
-			if (enemyCount == 6)break;
+		if (attack2Timer.count == 0) {
+			for (int i = 0;i < kEnemy2Limit;i++) {
+				if (enemy2[i].isAlive)continue;
+				enemy2[i].isAlive = true;
+				enemyCount++;
+				if (enemyCount == 6)break;
+			}
 		}
 		for (int i = 0;i < kEnemy2Limit;i++) {
 			if (!enemy2[i].isAlive)continue;
-			enemy2[i].pos.x = sinf(bossEnemyRotateTheta) * attack2Pos.enemy2[enemyCount].x + bossEnemyPos.x;
-			enemy2[i].pos.y = cosf(bossEnemyRotateTheta) * attack2Pos.enemy2[enemyCount].y + bossEnemyPos.y;
+			enemy2[i].pos.x = cosf(bossEnemyRotateTheta+attack2Pos.theta[enemyCount]) * attack2Pos.dstance[enemyCount] + bossEnemyPos.x;
+			enemy2[i].pos.y = sinf(bossEnemyRotateTheta+attack2Pos.theta[enemyCount]) * attack2Pos.dstance[enemyCount] + bossEnemyPos.y;
 			enemyCount++;
 			if (enemyCount == 6)break;
+		}
+	}
+	else if (bossEnemyNouStates != Attack2) {
+		for (int i = 0;i < kEnemy2Limit;i++) {
+			enemy2[i].isAlive = false;
+			enemy2[i].hp = enemy2[i].hpMax;
 		}
 	}
 }
@@ -191,7 +201,7 @@ void UpdateEnemy(void) {
 	ShootEnemyBullet1();
 	ShootEnemyBullet2();
 	ReSpawnEnemy();
-	SpawnEnemy2();
+	Attack2Enemy2Move();
 }
 
 void DrawEnemy(void) {
