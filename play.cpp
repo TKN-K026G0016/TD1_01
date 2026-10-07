@@ -62,6 +62,7 @@ void DrawPlay(void) {
 
 	DrawPlayerLaser();
 	DrawGem();
+
 	DrawPlayer();
 
 	DrawEnemy();

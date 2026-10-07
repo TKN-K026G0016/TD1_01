@@ -7,6 +7,8 @@
 #include "tool.h"
 #include "texture.h"
 
+#include <Novice.h>
+
 #pragma region データ: HPアイコン
 struct LifeIcon {
 	Vector2 startPos = { 30, 690 };
@@ -55,6 +57,19 @@ struct BossHpGaugeMeter {
 	Texture texture = {};
 };
 BossHpGaugeMeter bossHpGaugeMeter;
+
+#pragma endregion
+
+#pragma region データ: 持続ボーナス
+
+struct LaserPowRate {
+	Vector2i startPos = { 1000, 700 };
+
+	float powRate = 1.0f;
+};
+LaserPowRate laserPowRate;
+
+
 
 #pragma endregion
 
@@ -122,6 +137,28 @@ static void DrawBossHpGauge(void) {
 
 #pragma endregion
 
+#pragma region 関数: 持続ボーナス
+
+static void UpdatePowRate(void) {
+	if (GetPlayerNowLaserLevel() == PlayerLaserLevel::Level2) {
+		laserPowRate.powRate = GetPlayerLaserPowRate();
+	}
+}
+
+static void DrawPowRate(void) {
+	if (GetPlayerNowLaserLevel() != PlayerLaserLevel::Level2) return;
+
+	if (!GetPlayerIsAlive()) return;
+
+	/*Vector2i posS = laserPowRate.startPos;*/
+	Vector2 playerPos = GetPlayerPos();
+	Vector2i posS = ConvertPosWToS({ playerPos.x, playerPos.y + 40 });
+
+	Novice::ScreenPrintf(posS.x, posS.y, "DAMAGE RATE: %.3f!!!", laserPowRate.powRate);
+}
+
+#pragma endregion
+
 void InitPlayUI(void) {
 	InitLifeIcon();
 	InitEnergyGauge();
@@ -131,12 +168,14 @@ void InitPlayUI(void) {
 void UpdatePlayUI(void){
 	UpdateEnergyGauge();
 	UpdateBossHpGauge();
+	UpdatePowRate();
 }
 
 void DrawPlayUI(void) {
 	DrawLifeIcon();
 	DrawEnergyGauge();
 	DrawBossHpGauge();
+	DrawPowRate();
 }
 
 #pragma region 関数: 外部参照関係
