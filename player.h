@@ -80,3 +80,17 @@ PlayerLaserLevel GetPlayerNowLaserLevel(void);
 /// </summary>
 /// <param name=""></param>
 void PlayerDamage(void);
+
+bool GetDodgeCloseSwitch(void);
+
+/// <summary>
+/// ギリ避け判定の大きさ取得
+/// </summary>
+/// <returns>player.dodgeCloseRadius</returns>
+float GetPlayerDodgeCloseRadius(void);
+
+/// <summary>
+/// ギリ避け成功時の処理
+/// </summary>
+/// <param name="eBulletPos">敵弾の座標</param>
+void TriggerDodgeClose(Vector2 eBulletPos);

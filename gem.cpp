@@ -144,7 +144,7 @@ void DrawGem(void) {
 		DrawTextureObj(gem[i].texture, gem[i].pos, gem[i].size);
 
 #ifdef _DEBUG
-		DrawHitEllipse(gem[i].pos, gem[i].hitRadius, RED, true);
+		DrawHitEllipse(gem[i].pos, gem[i].hitRadius, BLUE, false);
 #endif // _DEBUG
 
 	}
