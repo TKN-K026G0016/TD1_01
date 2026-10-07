@@ -50,6 +50,7 @@ static void CheckCollisionPlayerVSEnemyBullet(void) {
 	if (!GetPlayerIsAlive()) return;
 	Vector2 playerPos = GetPlayerPos();
 	float playerHitRadius = GetPlayerHitRadius();
+	float playerDodgeCloseRadius = GetPlayerDodgeCloseRadius();
 
 	EnemyBullet* eBullet = GetEnemyBulletArray();
 	int eBulletLimit = GetEnemyBulletLimit();
@@ -57,9 +58,15 @@ static void CheckCollisionPlayerVSEnemyBullet(void) {
 	for (int i = 0; i < eBulletLimit; i++) {
 		if (!eBullet[i].isShoot) continue;
 
-		if (CheckCollisionCircleVSCircle(eBullet[i].pos, eBullet[i].hitRadius, playerPos, playerHitRadius)) {
-			BreakEnemyBullet(i);
+		//ギリ避け判定
+		if (GetDodgeCloseSwitch()) {
+			if (CheckCollisionCircleVSCircle(eBullet[i].pos, eBullet[i].hitRadius, playerPos, playerDodgeCloseRadius)) {
+				TriggerDodgeClose(eBullet[i].pos);
+			}
+		}
 
+		//被弾判定
+		if (CheckCollisionCircleVSCircle(eBullet[i].pos, eBullet[i].hitRadius, playerPos, playerHitRadius)) {
 			PlayerDamage();
 		}
 

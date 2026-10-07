@@ -6,7 +6,15 @@
 #include "tool.h"
 #include "texture.h"
 
+#define _USE_MATH_DEFINES
+#include <math.h>
+
 constexpr int kGemLimit = 100;
+
+//散らばる範囲(最大)
+constexpr int kScatterLengthMax = 60;
+//散らばる範囲(最小)
+constexpr int kScatterLengthMin = 0;
 
 struct GemSpec {
 	GemType type;
@@ -17,6 +25,7 @@ struct GemSpec {
 	Texture texture = {};
 };
 GemSpec spec[ToInt(GemType::Count)] = {
+	//type //size //hitRadius // //回復量
 	{GemType::S, {20,20}, 15.0f, 10.0f, {}},
 	{GemType::M, {30,30}, 25.0f, 25.0f, {}},
 	{GemType::L, {40,40}, 35.0f, 40.0f, {}},
@@ -46,7 +55,7 @@ Gem gem[kGemLimit];
 
 #pragma endregion
 
-#pragma region 関数
+#pragma region 関数: 本体
 
 /// <summary>
 /// ジェムの消滅処理
@@ -90,6 +99,27 @@ static void CountBreakTimer(void) {
 
 #pragma endregion
 
+#pragma region 関数: 生成処理
+
+/// <summary>
+/// 生成時の出現座標作成
+/// </summary>
+/// <param name="centerPos">中心座標</param>
+/// <returns>出現座標</returns>
+Vector2 CreateScatterPos(Vector2 centerPos) {
+	float scatterLength = ToFloat(GetRand(kScatterLengthMin, kScatterLengthMax));
+
+	float theta = ToFloat(GetRand(0, 360)) * (ToFloat(M_PI) / 180.0f);
+
+	Vector2 pos;
+	pos.x = centerPos.x + scatterLength * cosf(theta);
+	pos.y = centerPos.y + scatterLength * sinf(theta);
+
+	return pos;
+}
+
+#pragma endregion
+
 void InitGem(void) {
 	spec[ToInt(GemType::S)].texture = GetTexture(TextureType::GemSmall);
 	spec[ToInt(GemType::M)].texture = GetTexture(TextureType::Gem);
@@ -114,7 +144,7 @@ void DrawGem(void) {
 		DrawTextureObj(gem[i].texture, gem[i].pos, gem[i].size);
 
 #ifdef _DEBUG
-		DrawHitEllipse(gem[i].pos, gem[i].hitRadius, RED, true);
+		DrawHitEllipse(gem[i].pos, gem[i].hitRadius, BLUE, false);
 #endif // _DEBUG
 
 	}
@@ -127,7 +157,7 @@ void SpawnGem(Vector2 pos, GemType type) {
 		if (gem[i].isAlive) continue;
 
 		gem[i].isAlive = true;
-		gem[i].pos = pos;
+		gem[i].pos = CreateScatterPos(pos);
 
 		gem[i].type = type;
 		gem[i].size = spec[ToInt(type)].size;

@@ -320,7 +320,7 @@ void DrawHitEllipse(Vector2 centerPos, float radius, unsigned int color, bool so
 	Vector2i posS = ConvertPosWToS(centerPos);
 	int viewRadius = ToInt(radius);
 
-	unsigned int viewColor = (color & 0xFFFFFF00) | 0x33;
+	unsigned int viewColor = (color & 0xFFFFFF00) | kDebugHitColor;
 
 	if (solidSwitch) {
 		Novice::DrawEllipse(

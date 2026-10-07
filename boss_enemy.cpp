@@ -73,7 +73,7 @@ int GetBossEnemyNowStates(void) {
 }
 
 void StatesCount(void) {
-	if (bossEnemy.nowsSates == BossStates::Nomal) {
+	if (bossEnemy.nowsSates == BossStates::Normal) {
 		stateTimer.nomal.count++;
 		if (stateTimer.nomal.count == stateTimer.nomal.time) {
 			stateTimer.nomal.count = 0;
@@ -84,21 +84,21 @@ void StatesCount(void) {
 		stateTimer.attack1.count++;
 		if (stateTimer.attack1.count == stateTimer.attack1.time) {
 			stateTimer.attack1.count = 0;
-			bossEnemy.nowsSates = BossStates::Nomal;
+			bossEnemy.nowsSates = BossStates::Normal;
 		}
 	}
 	else if (bossEnemy.nowsSates == BossStates::Attack2) {
 		stateTimer.attack2.count++;
 		if (stateTimer.attack2.count == stateTimer.attack2.time) {
 			stateTimer.attack2.count = 0;
-			bossEnemy.nowsSates = BossStates::Nomal;
+			bossEnemy.nowsSates = BossStates::Normal;
 		}
 	}
 }
 
 
 void MoveNomal(void) {
-	if (bossEnemy.nowsSates == BossStates::Nomal) {
+	if (bossEnemy.nowsSates == BossStates::Normal) {
 		playerPos = GetPlayerPos();
 		float DiffX = playerPos.x - bossEnemy.pos.x;
 		float DiffY = playerPos.y - bossEnemy.pos.y;

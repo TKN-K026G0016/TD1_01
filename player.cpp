@@ -2,6 +2,7 @@
 #include "player_laser.h"
 #include "stage.h"
 #include "enemy.h"
+#include "gem.h"
 #include "boss_enemy.h"
 
 #include "vector2.h"
@@ -15,7 +16,9 @@
 
 
 //ロックオンスイッチ
-bool lockOnSwitch = true;
+static constexpr bool kLockOnSwitch = true;
+//ギリ避けスイッチ
+constexpr bool kDodgeCloseSwitch = true;
 
 #pragma region データ: player本体
 struct Player {
@@ -28,6 +31,9 @@ struct Player {
 	float hitRadius = 10.0f;
 	int hp = 5;
 	int hpMax = 5;
+
+	//<ギリ避け関係>
+	float dodgeCloseRadius = 50.0f;
 
 	//<無敵関係>
 	//無敵フラグ
@@ -125,6 +131,13 @@ constexpr float kLaserPowRateMin = 1.0f;
 constexpr float kLaserPowRateMax = 3.0f;
 //火力の上昇速度
 constexpr float kLaserPowRateIncreaseSpeed = 0.01f;
+
+#pragma endregion
+
+#pragma region データ: ギリ避け関係
+
+//ギリ避け時のボーナススパン
+static Timer dodgeCloseBonusTimer = { 8, 0 };
 
 #pragma endregion
 
@@ -613,11 +626,11 @@ void DrawPlayer(void) {
 
 	DrawTextureRotateObj(player.texture, player.pos, player.size, player.rotateTheta);
 
+
 	DrawLockOnSign();
 
 #ifdef _DEBUG
-	//Novice::ScreenPrintf(20, 60, "NowLevel: %d", ToInt(player.laserLevel));
-	//Novice::ScreenPrintf(20, 80, "RemainEnergy: %.1f/%.1f", player.remainEnergy, player.energyLimit);
+	DrawHitEllipse(player.pos, player.dodgeCloseRadius, BLUE, false);
 
 #endif // _DEBUG
 
@@ -678,6 +691,25 @@ void PlayerDamage(void) {
 		//無敵開始
 		player.isInvincible = true;
 
+	}
+}
+
+bool GetDodgeCloseSwitch(void) {
+	return kDodgeCloseSwitch;
+}
+
+float GetPlayerDodgeCloseRadius(void) {
+	return player.dodgeCloseRadius;
+}
+
+void TriggerDodgeClose(Vector2 eBulletPos) {
+	if (!player.isAlive || player.isInvincible) return;
+
+	dodgeCloseBonusTimer.count++;
+	if (dodgeCloseBonusTimer.count >= dodgeCloseBonusTimer.time) {
+		dodgeCloseBonusTimer.count = 0;
+
+		SpawnGem(eBulletPos, GemType::S);
 	}
 }
 
