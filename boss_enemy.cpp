@@ -1,6 +1,7 @@
 #include "boss_enemy.h"
 #include "player.h"
 #include "player_laser.h"
+#include "stage.h"
 
 #include "vector2.h"
 #include "tool.h"
@@ -69,8 +70,14 @@ enum class ModeShootLaser {
 ModeShootLaser nowModeShootLaser = ModeShootLaser::Teleport;
 
 struct DataShootLaser {
+
+	ModeShootLaser nowMode = ModeShootLaser::Teleport;
+
 	//テレポート準備にかかる時間
 	Timer readyTeleportTimer = { 60, 0 };
+	//テレポート後の座標
+	Vector2 teleportTargetPos = {};
+
 	//テレポート終了から射撃開始までの時間
 	Timer readyShootTimer = { 100, 0 };
 
@@ -78,6 +85,8 @@ struct DataShootLaser {
 	Timer shootTimer = { 300, 0 };
 	//回転が始まるまでの時間
 	int startRotateTime = 60;
+	//レーザーの射撃スパン
+	Timer shootLaserTimer = { 3, 0 };
 
 	//現在の回転速度
 	float nowRotateSpeed = 0.0f;
@@ -202,6 +211,58 @@ void MoveAttack1(void) {
 void MoveAttack2(void) {
 	if (bossEnemy.nowsSates == BossStates::Attack2) {
 
+		DataShootLaser& data = dataShootLaser;
+
+		switch (data.nowMode) {
+		case ModeShootLaser::Teleport: {
+			data.readyTeleportTimer.count++;
+			if (data.readyTeleportTimer.count >= data.readyTeleportTimer.time) {
+				data.readyTeleportTimer.count = 0;
+
+				//ワープする
+				bossEnemy.pos = data.teleportTargetPos;
+				data.nowMode = ModeShootLaser::ReadyShoot;
+			}
+
+			break;
+		}
+		case ModeShootLaser::ReadyShoot: {
+			data.readyShootTimer.count++;
+			if (data.readyShootTimer.count >= data.readyShootTimer.time) {
+				data.readyShootTimer.count = 0;
+
+				data.nowMode = ModeShootLaser::Shoot;
+			}
+
+			break;
+		}
+		case ModeShootLaser::Shoot:
+		case ModeShootLaser::ShootAndRotate: {
+
+			//射撃処理
+
+
+
+			//回転処理
+
+			//射撃時間
+			data.shootTimer.count++;
+			//回転の開始
+			if (data.nowMode != ModeShootLaser::ShootAndRotate && data.shootTimer.count >= data.startRotateTime) {
+				data.nowMode = ModeShootLaser::ShootAndRotate;
+			}
+			//攻撃の終了
+			if (data.shootTimer.count >= data.shootTimer.time) {
+				data.shootTimer.count = 0;
+				data.nowMode = ModeShootLaser::Teleport;
+				bossEnemy.nowsSates = BossStates::Normal;
+			}
+
+			break;
+		}
+		}
+
+
 
 	}
 }
@@ -215,6 +276,12 @@ void DeathBossEnemy(void) {
 
 void InitBossEnemy(void) {
 	bossEnemy = {};
+
+	//ステージの中心座標を取得(shootLaser時のため)
+	Vector2 movablePos[2];
+	GetMovablePos(movablePos);
+	dataShootLaser.teleportTargetPos = { (movablePos[1].x - movablePos[0].x) / 2, (movablePos[1].y - movablePos[0].y) / 2 };
+
 	bossEnemy.texture = GetTexture(TextureType::BossEnemy);
 	for (int i = 0;i < 6;i++) {
 		bossBomb[i] = {};
