@@ -64,7 +64,7 @@ static void CheckDeadEnemy(void) {
 			DeadEnemy1(i);
 
 			//ジェムの生成処理
-			SpawnGem(enemy1[i].pos);
+			SpawnGem(enemy1[i].pos, GemType::M);
 		}
 	}
 }

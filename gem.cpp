@@ -8,21 +8,37 @@
 
 constexpr int kGemLimit = 100;
 
-#pragma region データ
+struct GemSpec {
+	GemType type;
+	Vector2 size;
+	float hitRadius;
+	float recoveryEnergy;
+
+	Texture texture = {};
+};
+GemSpec spec[ToInt(GemType::Count)] = {
+	{GemType::S, {20,20}, 15.0f, 10.0f, {}},
+	{GemType::M, {30,30}, 25.0f, 25.0f, {}},
+	{GemType::L, {40,40}, 35.0f, 40.0f, {}},
+};
+
+#pragma region データ: ジェム本体
 
 struct Gem {
 	Vector2 pos = { 0, 0 };
 	Vector2 size = { 32, 32 };
 
 	bool isAlive = false;
+	Timer breakTimer = { 3000, 0 };
+
+	//種類
+	GemType type = GemType::S;
 
 	//当たり判定の大きさ
-	float hitRadius = 35.0f;
+	float hitRadius = 0.0f;
 
 	//エネルギー回復量
-	float recoveryEnergy = 40.0f;
-
-	Timer breakTimer = { 3000, 0 };
+	float recoveryEnergy = 0.0f;
 
 	Texture texture = {};
 };
@@ -75,12 +91,15 @@ static void CountBreakTimer(void) {
 #pragma endregion
 
 void InitGem(void) {
+	spec[ToInt(GemType::S)].texture = GetTexture(TextureType::GemSmall);
+	spec[ToInt(GemType::M)].texture = GetTexture(TextureType::Gem);
+	spec[ToInt(GemType::L)].texture = GetTexture(TextureType::Gem);
+
 	for (int i = 0; i < kGemLimit; i++) {
 		gem[i] = {};
-		gem[i].texture = GetTexture(TextureType::Gem);
 	}
 
-	SpawnGem({500, 500});
+	SpawnGem({ 500, 500 }, GemType::S);
 }
 
 void UpdateGem(void) {
@@ -98,12 +117,18 @@ void DrawGem(void) {
 
 #pragma region 関数: 外部参照関係
 
-void SpawnGem(Vector2 pos) {
+void SpawnGem(Vector2 pos, GemType type) {
 	for (int i = 0; i < kGemLimit; i++) {
 		if (gem[i].isAlive) continue;
 
 		gem[i].isAlive = true;
 		gem[i].pos = pos;
+
+		gem[i].type = type;
+		gem[i].size = spec[ToInt(type)].size;
+		gem[i].hitRadius = spec[ToInt(type)].hitRadius;
+		gem[i].recoveryEnergy = spec[ToInt(type)].recoveryEnergy;
+		gem[i].texture = spec[ToInt(type)].texture;
 
 		break;
 	}
