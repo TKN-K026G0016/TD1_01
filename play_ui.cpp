@@ -148,6 +148,8 @@ static void UpdatePowRate(void) {
 static void DrawPowRate(void) {
 	if (GetPlayerNowLaserLevel() != PlayerLaserLevel::Level2) return;
 
+	if (!GetPlayerIsAlive()) return;
+
 	/*Vector2i posS = laserPowRate.startPos;*/
 	Vector2 playerPos = GetPlayerPos();
 	Vector2i posS = ConvertPosWToS({ playerPos.x, playerPos.y + 40 });

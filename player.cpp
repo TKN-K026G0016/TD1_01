@@ -102,6 +102,14 @@ enum class LockTargetType {
 	Enemy1 = 0,
 };
 
+struct LockOnSign {
+	Vector2 pos = {};
+	Vector2 size = { 64, 64 };
+
+	Texture texture = {};
+};
+LockOnSign lockOnSign;
+
 #pragma endregion
 
 #pragma region データ: 射撃関係
@@ -147,8 +155,7 @@ static void CheckInput(void) {
 #pragma region ロック
 	if (CheckInputAction(InputAction::Lock)) {
 		player.isLock = true;
-	}
-	else {
+	} else {
 		player.isLock = false;
 	}
 
@@ -257,8 +264,7 @@ static void ClampPlayerPos(void) {
 	//横
 	if (player.pos.x < movablePos[0].x) {
 		player.pos.x = movablePos[0].x;
-	}
-	else if (player.pos.x > movablePos[1].x) {
+	} else if (player.pos.x > movablePos[1].x) {
 		player.pos.x = movablePos[1].x;
 	}
 
@@ -269,6 +275,10 @@ static void ClampPlayerPos(void) {
 		player.pos.y = movablePos[1].y;
 	}
 }
+
+#pragma endregion
+
+#pragma region 関数: 回転&ロックオン関係
 
 /// <summary>
 /// 通常時の回転処理
@@ -386,6 +396,39 @@ static void LockOn(void) {
 
 }
 
+
+/// <summary>
+/// ロックオンマークの初期化処理
+/// </summary>
+/// <param name=""></param>
+static void InitLockSign(void) {
+	lockOnSign = {};
+	lockOnSign.texture = GetTexture(TextureType::LockOnSign);
+}
+
+static void UpdateLockOnSign(void) {
+	if (!player.isLock || player.targetIndex == ToInt(LockTargetType::None)) return;
+
+	//ボスの場合、
+	if (player.targetIndex == ToInt(LockTargetType::Boss)) {
+		BossEnemy* boss = GetBossEnemy();
+
+		lockOnSign.pos = boss->pos;
+	}
+	//ザコの場合
+	else {
+		Enemy1* enemy1 = GetEnemy1Array();
+		lockOnSign.pos = enemy1[player.targetIndex].pos;
+	}
+
+}
+
+static void DrawLockOnSign(void) {
+	if (!player.isLock || player.targetIndex == ToInt(LockTargetType::None)) return;
+
+	DrawTextureObj(lockOnSign.texture, lockOnSign.pos, lockOnSign.size);
+}
+
 #pragma endregion
 
 #pragma region 関数: 射撃・エネルギー関係
@@ -456,10 +499,10 @@ static void UpdateSustainLv2Bonus(void) {
 		sustainLv2Count++;
 
 		//初期値 + (maxまでの数値 * (1.0f - 指数関数(0に近づく)))
-		laserPowRate = kLaserPowRateMin + 
+		laserPowRate = kLaserPowRateMin +
 			(kLaserPowRateMax - kLaserPowRateMin) * (1.0f - expf(-kLaserPowRateIncreaseSpeed * sustainLv2Count));
 
-	} 
+	}
 	//それ以外の状態時、攻撃力の倍率を戻す
 	else {
 		sustainLv2Count = 0;
@@ -469,15 +512,15 @@ static void UpdateSustainLv2Bonus(void) {
 
 #pragma endregion
 
-#pragma region 関数: その他
+#pragma region 関数: 死亡判定など
 
 /// <summary>
 /// 無敵時の処理
 /// </summary>
 /// <param name=""></param>
 static void UpdateInvinciblePlayer(void) {
-	if(!player.isInvincible) return;
-		
+	if (!player.isInvincible) return;
+
 #pragma region 点滅処理
 
 	invisibleTimer.count++;
@@ -485,8 +528,7 @@ static void UpdateInvinciblePlayer(void) {
 		invisibleTimer.count = 0;
 		if (!isInvisible) {
 			isInvisible = true;
-		}
-		else {
+		} else {
 			isInvisible = false;
 		}
 	}
@@ -500,7 +542,7 @@ static void UpdateInvinciblePlayer(void) {
 
 		//無敵フラグを折る
 		player.isInvincible = false;
-		
+
 		//透明処理をリセット
 		isInvisible = false;
 		invisibleTimer.count = 0;
@@ -540,6 +582,7 @@ void InitPlayer(void) {
 	player.texture = GetTexture(TextureType::Player);
 
 	GetMovablePos(movablePos);
+	InitLockSign();
 }
 
 void UpdatePlayer(void) {
@@ -551,6 +594,7 @@ void UpdatePlayer(void) {
 	LockOn();
 	RotatePlayer();
 	RotatePlayerByLockOn();
+	UpdateLockOnSign();
 
 	ShootLaser();
 
@@ -568,6 +612,8 @@ void DrawPlayer(void) {
 	if (!player.isAlive || isInvisible) return;
 
 	DrawTextureRotateObj(player.texture, player.pos, player.size, player.rotateTheta);
+
+	DrawLockOnSign();
 
 #ifdef _DEBUG
 	//Novice::ScreenPrintf(20, 60, "NowLevel: %d", ToInt(player.laserLevel));
@@ -624,7 +670,7 @@ PlayerLaserLevel GetPlayerNowLaserLevel(void) {
 
 void PlayerDamage(void) {
 	if (!player.isAlive || player.isInvincible) return;
-	
+
 	//体力減らす
 	player.hp--;
 
