@@ -5,7 +5,7 @@
 //頂点の数
 constexpr int kVertexNum = 4;
 //当たり判定の透明度
-constexpr unsigned int kDebugHitColor = 0xAA;
+constexpr unsigned int kDebugHitColor = 0x77;
 
 template <typename T>
 //static_cast<int>()の代わり
