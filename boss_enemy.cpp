@@ -58,27 +58,6 @@ StatesTimer statesTimer;
 
 #pragma region データ: レーザー攻撃
 
-bool GetBossEnemyIsAlive(void) {
-	return bossEnemy.isAlive;
-}
-Vector2 GetBossEnemyPos(void) {
-	return bossEnemy.pos;
-}
-float GetBossEnemyRotateTheta(void) {
-	return bossEnemy.rotateTheta;
-}
-int GetBossEnemyRemainLife(void) {
-	return bossEnemy.remainLife;
-}
-int GetBossEnemyRemainLifeMax(void) {
-	return bossEnemy.remainLifeMax;
-}
-int GetBossEnemyNowStates(void) {
-	return bossEnemy.nowsSates;
-}
-Timer GetAttack2Timer(void) {
-	return statesTimer.attack2;
-}
 enum class ModeShootLaser {
 	//テレポート状態
 	Teleport,
@@ -431,26 +410,30 @@ void DrawBossEnemy(void) {
 
 #pragma region 関数: 外部参照関係
 
-BossEnemy* GetBossEnemy(void) {
-	return &bossEnemy;
+bool GetBossEnemyIsAlive(void) {
+	return bossEnemy.isAlive;
 }
-
 Vector2 GetBossEnemyPos(void) {
 	return bossEnemy.pos;
 }
-
 float GetBossEnemyRotateTheta(void) {
 	return bossEnemy.rotateTheta;
-}
-
-bool GetBossEnemyIsAlive(void) {
-	return bossEnemy.isAlive;
 }
 int GetBossEnemyRemainLife(void) {
 	return bossEnemy.remainLife;
 }
 int GetBossEnemyRemainLifeMax(void) {
 	return bossEnemy.remainLifeMax;
+}
+int GetBossEnemyNowStates(void) {
+	return bossEnemy.nowsSates;
+}
+Timer GetAttack2Timer(void) {
+	return statesTimer.attack2;
+}
+
+BossEnemy* GetBossEnemy(void) {
+	return &bossEnemy;
 }
 
 #pragma endregion

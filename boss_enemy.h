@@ -7,9 +7,14 @@
 
 
 enum BossStates {
+	//移動のみ
 	Normal,
+	//爆弾
 	Attack1,
+	//ザコ召喚
 	Attack2,
+	//レーザー射撃
+	Attack3,
 
 	Count,
 };
@@ -49,8 +54,6 @@ struct BossEnemy {
 	int nowsSates=BossStates::Attack2;
 
 	Texture texture = {};
-	//状態
-	int nowsSates=BossStates::Attack2;
 };
 
 struct Attack2Enemy2Pos {
@@ -86,5 +89,3 @@ void UpdateBossEnemy(void);
 void DrawBossEnemy(void);
 
 BossEnemy* GetBossEnemy(void);
-Vector2 GetBossEnemyPos(void);
-float GetBossEnemyRotateTheta(void);
