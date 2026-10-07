@@ -18,13 +18,13 @@ struct Enemy1 {
 	//生存フラグ
 	bool isAlive = false;
 
-	int hp = 60;
+	int hp = 30;
 	int hpMax = 30;
 
 	float hitRadius = 20.0f;
 
 	//<射撃処理関係>
-	Timer shootTimer = { 150, 0 };
+	Timer shootTimer = { 300, 0 };
 
 	Texture texture = {};
 };
@@ -42,7 +42,7 @@ struct Enemy2 {
 	float hitRadius = 20.0f;
 
 	//<射撃処理関係>
-	Timer shootTimer = { 150, 0 };
+	Timer shootTimer = { 75, 0 };
 
 	Texture texture = {};
 };

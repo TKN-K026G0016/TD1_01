@@ -27,8 +27,8 @@ struct BossEnemy {
 	bool isAlive = true;
 	//当たり判定の大きさ
 	float hitRadius =	128.0f;
-	int remainLife = 1000;
-	int remainLifeMax = 1000;
+	int remainLife = 3000;
+	int remainLifeMax = 3000;
 
 	//<移動関係>
 	// 視界

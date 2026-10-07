@@ -26,9 +26,9 @@ LaserSpec laserSpec[kLaserLevel] = {
 	//level0
 	{ LaserLevel::Level0, {50, 20}, 1, { }},
 	//level1
-	{ LaserLevel::Level1, {50, 40}, 2, {} },
+	{ LaserLevel::Level1, {50, 40}, 3, {} },
 	//level2
-	{ LaserLevel::Level2, {50, 80}, 2, {} },
+	{ LaserLevel::Level2, {50, 80}, 5, {} },
 };
 
 #pragma region データ
