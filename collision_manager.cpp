@@ -31,7 +31,9 @@ static void CheckCollisionLaserVSEnemy(void) {
 					BreakLaser(j);
 				}
 
-				enemy1[i].hp -= laser[j].pow;
+				int pow = GetLaserPow(j);
+
+				enemy1[i].hp -= pow;
 			}
 		}
 	}
@@ -67,9 +69,7 @@ static void CheckCollisionPlayerVSEnemyBullet(void) {
 
 /// <summary>
 /// PlayerLaserとBossEnemyの判定
-/// </summary>
-/// <param name=""></param>
-/// 
+/// </summary> 
 void CheckCollisionLaserVSBossEnemy(void) {
 	PlayerLaser* laser = GetPlayerLaserArray();
 	int laserLimit = GetPlayerLaserLimit();
@@ -79,7 +79,10 @@ void CheckCollisionLaserVSBossEnemy(void) {
 		if (!laser[i].isShoot) continue;
 		if (CheckCollisionOBBvsCircle(boss->pos, boss->hitRadius, laser[i].hitBoxVertex)) {
 			BreakLaser(i);
-			boss->remainLife -= laser[i].pow;
+
+			int pow = GetLaserPow(i);
+
+			boss->remainLife -= pow;
 		}
 	}
 }

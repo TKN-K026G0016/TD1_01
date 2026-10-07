@@ -28,7 +28,7 @@ LaserSpec laserSpec[kLaserLevel] = {
 	//level1
 	{ LaserLevel::Level1, {50, 40}, 2, {} },
 	//level2
-	{ LaserLevel::Level2, {50, 80}, 3, {} },
+	{ LaserLevel::Level2, {50, 80}, 2, {} },
 };
 
 #pragma region データ
@@ -132,6 +132,8 @@ void DrawPlayerLaser(void) {
 	}
 }
 
+#pragma region 関数: 外部参照関係
+
 void ShootPlayerLaser(Vector2 pos, float moveTheta, float firstDisLength) {
 	int level = ToInt(GetPlayerNowLaserLevel());
 	LaserSpec& spec = laserSpec[level];
@@ -164,6 +166,17 @@ int GetPlayerLaserLimit(void) {
 	return kPlayerLaserLimit;
 }
 
+int GetLaserPow(int index) {
+	int pow;
+
+	if (laser[index].level != LaserLevel::Level2) {
+		pow = laser[index].pow;
+	} else {
+		pow = ToInt(laser[index].pow * GetPlayerLaserPowRate());
+	}
+	return pow;
+}
+
 /// <summary>
 /// 消滅処理
 /// </summary>
@@ -172,3 +185,5 @@ void BreakLaser(int index) {
 	laser[index].isShoot = false;
 	laser[index].breakTimer.count = 0;
 }
+
+#pragma endregion

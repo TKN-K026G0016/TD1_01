@@ -49,6 +49,13 @@ void DrawPlayerLaser(void);
 /// <param name="firstDisLength">最初のプレイヤーとの距離</param>
 void ShootPlayerLaser(Vector2 pos, float moveTheta, float firstDisLength);
 
+/// <summary>
+/// 指定レーザーの威力を取得
+/// </summary>
+/// <param name="index">番号</param>
+/// <returns>威力</returns>
+int GetLaserPow(int index);
+
 PlayerLaser* GetPlayerLaserArray(void);
 
 int GetPlayerLaserLimit(void);

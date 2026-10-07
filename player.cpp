@@ -114,9 +114,9 @@ int sustainLv2Count = 0;
 //Lv2レーザーの攻撃力倍率
 float laserPowRate = 1.0f;
 constexpr float kLaserPowRateMin = 1.0f;
-constexpr float kLaserPowRateMax = 6.0f;
+constexpr float kLaserPowRateMax = 3.0f;
 //火力の上昇速度
-constexpr float kLaserPowRateIncreaseSpeed = 0.1f;
+constexpr float kLaserPowRateIncreaseSpeed = 0.01f;
 
 #pragma endregion
 
