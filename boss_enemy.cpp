@@ -89,7 +89,7 @@ struct DataShootLaser {
 	//射撃時間
 	Timer shootTimer = { 300, 0 };
 	//回転が始まるまでの時間
-	int startRotateTime = 60;
+	int startRotateTime = 90;
 	//レーザーの射撃スパン
 	Timer shootLaserTimer = { 2, 0 };
 
@@ -97,9 +97,15 @@ struct DataShootLaser {
 	//現在の回転速度
 	float nowRotateSpeed = 0.0f;
 	//回転速度の加速度
-	float rotateAccelerationSpeed = 0.01f;
+	float rotateAccelerationSpeed = 0.0005f;
 	//回転速度の上限
-	float rotateSpeedMax = 0.1f;
+	float rotateSpeedMax = 0.05f;
+	//現在の回転角
+	float nowRotateTheta = 0.0f;
+	//回転角の上限
+	float rotateThetaMax = 1.0f * float(M_PI);
+	//レーザーの回転方向
+	float rotateDiff = 0.0f;
 };
 DataShootLaser dataShootLaser;
 
@@ -150,7 +156,8 @@ void MoveNormal(void) {
 			if (bossEnemy.nowSpeed > bossEnemy.moveSpeedLimit) {
 				bossEnemy.nowSpeed = bossEnemy.moveSpeedLimit;
 			}
-		} else {
+		}
+		else {
 			if (DiffX != 0) {
 				bossEnemy.velocity.x = (DiffX / distance);
 			}
@@ -296,6 +303,12 @@ void MoveAttack3(void) {
 			while (diff < -ToFloat(M_PI)) {
 				diff += ToFloat(M_PI) * 2;
 			}
+			if (diff > 0) {
+				data.rotateDiff = 1;
+			}
+			else if (diff <= 0) {
+				data.rotateDiff = -1;
+			}
 
 			bossEnemy.rotateTheta += diff * data.rotatateSpeedReadyShoot;
 
@@ -306,9 +319,10 @@ void MoveAttack3(void) {
 		case ModeShootLaser::Shoot:
 		case ModeShootLaser::ShootAndRotate: {
 
+
 			//射撃処理
 			data.shootLaserTimer.count++;
-			if (data.shootLaserTimer.count >= data.shootLaserTimer.time) {
+			if (data.shootLaserTimer.count >= data.shootLaserTimer.time&&data.shootTimer.count<data.shootTimer.time-60) {
 				data.shootLaserTimer.count = 0;
 				ShootEnemyLaser(bossEnemy.pos, bossEnemy.rotateTheta, 0.0f);
 			}
@@ -318,23 +332,27 @@ void MoveAttack3(void) {
 			if (data.nowMode == ModeShootLaser::ShootAndRotate) {
 				playerPos = GetPlayerPos();
 
-				//プレイヤーを追跡するように回転
-				float disX = playerPos.x - bossEnemy.pos.x;
-				float disY = playerPos.y - bossEnemy.pos.y;
-				float targetTheta = atan2f(disY, disX);
+				/*if(data.shootLaserTimer.count==data.startRotateTime){
+					プレイヤーを追跡するように回転
+					float disX = playerPos.x - bossEnemy.pos.x;
+					float disY = playerPos.y - bossEnemy.pos.y;
+					float targetTheta = atan2f(disY, disX);
 
-				//現在の方向との差を求める
-				float diff = targetTheta - bossEnemy.rotateTheta;
+					現在の方向との差を求める
+					data.rotateDiff = targetTheta - bossEnemy.rotateTheta;
 
-				//差を-π~πに正規化
-				while (diff > ToFloat(M_PI)) {
-					diff -= ToFloat(M_PI) * 2;
+					差を-π~πに正規化
+					while (data.rotateDiff > ToFloat(M_PI)) {
+						data.rotateDiff -= ToFloat(M_PI) * 2;
+					}
+					while (data.rotateDiff < -ToFloat(M_PI)) {
+						data.rotateDiff += ToFloat(M_PI) * 2;
+					}
+				}*/
+				if (data.nowRotateTheta < data.rotateThetaMax&&data.nowRotateTheta>-1*data.rotateThetaMax) {
+					bossEnemy.rotateTheta += data.rotateDiff * data.nowRotateSpeed;
+					data.nowRotateTheta += data.rotateDiff * data.nowRotateSpeed;
 				}
-				while (diff < -ToFloat(M_PI)) {
-					diff += ToFloat(M_PI) * 2;
-				}
-
-				bossEnemy.rotateTheta += diff * data.nowRotateSpeed;
 
 				//回転の加速処理
 				data.nowRotateSpeed += data.rotateAccelerationSpeed;
@@ -353,6 +371,7 @@ void MoveAttack3(void) {
 			}
 			//攻撃の終了
 			if (data.shootTimer.count >= data.shootTimer.time) {
+				data.nowRotateTheta = 0;
 				data.shootTimer.count = 0;
 				data.nowMode = ModeShootLaser::Teleport;
 				bossEnemy.nowsSates = BossStates::Normal;

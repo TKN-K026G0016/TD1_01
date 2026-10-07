@@ -22,7 +22,7 @@ struct EnemyBullet {
 
 struct EnemyLaser {
 	Vector2 pos = { 0, 0 };
-	Vector2 size = { 30, 15 };
+	Vector2 size = { 60, 90 };
 
 	//<移動関係>
 	float moveSpeed = 20.0f;
