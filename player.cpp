@@ -186,26 +186,27 @@ static void MovePlayer(void) {
 
 	//右入力
 	if (player.inputVec.x >= 1.0f) {
-		player.velocity.x += player.accleretionSpeed;
+		//player.velocity.x += player.accleretionSpeed;
 
-		//反対側に勢いがあれば、減速度も加える
-		if (player.velocity.x < 0.0f) {
-			player.velocity.x += player.decelerationSpeed;
-		}
-
+		////反対側に勢いがあれば、減速度も加える
+		//if (player.velocity.x < 0.0f) {
+		//	player.velocity.x += player.decelerationSpeed;
+		//}
+		player.pos.x += 5.0f;
 	}
 	//左入力
 	else if (player.inputVec.x <= -1.0f) {
-		player.velocity.x -= player.accleretionSpeed;
+		//player.velocity.x -= player.accleretionSpeed;
 
-		//反対側に勢いがあれば、減速度も加える
-		if (player.velocity.x > 0.0f) {
-			player.velocity.x -= player.decelerationSpeed;
-		}
+		////反対側に勢いがあれば、減速度も加える
+		//if (player.velocity.x > 0.0f) {
+		//	player.velocity.x -= player.decelerationSpeed;
+		//}
+		player.pos.x -= 5.0f;
 	}
 	//入力なし(=減速)
 	else {
-		if (player.velocity.x > 0.0f) {
+		/*if (player.velocity.x > 0.0f) {
 			player.velocity.x -= player.decelerationSpeed;
 			if (player.velocity.x < 0.0f) {
 				player.velocity.x = 0.0f;
@@ -215,26 +216,28 @@ static void MovePlayer(void) {
 			if (player.velocity.x > 0.0f) {
 				player.velocity.x = 0.0f;
 			}
-		}
+		}*/
 	}
 
 	//上入力
 	if (player.inputVec.y >= 1.0f) {
-		player.velocity.y += player.accleretionSpeed;
+		//player.velocity.y += player.accleretionSpeed;
 
-		//反対側に勢いがあれば、減速度も加える
-		if (player.velocity.y < 0.0f) {
-			player.velocity.y += player.decelerationSpeed;
-		}
+		////反対側に勢いがあれば、減速度も加える
+		//if (player.velocity.y < 0.0f) {
+		//	player.velocity.y += player.decelerationSpeed;
+		//}
+		player.pos.y += 5.0f;
 	}
 	//下入力
 	else if (player.inputVec.y <= -1.0f) {
-		player.velocity.y -= player.accleretionSpeed;
+		/*player.velocity.y -= player.accleretionSpeed;
 
-		//反対側に勢いがあれば、減速度も加える
+		反対側に勢いがあれば、減速度も加える
 		if (player.velocity.y > 0.0f) {
 			player.velocity.y -= player.decelerationSpeed;
-		}
+		}*/
+		player.pos.y -= 5.0f;
 	}
 	//入力なし(=減速)
 	else {
@@ -252,12 +255,12 @@ static void MovePlayer(void) {
 	}
 
 	//速度調整
-	float speed = sqrtf(player.velocity.x * player.velocity.x + player.velocity.y * player.velocity.y);
+	/*float speed = sqrtf(player.velocity.x * player.velocity.x + player.velocity.y * player.velocity.y);
 	if (speed > player.moveSpeedLimit) {
 		float scale = player.moveSpeedLimit / speed;
 		player.velocity.x *= scale;
 		player.velocity.y *= scale;
-	}
+	}*/
 
 	//位置更新
 	player.pos.x += player.velocity.x;
