@@ -19,6 +19,8 @@
 static constexpr bool kAutoLockOnSwitch = true;
 //加速度移動スイッチ
 static constexpr bool kAcceleratingSwitch = false;
+//真ん中に維持するゲーム性にするスイッチ
+static constexpr bool kModeKeepCenterSwitch = true;
 
 //ギリ避けスイッチ
 constexpr bool kDodgeCloseSwitch = true;
@@ -55,7 +57,7 @@ struct Player {
 	float decelerationSpeed = 0.15f;
 
 	//移動速度(等速)
-	float moveSpeed = 5.0f;
+	float moveSpeed[2] = {6.0f, 1.3f};
 
 	Vector2 inputVec = { 0, 0 };
 
@@ -76,12 +78,12 @@ struct Player {
 	Timer shootTimer = { 2, 0 };
 
 	//<エネルギー関係>
+	bool isEmptyEnergy = false;
 	//エネルギー残量
-	float remainEnergy = 0.0f;
-	//エネルギー上限
-	float energyLimit = 100.0f;
-	//エネルギー消費量(レベルごと)
-	float consumptionEnergy[ToInt(PlayerLaserLevel::Count)] = { 0.0f, 0.1f, 0.7f };
+	float remainEnergy = 0;
+
+	//故障時のenergy回復量
+	float recoveryEnergyDuringEmpty = 0.3f;
 
 	//<レベル関係>
 	//レーザーのレベル
@@ -140,6 +142,22 @@ constexpr float kLaserPowRateMin = 1.0f;
 constexpr float kLaserPowRateMax = 3.0f;
 //火力の上昇速度
 constexpr float kLaserPowRateIncreaseSpeed = 0.01f;
+
+#pragma endregion
+
+#pragma region データ: エネルギー関係
+
+//エネルギー上限
+constexpr float kEnergyMax = 100.0f;
+//エネルギー下限
+constexpr float kEnergyMin = 0.0f;
+//エネルギーゲージの中間
+constexpr float kEnergyCenter = (kEnergyMax - kEnergyMin) / 2;
+
+//エネルギー消費量
+constexpr float kConsumptionEnergy = 0.1f;
+//エネルギー消費量(レベルごと)
+constexpr float kConsumptionEnergys[ToInt(PlayerLaserLevel::Count)] = { 0.0f, 0.1f, 0.7f };
 
 #pragma endregion
 
@@ -286,8 +304,10 @@ static void MovePlayer(void) {
 			moveVec.y /= moveVecLength;
 		}
 
-		player.pos.x += player.moveSpeed * moveVec.x;
-		player.pos.y += player.moveSpeed * moveVec.y;
+		float moveSpeed = (!player.isEmptyEnergy) ? player.moveSpeed[0] : player.moveSpeed[1];
+
+		player.pos.x += moveSpeed * moveVec.x;
+		player.pos.y += moveSpeed * moveVec.y;
 	}
 }
 
@@ -610,16 +630,33 @@ static void DrawLockOnSign(void) {
 static void ShootLaser(void) {
 	if (!player.isAlive) return;
 
-	player.shootTimer.count++;
-	if (player.shootTimer.count >= player.shootTimer.time) {
-		player.shootTimer.count = 0;
+	if (!kModeKeepCenterSwitch) {
+		player.shootTimer.count++;
+		if (player.shootTimer.count >= player.shootTimer.time) {
+			player.shootTimer.count = 0;
 
-		//射撃位置設定
-		Vector2 shootPos;
-		shootPos.x = player.pos.x + kShootDisLength * cosf(player.rotateTheta);
-		shootPos.y = player.pos.y + kShootDisLength * sinf(player.rotateTheta);
+			//射撃位置設定
+			Vector2 shootPos;
+			shootPos.x = player.pos.x + kShootDisLength * cosf(player.rotateTheta);
+			shootPos.y = player.pos.y + kShootDisLength * sinf(player.rotateTheta);
 
-		ShootPlayerLaser(shootPos, player.rotateTheta, kShootDisLength);
+			ShootPlayerLaser(shootPos, player.rotateTheta, kShootDisLength);
+		}
+	} 
+	else {
+		if (player.isEmptyEnergy) return;
+
+		player.shootTimer.count++;
+		if (player.shootTimer.count >= player.shootTimer.time) {
+			player.shootTimer.count = 0;
+
+			//射撃位置設定
+			Vector2 shootPos;
+			shootPos.x = player.pos.x + kShootDisLength * cosf(player.rotateTheta);
+			shootPos.y = player.pos.y + kShootDisLength * sinf(player.rotateTheta);
+
+			ShootPlayerLaser(shootPos, player.rotateTheta, kShootDisLength);
+		}
 	}
 }
 
@@ -629,14 +666,16 @@ static void ShootLaser(void) {
 static void LevelUp(void) {
 	if (!player.isAlive) return;
 
-	int level = ToInt(player.laserLevel);
+	if (!kModeKeepCenterSwitch) {
+		int level = ToInt(player.laserLevel);
 
-	//レベル2以上はレベルアップなし
-	if (level >= ToInt(PlayerLaserLevel::Level2)) return;
+		//レベル2以上はレベルアップなし
+		if (level >= ToInt(PlayerLaserLevel::Level2)) return;
 
-	float levelUpLine = player.levelUpLine[level + 1];
-	if (player.remainEnergy >= levelUpLine) {
-		player.laserLevel = static_cast<PlayerLaserLevel>(level + 1);
+		float levelUpLine = player.levelUpLine[level + 1];
+		if (player.remainEnergy >= levelUpLine) {
+			player.laserLevel = static_cast<PlayerLaserLevel>(level + 1);
+		}
 	}
 }
 
@@ -646,16 +685,26 @@ static void LevelUp(void) {
 static void ConsumptionEnergy(void) {
 	if (!player.isAlive) return;
 
-	int level = ToInt(player.laserLevel);
+	if (!kModeKeepCenterSwitch) {
+		int level = ToInt(player.laserLevel);
 
-	//レベル0は消費なし
-	if (level == 0) return;
+		//レベル0は消費なし
+		if (level == 0) return;
 
-	player.remainEnergy -= player.consumptionEnergy[level];
+		player.remainEnergy -= kConsumptionEnergys[level];
 
-	if (player.remainEnergy <= 0.0f) {
-		player.laserLevel = PlayerLaserLevel::Level0;
-		player.remainEnergy = 0.0f;
+		if (player.remainEnergy <= 0.0f) {
+			player.laserLevel = PlayerLaserLevel::Level0;
+			player.remainEnergy = 0.0f;
+		}
+	} 
+	//中心に保つゲーム性
+	else {
+		player.remainEnergy -= kConsumptionEnergy;
+
+		if (player.remainEnergy <= 0.0f) {
+			player.remainEnergy = 0.0f;
+		}
 	}
 }
 
@@ -665,19 +714,56 @@ static void ConsumptionEnergy(void) {
 /// <param name=""></param>
 static void UpdateSustainLv2Bonus(void) {
 	if (!player.isAlive) return;
-	//Lv2状態時のみ実行
-	if (player.laserLevel == PlayerLaserLevel::Level2) {
-		sustainLv2Count++;
 
-		//初期値 + (maxまでの数値 * (1.0f - 指数関数(0に近づく)))
-		laserPowRate = kLaserPowRateMin +
-			(kLaserPowRateMax - kLaserPowRateMin) * (1.0f - expf(-kLaserPowRateIncreaseSpeed * sustainLv2Count));
+	if (!kModeKeepCenterSwitch) {
+		//Lv2状態時のみ実行
+		if (player.laserLevel == PlayerLaserLevel::Level2) {
+			sustainLv2Count++;
 
+			//初期値 + (maxまでの数値 * (1.0f - 指数関数(0に近づく)))
+			laserPowRate = kLaserPowRateMin +
+				(kLaserPowRateMax - kLaserPowRateMin) * (1.0f - expf(-kLaserPowRateIncreaseSpeed * sustainLv2Count));
+
+		}
+		//それ以外の状態時、攻撃力の倍率を戻す
+		else {
+			sustainLv2Count = 0;
+			laserPowRate = kLaserPowRateMin;
+		}
 	}
-	//それ以外の状態時、攻撃力の倍率を戻す
-	else {
-		sustainLv2Count = 0;
-		laserPowRate = kLaserPowRateMin;
+}
+
+/// <summary>
+/// ゲージ維持失敗の確認処理
+/// </summary>
+/// <param name=""></param>
+static void CheckFailedMaintenance(void) {
+	if (!player.isAlive) return;
+
+	if (kModeKeepCenterSwitch) {
+		if (player.isEmptyEnergy) return;
+
+		if (player.remainEnergy <= kEnergyMin || player.remainEnergy >= kEnergyMax) {
+			player.isEmptyEnergy = true;
+			player.remainEnergy = 0.0f;
+		}
+	}
+}
+
+/// <summary>
+/// 故障中のエネルギー回復処理
+/// </summary>
+/// <param name=""></param>
+static void RecoveryEnergyDuringEmptyEnergy(void) {
+	if (!player.isAlive) return;
+
+	if (kModeKeepCenterSwitch) {
+		if (!player.isEmptyEnergy) return;
+
+		player.remainEnergy += player.recoveryEnergyDuringEmpty;
+		if (player.remainEnergy >= kEnergyCenter) {
+			player.isEmptyEnergy = false;
+		}
 	}
 }
 
@@ -751,6 +837,7 @@ static void ReplenishmentEnergy(void) {
 void InitPlayer(void) {
 	player = {};
 	player.texture = GetTexture(TextureType::Player);
+	player.remainEnergy = kEnergyCenter;
 
 	GetMovablePos(movablePos);
 	InitLockSign();
@@ -769,9 +856,13 @@ void UpdatePlayer(void) {
 
 	ShootLaser();
 
-	LevelUp();
+	CheckFailedMaintenance();
+	RecoveryEnergyDuringEmptyEnergy();
+
 	ConsumptionEnergy();
+	LevelUp();
 	UpdateSustainLv2Bonus();
+
 
 	UpdateInvinciblePlayer();
 	DeadPlayer();
@@ -817,7 +908,7 @@ float GetPlayerRemainEnergy(void) {
 }
 
 float GetPlayerEnergyLimit(void) {
-	return player.energyLimit;
+	return kEnergyMax;
 }
 
 float GetPlayerLaserPowRate(void) {
@@ -826,8 +917,8 @@ float GetPlayerLaserPowRate(void) {
 
 void RecoveryEnergy(float recoveryValue) {
 	player.remainEnergy += recoveryValue;
-	if (player.remainEnergy > player.energyLimit) {
-		player.remainEnergy = player.energyLimit;
+	if (player.remainEnergy > kEnergyMax) {
+		player.remainEnergy = kEnergyMax;
 	}
 }
 
