@@ -80,7 +80,7 @@ struct Player {
 	//<エネルギー関係>
 	bool isEmptyEnergy = false;
 	//エネルギー残量
-	float remainEnergy = 0;
+	float remainEnergy = 0.0f;
 
 	//故障時のenergy回復量
 	float recoveryEnergyDuringEmpty = 0.3f;
