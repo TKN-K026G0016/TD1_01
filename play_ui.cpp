@@ -25,8 +25,8 @@ LifeIcon lifeIcon;
 #pragma region データ: エネルギーゲージ
 
 struct EnergyGaugeFrame {
-	Vector2 pos = { 140, 630 };
-	Vector2 size = { 256, 64 };
+	Vector2 pos = { 640, 120 };
+	Vector2 size = { 512, 128 };
 
 	Texture texture = {};
 };
