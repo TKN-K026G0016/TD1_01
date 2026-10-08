@@ -1,5 +1,6 @@
 #include "enemy.h"
 #include "player.h"
+#include "stage.h"
 #include "enemy_bullet.h"
 #include "gem.h"
 #include "boss_enemy.h"
@@ -13,26 +14,25 @@
 #include <math.h>
 
 constexpr int kEnemy1Limit = 10;
-
 static Enemy1 enemy1[kEnemy1Limit];
-
 int nowEnemy1IsAliveCount = 0;
-
+//ジェムの生成量
 constexpr int enemy1GemLimit = 3;
 
 
 constexpr int kEnemy2Limit = 10;
-
 static Enemy2 enemy2[kEnemy2Limit];
 
 struct Spawner {
 	Timer spawnTimer = { 0, 0 };
 
-	Vector2 spawnPos = {};
+	Vector2 spawnRange[2] = {};
 
 	int kSpawnTime = 20;
 };
 Spawner spawner;
+
+
 
 #pragma region 関数: enemy1
 
@@ -98,8 +98,10 @@ void ReSpawnEnemy(void) {
 	spawner.spawnTimer.count++;
 	if (spawner.spawnTimer.count >= spawner.spawnTimer.time) {
 		spawner.spawnTimer.count = 0;
-		spawner.spawnPos = { ToFloat(GetRand(0, 2000)), ToFloat(GetRand(0, 1300)) };
-		SpawnEnemy(spawner.spawnPos, EnemyType::Enemy1);
+		Vector2i spawnRange[2] = { {ToInt(spawner.spawnRange[0].x), ToInt(spawner.spawnRange[0].y) }, {ToInt(spawner.spawnRange[1].x), ToInt(spawner.spawnRange[1].y)} };
+
+		Vector2 spawnPos = { ToFloat(GetRand(spawnRange[0].x, spawnRange[1].x)), ToFloat(GetRand(spawnRange[0].y, spawnRange[1].y))};
+		SpawnEnemy(spawnPos, EnemyType::Enemy1);
 	}
 }
 #pragma endregion
@@ -198,11 +200,13 @@ void InitEnemy(void) {
 	InitEnemy1();
 	InitEnemy2();
 
-	for (int i = 0; i < 5; i++) {
-		Vector2 pos = { ToFloat(GetRand(0, 2000)), ToFloat(GetRand(0, 1300)) };
+	//for (int i = 0; i < 5; i++) {
+	//	Vector2 pos = { ToFloat(GetRand(0, 2000)), ToFloat(GetRand(0, 1300)) };
 
-		SpawnEnemy(pos, EnemyType::Enemy1);
-	}
+	//	SpawnEnemy(pos, EnemyType::Enemy1);
+	//}
+
+	GetMovablePos(spawner.spawnRange);
 
 }
 
