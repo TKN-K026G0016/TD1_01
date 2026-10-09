@@ -11,6 +11,7 @@
 #include "collision_manager.h"
 #include "stage.h"
 #include "play_ui.h"
+#include "effect.h"
 
 #include <Novice.h>
 
@@ -36,6 +37,8 @@ void InitPlay(void) {
 	InitStage();
 
 	InitPlayUI();
+
+	InitEffect();
 }
 
 void UpdatePlay(void) {
@@ -54,11 +57,14 @@ void UpdatePlay(void) {
 
 	UpdatePlayUI();
 
+	UpdateEffect();
+
 	Pause();
 }
 
 void DrawPlay(void) {
 	DrawStage();
+
 
 	DrawPlayerLaser();
 	DrawGem();
@@ -69,7 +75,7 @@ void DrawPlay(void) {
 	DrawBossEnemy();
 
 	DrawPlayer();
-
+	DrawEffect();
 
 	DrawPlayUI();
 

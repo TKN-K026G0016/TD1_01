@@ -73,6 +73,12 @@ void InitTexture(void) {
 		{ Novice::LoadTexture("./resources/texture/ui/play/boss_hp_gauge_frame.png"), { 768, 32 }, {0, 0}, 0, 0, WHITE },
 		{ Novice::LoadTexture("./resources/texture/ui/play/boss_hp_gauge_meter.png"), { 768, 32 }, {0, 0}, 0, 0, WHITE },
 
+		//effect
+		{ Novice::LoadTexture("./resources/texture/effect/effect.square.png"), {64 , 64 }, {0, 0}, 0, 0, WHITE },
+		{ Novice::LoadTexture("./resources/texture/effect/effect.square.mini.png"), {32 , 32 }, {0, 0}, 0, 0, WHITE },
+		{ Novice::LoadTexture("./resources/texture/effect/effect.circle.png"), {256 , 256 }, {0, 0}, 0, 0, WHITE },
+		{ Novice::LoadTexture("./resources/texture/effect/effect.triangle.png"), {26 , 22 }, {0, 0}, 0, 0, WHITE },
+
 		//===============
 		//Pause
 		//===============

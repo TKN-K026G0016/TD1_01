@@ -81,6 +81,12 @@ enum class TextureType {
 	BossHpGaugeFrame,
 	BossHpGaugeMeter,
 
+	//effect
+	EffectSquare,
+	EffectSquareMini,
+	EffectCircle,
+	EffectTriangle
+
 	//===============
 	//Pause
 	//===============

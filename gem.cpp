@@ -5,6 +5,7 @@
 #include "timer.h"
 #include "tool.h"
 #include "texture.h"
+#include "effect.h"
 
 #define _USE_MATH_DEFINES
 #include <math.h>
@@ -75,6 +76,7 @@ static void CheckHitVSPlayer(void) {
 
 		//接触したら、エネルギー回復させる
 		if (CheckCollisionCircleVSCircle(playerPos, playerHitRadius, gem[i].pos, gem[i].hitRadius)) {
+			CreateJemEffect();
 			BreakGem(i);
 			RecoveryEnergy(gem[i].recoveryEnergy);
 		}
