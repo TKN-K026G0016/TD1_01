@@ -147,6 +147,8 @@ void SpawnElecShock(Vector2 pos) {
 
 		elecShock[i].isShoot = true;
 		elecShock[i].pos = pos;
+
+		break;
 	}
 }
 

@@ -32,7 +32,7 @@ struct ElecShock {
 	bool isShoot = false;
 
 	//<当たり判定の大きさ>
-	float hitRadius = 60.0f;
+	float hitRadius = 120.0f;
 	int pow = 2;
 
 	Timer breakTimer = { 5, 0 };

@@ -28,8 +28,8 @@ struct GemSpec {
 
 GemSpec spec[ToInt(GemType::Count)] = {
 	//type //size //hitRadius // //回復量
-	{GemType::S, {20,20}, 15.0f, 10.0f, {}},
-	{GemType::M, {30,30}, 25.0f, 25.0f, {}},
+	{GemType::S, {20,20}, 5.0f, 10.0f, {}},
+	{GemType::M, {30,30}, 15.0f, 25.0f, {}},
 	{GemType::L, {40,40}, 35.0f, 40.0f, {}},
 };
 

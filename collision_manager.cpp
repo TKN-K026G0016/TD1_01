@@ -257,10 +257,14 @@ void CheckCollisionElecShockVSBossEnemy(void) {
 	if (!boss->isAlive) return;
 	for (int i = 0; i < elecShockLimit; i++) {
 		if (!elecShock[i].isShoot) continue;
+
+		if (boss->isIgnoreElecShock) continue;
+
 		if (CheckCollisionCircleVSCircle(boss->pos, boss->hitRadius, elecShock[i].pos, elecShock[i].hitRadius)) {
 			BreakElecShock(i);
 			//ホウデンの生成
 			SpawnElecShock(boss->pos);
+			boss->isIgnoreElecShock = true;
 
 			int pow = elecShock[i].pow;
 
