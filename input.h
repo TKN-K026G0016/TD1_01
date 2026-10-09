@@ -20,6 +20,7 @@ enum class InputAction {
 	TriggerLock,
 
 	Shoot,
+	Charge,
 
 	Count,
 };

@@ -7,6 +7,39 @@
 
 #include <math.h>
 
+//レベルごとの性能
+struct ElecBulletSpec {
+	Vector2 size;
+	float hitRadius;
+
+	int pow;
+
+	Texture texture = {};
+};
+
+ElecBulletSpec elecBulletSpec[ToInt(ElecBulletType::Count)] = {
+	//Normal弾
+	{ {32, 32}, 20, 1, {}},
+	//Charge弾
+	{ {64, 64}, 32, 3, {} },
+};
+
+//レベルごとの性能
+struct ElecShockSpec {
+	float hitRadius;
+
+	int pow;
+
+	Texture texture = {};
+};
+
+ElecShockSpec elecShockSpec[ToInt(ElecBulletType::Count)] = {
+	//Normal弾
+	{ 120, 1, {}},
+	//Charge弾
+	{ 200, 3, {} },
+};
+
 constexpr static int kElecBulletLimit = 5;
 ElecBullet elecBullet[kElecBulletLimit] = {};
 
@@ -19,8 +52,10 @@ ElecShock elecShock[kElecShockLimit] = {};
 static void InitBullet(void) {
 	for (int i = 0; i < kElecBulletLimit; i++) {
 		elecBullet[i] = {};
-		elecBullet[i].texture = GetTexture(TextureType::PlayerLaser0);
 	}
+
+	elecBulletSpec[ToInt(ElecBulletType::Normal)].texture = GetTexture(TextureType::PlayerLaser0);
+	elecBulletSpec[ToInt(ElecBulletType::Charge)].texture = GetTexture(TextureType::PlayerLaser1);
 }
 
 /// <summary>
@@ -114,7 +149,7 @@ void DrawElecBullet(void) {
 
 #pragma region 関数: 外部参照関係
 
-void ShootElecBullet(Vector2 pos, float moveTheta) {
+void ShootElecBullet(Vector2 pos, float moveTheta, ElecBulletType type) {
 	for (int i = 0; i < kElecBulletLimit; i++) {
 		if (elecBullet[i].isShoot) continue;
 
@@ -123,6 +158,13 @@ void ShootElecBullet(Vector2 pos, float moveTheta) {
 		elecBullet[i].pos = pos;
 		elecBullet[i].moveTheta = moveTheta;
 
+
+		elecBullet[i].type = type;
+		elecBullet[i].size = elecBulletSpec[ToInt(type)].size;
+		elecBullet[i].hitRadius = elecBulletSpec[ToInt(type)].hitRadius;
+		elecBullet[i].pow = elecBulletSpec[ToInt(type)].pow;
+
+		elecBullet[i].texture = elecBulletSpec[ToInt(type)].texture;
 
 		break;
 	}
@@ -141,12 +183,16 @@ int GetElecBulletLimit(void) {
 	return kElecBulletLimit;
 }
 
-void SpawnElecShock(Vector2 pos) {
+void SpawnElecShock(Vector2 pos, ElecBulletType type) {
 	for (int i = 0; i < kElecShockLimit; i++) {
 		if (elecShock[i].isShoot) continue;
 
 		elecShock[i].isShoot = true;
 		elecShock[i].pos = pos;
+
+		elecShock[i].type = type;
+		elecShock[i].hitRadius = elecShockSpec[ToInt(type)].hitRadius;
+		elecShock[i].pow = elecShockSpec[ToInt(type)].pow;
 
 		break;
 	}

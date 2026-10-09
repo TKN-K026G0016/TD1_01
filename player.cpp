@@ -146,6 +146,11 @@ constexpr float kLaserPowRateMax = 3.0f;
 //火力の上昇速度
 constexpr float kLaserPowRateIncreaseSpeed = 0.01f;
 
+//チャージタイマー
+Timer chargeElecBulletTimer = { 40, 0 };
+float consumptionShootNormal = 0.1f;
+float consumptionShootCharge = 2.0f;
+
 #pragma endregion
 
 #pragma region データ: エネルギー関係
@@ -158,7 +163,7 @@ constexpr float kEnergyMin = 0.0f;
 constexpr float kEnergyCenter = (kEnergyMax - kEnergyMin) / 2;
 
 //エネルギー消費量
-constexpr float kConsumptionEnergy = 0.1f;
+constexpr float kConsumptionEnergy = 0.075f;
 //エネルギー消費量(レベルごと)
 constexpr float kConsumptionEnergys[ToInt(PlayerLaserLevel::Count)] = { 0.0f, 0.1f, 0.7f };
 
@@ -665,6 +670,10 @@ static void ShootLaser(void) {
 	}
 }
 
+/// <summary>
+/// デンゲキ弾発射処理
+/// </summary>
+/// <param name=""></param>
 static void ShootElecBullet(void) {
 	if (!player.isAlive) return;
 
@@ -672,13 +681,34 @@ static void ShootElecBullet(void) {
 
 	if (player.isEmptyEnergy) return;
 
-	if (CheckInputAction(InputAction::Shoot)) {
+	//押し
+	if (CheckInputAction(InputAction::Charge)) {
+		if (chargeElecBulletTimer.count >= chargeElecBulletTimer.time) return;
+
+		chargeElecBulletTimer.count++;
+	} 
+	//離す
+	else {
+		if (chargeElecBulletTimer.count <= 0) return;
+
 		//射撃位置設定
 		Vector2 shootPos;
 		shootPos.x = player.pos.x + kShootDisLength * cosf(player.rotateTheta);
 		shootPos.y = player.pos.y + kShootDisLength * sinf(player.rotateTheta);
 
-		ShootElecBullet(shootPos, player.rotateTheta);
+		//通常弾
+		if (chargeElecBulletTimer.count < chargeElecBulletTimer.time) {
+			ShootElecBullet(shootPos, player.rotateTheta, ElecBulletType::Normal);
+			player.remainEnergy -= consumptionShootNormal;
+		}
+		//チャージ弾
+		else {
+			ShootElecBullet(shootPos, player.rotateTheta, ElecBulletType::Charge);
+			player.remainEnergy -= consumptionShootCharge;
+		}
+
+		chargeElecBulletTimer.count = 0;
+
 	}
 
 }
