@@ -8,18 +8,20 @@
 #include <math.h>
 
 constexpr static int kElecBulletLimit = 5;
-
-
 ElecBullet elecBullet[kElecBulletLimit] = {};
 
-//デンゲキショック
-struct ElecShock {
-	float hitRadius = 30.0f;
-	int pow = 1;
-};
-ElecShock elecShock = {};
+
+constexpr static int kElecShockLimit = 30;
+ElecShock elecShock[kElecShockLimit] = {};
 
 #pragma region 関数: デンゲキ弾関係
+
+static void InitBullet(void) {
+	for (int i = 0; i < kElecBulletLimit; i++) {
+		elecBullet[i] = {};
+		elecBullet[i].texture = GetTexture(TextureType::PlayerLaser0);
+	}
+}
 
 /// <summary>
 /// デンゲキ弾の移動処理
@@ -61,20 +63,53 @@ static void DrawBullet(void) {
 
 #pragma endregion
 
-void InitElecBullet(void) {
-	for (int i = 0; i < kElecBulletLimit; i++) {
-		elecBullet[i] = {};
-		elecBullet[i].texture = GetTexture(TextureType::PlayerLaser0);
+#pragma region 関数: デンゲキショック関係
+
+static void InitElecShock(void) {
+	for (int i = 0; i < kElecShockLimit; i++) {
+		elecShock[i] = {};
 	}
+}
+
+static void BreakElecShockItSelf(void) {
+	for (int i = 0; i < kElecShockLimit; i++) {
+		if (!elecShock[i].isShoot) continue;
+
+		elecShock[i].breakTimer.count++;
+		if (elecShock[i].breakTimer.count >= elecShock[i].breakTimer.time) {
+			elecShock[i].breakTimer.count = 0;
+			BreakElecShock(i);
+		}
+	}
+}
+
+static void DrawElecShock(void) {
+	for (int i = 0; i < kElecShockLimit; i++) {
+		if (!elecShock[i].isShoot) continue;
+
+		DrawHitEllipse(elecShock[i].pos, elecShock[i].hitRadius, elecShock[i].color, true);
+	}
+}
+
+#pragma endregion
+
+void InitElecBullet(void) {
+	InitBullet();
+
+	InitElecShock();
 }
 
 void UpdateElecBullet(void) {
 	MoveBullet();
 	BreakBulletItSelf();
+
+	BreakElecShockItSelf();
 }
 
 void DrawElecBullet(void) {
 	DrawBullet();
+
+	DrawElecShock();
 }
 
 #pragma region 関数: 外部参照関係
@@ -104,6 +139,28 @@ ElecBullet* GetElecBulletArray(void) {
 
 int GetElecBulletLimit(void) {
 	return kElecBulletLimit;
+}
+
+void SpawnElecShock(Vector2 pos) {
+	for (int i = 0; i < kElecShockLimit; i++) {
+		if (elecShock[i].isShoot) continue;
+
+		elecShock[i].isShoot = true;
+		elecShock[i].pos = pos;
+	}
+}
+
+void BreakElecShock(int index) {
+	elecShock[index].isShoot = false;
+	elecShock[index].breakTimer.count = 0;
+}
+
+ElecShock* GetElecShockArray(void) {
+	return elecShock;
+}
+
+int GetElecShockLimit(void) {
+	return kElecShockLimit;
 }
 
 #pragma endregion

@@ -10,6 +10,7 @@
 #include <math.h>
 
 constexpr int kGemLimit = 100;
+Gem gem[kGemLimit];
 
 //散らばる範囲(最大)
 constexpr int kScatterLengthMax = 60;
@@ -24,36 +25,13 @@ struct GemSpec {
 
 	Texture texture = {};
 };
+
 GemSpec spec[ToInt(GemType::Count)] = {
 	//type //size //hitRadius // //回復量
 	{GemType::S, {20,20}, 15.0f, 10.0f, {}},
 	{GemType::M, {30,30}, 25.0f, 25.0f, {}},
 	{GemType::L, {40,40}, 35.0f, 40.0f, {}},
 };
-
-#pragma region データ: ジェム本体
-
-struct Gem {
-	Vector2 pos = { 0, 0 };
-	Vector2 size = { 32, 32 };
-
-	bool isAlive = false;
-	Timer breakTimer = { 3000, 0 };
-
-	//種類
-	GemType type = GemType::S;
-
-	//当たり判定の大きさ
-	float hitRadius = 0.0f;
-
-	//エネルギー回復量
-	float recoveryEnergy = 0.0f;
-
-	Texture texture = {};
-};
-Gem gem[kGemLimit];
-
-#pragma endregion
 
 #pragma region 関数: 本体
 
@@ -167,6 +145,14 @@ void SpawnGem(Vector2 pos, GemType type) {
 
 		break;
 	}
+}
+
+Gem* GetGemArray(void) {
+	return gem;
+}
+
+int GetGemLimit(void) {
+	return kGemLimit;
 }
 
 #pragma endregion

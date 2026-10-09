@@ -25,6 +25,21 @@ struct ElecBullet {
 	Texture texture = {};
 };
 
+//デンゲキショック
+struct ElecShock {
+	Vector2 pos = {};
+
+	bool isShoot = false;
+
+	//<当たり判定の大きさ>
+	float hitRadius = 60.0f;
+	int pow = 1;
+
+	Timer breakTimer = { 5, 0 };
+
+	unsigned int color = RED;
+};
+
 void InitElecBullet(void);
 void UpdateElecBullet(void);
 void DrawElecBullet(void);
@@ -55,3 +70,29 @@ ElecBullet* GetElecBulletArray(void);
 /// </summary>
 /// <returns></returns>
 int GetElecBulletLimit(void);
+
+/// <summary>
+/// デンゲキショックの生成処理
+/// </summary>
+/// <param name="pos"></param>
+void SpawnElecShock(Vector2 pos);
+
+/// <summary>
+/// デンゲキショックの破壊処理
+/// </summary>
+/// <param name="index"></param>
+void BreakElecShock(int index);
+
+/// <summary>
+/// デンゲキショックの配列取得
+/// </summary>
+/// <param name=""></param>
+/// <returns></returns>
+ElecShock* GetElecShockArray(void);
+
+/// <summary>
+/// デンゲキショックの配列取得
+/// </summary>
+/// <param name=""></param>
+/// <returns></returns>
+int GetElecShockLimit(void);
