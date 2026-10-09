@@ -204,16 +204,18 @@ static void CheckCollisionElecShockVSEnemy(void) {
 		for (int j = 0; j < elecShockLimit; j++) {
 			if (!elecShock[j].isShoot) continue;
 
-			//無視状態時はダメージを受けない(仮)
-			if (enemy1[i].isIgnoreShock) continue;
-
 			if (CheckCollisionCircleVSCircle(enemy1[i].pos, enemy1[i].hitRadius, elecShock[j].pos, elecShock[j].hitRadius)) {
-				//ホウデンの生成
-				SpawnElecShock(enemy1[i].pos);
-				enemy1[i].isIgnoreShock = true;
 
-				int pow = elecShock[j].pow;
-				enemy1[i].hp -= pow;
+				//ホウデンの生成
+				if (!enemy1[i].isIgnoreShock) {
+					SpawnElecShock(enemy1[i].pos);
+					enemy1[i].isIgnoreShock = true;
+				}
+				//ダメージ判定()
+				if (elecShock[j].breakTimer.count == elecShock[j].triggerDamageFrame) {
+					int pow = elecShock[j].pow;
+					enemy1[i].hp -= pow;
+				}
 			}
 
 		}
@@ -234,11 +236,15 @@ static void CheckCollisionElecShockVSEnemy(void) {
 
 			if (CheckCollisionCircleVSCircle(enemy2[i].pos, enemy2[i].hitRadius, elecShock[j].pos, elecShock[j].hitRadius)) {
 				//ホウデンの生成
-				SpawnElecShock(enemy2[i].pos);
-				enemy2[i].isIgnoreShock = true;
-
-				int pow = elecShock[j].pow;
-				enemy2[i].hp -= pow;
+				if (!enemy2[i].isIgnoreShock) {
+					SpawnElecShock(enemy2[i].pos);
+					enemy2[i].isIgnoreShock = true;
+				}
+				//ダメージ判定()
+				if (elecShock[j].breakTimer.count == elecShock[j].triggerDamageFrame) {
+					int pow = elecShock[j].pow;
+					enemy2[i].hp -= pow;
+				}
 			}
 		}
 	}
@@ -261,14 +267,16 @@ void CheckCollisionElecShockVSBossEnemy(void) {
 		if (boss->isIgnoreElecShock) continue;
 
 		if (CheckCollisionCircleVSCircle(boss->pos, boss->hitRadius, elecShock[i].pos, elecShock[i].hitRadius)) {
-			BreakElecShock(i);
 			//ホウデンの生成
-			SpawnElecShock(boss->pos);
-			boss->isIgnoreElecShock = true;
-
-			int pow = elecShock[i].pow;
-
-			boss->remainLife -= pow - 1;
+			if (!boss->isIgnoreElecShock) {
+				SpawnElecShock(boss->pos);
+				boss->isIgnoreElecShock = true;
+			}
+			//ダメージ判定()
+			if (elecShock[i].breakTimer.count == elecShock[i].triggerDamageFrame) {
+				int pow = elecShock[i].pow;
+				boss->remainLife -= pow;
+			}
 		}
 	}
 }

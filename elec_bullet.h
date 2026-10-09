@@ -35,7 +35,8 @@ struct ElecShock {
 	float hitRadius = 120.0f;
 	int pow = 2;
 
-	Timer breakTimer = { 5, 0 };
+	Timer breakTimer = { 7, 0 };
+	int triggerDamageFrame = 1;
 
 	unsigned int color = RED;
 };

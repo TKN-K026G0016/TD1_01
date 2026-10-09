@@ -298,6 +298,7 @@ void MoveAttack3(void) {
 				data.readyShootTimer.count = 0;
 
 				data.nowMode = ModeShootLaser::Shoot;
+				data.nowRotateSpeed = 0.0f;
 			}
 
 #pragma region 回転処理
