@@ -286,10 +286,14 @@ static void CheckCollisionElecBulletVSGem(void) {
 
 		for (int j = 0; j < gemLimit; j++) {
 			if (!gem[j].isAlive) continue;
+			if (gem[j].isIgnoreElecShock) continue;
 
 			//被弾判定
-			if (CheckCollisionCircleVSCircle(elecBullet[i].pos, elecBullet[i].hitRadius, gem[i].pos, gem[i].hitRadius)) {
+			if (CheckCollisionCircleVSCircle(elecBullet[i].pos, elecBullet[i].hitRadius, gem[j].pos, gem[j].hitRadius)) {
 				SpawnElecShock(gem[j].pos);
+				gem[j].isIgnoreElecShock = true;
+
+				BreakElecBullet(i);
 			}
 		}
 
@@ -310,9 +314,12 @@ static void CheckCollisionElecShockVSGem(void) {
 		for (int j = 0; j < gemLimit; j++) {
 			if (!gem[j].isAlive) continue;
 
+			if (gem[j].isIgnoreElecShock) continue;
+
 			//被弾判定
-			if (CheckCollisionCircleVSCircle(elecShock[i].pos, elecShock[i].hitRadius, gem[i].pos, gem[i].hitRadius)) {
+			if (CheckCollisionCircleVSCircle(elecShock[i].pos, elecShock[i].hitRadius, gem[j].pos, gem[j].hitRadius)) {
 				SpawnElecShock(gem[j].pos);
+				gem[j].isIgnoreElecShock = true;
 			}
 		}
 

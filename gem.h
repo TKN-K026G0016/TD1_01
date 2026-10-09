@@ -27,6 +27,10 @@ struct Gem {
 	//エネルギー回復量
 	float recoveryEnergy = 0.0f;
 
+	//ショックを無視する状態
+	bool isIgnoreElecShock = false;
+	Timer ignoreElecShockTimer = { 20, 0 };
+
 	Texture texture = {};
 };
 

@@ -44,6 +44,24 @@ static void BreakGem(int index) {
 	gem[index].breakTimer.count = 0;
 }
 
+static void CountIgnoreElecShock(void) {
+	for (int i = 0; i < kGemLimit; i++) {
+		if (!gem[i].isAlive) continue;
+
+		if (!gem[i].isIgnoreElecShock) continue;
+
+		gem[i].ignoreElecShockTimer.count++;
+		if (gem[i].ignoreElecShockTimer.count >= gem[i].ignoreElecShockTimer.time) {
+			gem[i].ignoreElecShockTimer.count = 0;
+			gem[i].isIgnoreElecShock = false;
+		}
+	}
+}
+
+/// <summary>
+/// プレイヤーとの当たり判定処理
+/// </summary>
+/// <param name=""></param>
 static void CheckHitVSPlayer(void) {
 	Vector2 playerPos = GetPlayerPos();
 	float playerHitRadius = GetPlayerHitRadius();
@@ -112,6 +130,7 @@ void InitGem(void) {
 
 void UpdateGem(void) {
 	CheckHitVSPlayer();
+	CountIgnoreElecShock();
 	CountBreakTimer();
 }
 
