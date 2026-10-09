@@ -63,7 +63,7 @@ struct Player {
 	bool isLock = false;
 
 	//回転速度
-	float lockOnRotateSpeed = 0.1f;
+	float lockOnRotateSpeed = 0.2f;
 
 	//<射撃関係>
 	//射撃スパン
@@ -169,11 +169,11 @@ static void CheckInput(void) {
 #pragma endregion
 
 #pragma region ロック
-	if (CheckInputAction(InputAction::Lock)) {
-		player.isLock = true;
-	} else {
-		player.isLock = false;
-	}
+	//if (CheckInputAction(InputAction::Lock)) {
+	//	player.isLock = true;
+	//} else {
+	//	player.isLock = false;
+	//}
 
 #pragma endregion
 
@@ -186,26 +186,27 @@ static void MovePlayer(void) {
 
 	//右入力
 	if (player.inputVec.x >= 1.0f) {
-		player.velocity.x += player.accleretionSpeed;
+		//player.velocity.x += player.accleretionSpeed;
 
-		//反対側に勢いがあれば、減速度も加える
-		if (player.velocity.x < 0.0f) {
-			player.velocity.x += player.decelerationSpeed;
-		}
-
+		////反対側に勢いがあれば、減速度も加える
+		//if (player.velocity.x < 0.0f) {
+		//	player.velocity.x += player.decelerationSpeed;
+		//}
+		player.pos.x += 5.0f;
 	}
 	//左入力
 	else if (player.inputVec.x <= -1.0f) {
-		player.velocity.x -= player.accleretionSpeed;
+		//player.velocity.x -= player.accleretionSpeed;
 
-		//反対側に勢いがあれば、減速度も加える
-		if (player.velocity.x > 0.0f) {
-			player.velocity.x -= player.decelerationSpeed;
-		}
+		////反対側に勢いがあれば、減速度も加える
+		//if (player.velocity.x > 0.0f) {
+		//	player.velocity.x -= player.decelerationSpeed;
+		//}
+		player.pos.x -= 5.0f;
 	}
 	//入力なし(=減速)
 	else {
-		if (player.velocity.x > 0.0f) {
+		/*if (player.velocity.x > 0.0f) {
 			player.velocity.x -= player.decelerationSpeed;
 			if (player.velocity.x < 0.0f) {
 				player.velocity.x = 0.0f;
@@ -215,26 +216,28 @@ static void MovePlayer(void) {
 			if (player.velocity.x > 0.0f) {
 				player.velocity.x = 0.0f;
 			}
-		}
+		}*/
 	}
 
 	//上入力
 	if (player.inputVec.y >= 1.0f) {
-		player.velocity.y += player.accleretionSpeed;
+		//player.velocity.y += player.accleretionSpeed;
 
-		//反対側に勢いがあれば、減速度も加える
-		if (player.velocity.y < 0.0f) {
-			player.velocity.y += player.decelerationSpeed;
-		}
+		////反対側に勢いがあれば、減速度も加える
+		//if (player.velocity.y < 0.0f) {
+		//	player.velocity.y += player.decelerationSpeed;
+		//}
+		player.pos.y += 5.0f;
 	}
 	//下入力
 	else if (player.inputVec.y <= -1.0f) {
-		player.velocity.y -= player.accleretionSpeed;
+		/*player.velocity.y -= player.accleretionSpeed;
 
-		//反対側に勢いがあれば、減速度も加える
+		反対側に勢いがあれば、減速度も加える
 		if (player.velocity.y > 0.0f) {
 			player.velocity.y -= player.decelerationSpeed;
-		}
+		}*/
+		player.pos.y -= 5.0f;
 	}
 	//入力なし(=減速)
 	else {
@@ -252,12 +255,12 @@ static void MovePlayer(void) {
 	}
 
 	//速度調整
-	float speed = sqrtf(player.velocity.x * player.velocity.x + player.velocity.y * player.velocity.y);
+	/*float speed = sqrtf(player.velocity.x * player.velocity.x + player.velocity.y * player.velocity.y);
 	if (speed > player.moveSpeedLimit) {
 		float scale = player.moveSpeedLimit / speed;
 		player.velocity.x *= scale;
 		player.velocity.y *= scale;
-	}
+	}*/
 
 	//位置更新
 	player.pos.x += player.velocity.x;
@@ -301,90 +304,26 @@ static void ClampPlayerPos(void) {
 /// </summary>
 /// <param name=""></param>
 static void RotatePlayer(void) {
-	if (player.isLock) return;
+	//if (player.isLock) return;
 
-	//入力なしならスキップ
-	if (player.inputVec.x == 0.0f && player.inputVec.y == 0.0f) return;
+	////入力なしならスキップ
+	//if (player.inputVec.x == 0.0f && player.inputVec.y == 0.0f) return;
 
-	//入力方向の角度
-	float inputTheta = atan2f(player.inputVec.y, player.inputVec.x);
-	//現在の方向との差を求める
-	float diff = inputTheta - player.rotateTheta;
+	////入力方向の角度
+	//float inputTheta = atan2f(player.inputVec.y, player.inputVec.x);
+	////現在の方向との差を求める
+	//float diff = inputTheta - player.rotateTheta;
+	
+	////差を-π~πに正規化
+	//while (diff > ToFloat(M_PI)) {
+	//	diff -= ToFloat(M_PI) * 2;
+	//}
+	//while (diff < -ToFloat(M_PI)) {
+	//	diff += ToFloat(M_PI) * 2;
+	//}
 
-	//差を-π~πに正規化
-	while (diff > ToFloat(M_PI)) {
-		diff -= ToFloat(M_PI) * 2;
-	}
-	while (diff < -ToFloat(M_PI)) {
-		diff += ToFloat(M_PI) * 2;
-	}
+	//player.rotateTheta += diff * player.rotateSpeed;
 
-	player.rotateTheta += diff * player.rotateSpeed;
-}
-
-/// <summary>
-/// ロックオン時の回転処理
-/// </summary>
-/// <param name=""></param>
-static void RotatePlayerByLockOn(void) {
-	if (!player.isLock) return;
-
-	Enemy1* enemy1 = GetEnemy1Array();
-	Enemy2* enemy2 = GetEnemy2Array();
-	BossEnemy* boss = GetBossEnemy();
-
-	// ターゲットが死んだらロック解除
-	if (nowTargetType == LockTargetType::None) return;
-
-	Vector2 targetPos = {};
-
-	//ボス
-	if (nowTargetType == LockTargetType::Boss) {
-		if (!boss->isAlive) {
-			nowTargetType = LockTargetType::None;
-			return;
-		}
-		targetPos = boss->pos;
-	} 
-	else if (nowTargetType == LockTargetType::Enemy1) {
-		if (!enemy1[targetIndex].isAlive) {
-			nowTargetType = LockTargetType::None;
-			return;
-		}
-		targetPos = enemy1[targetIndex].pos;
-	}
-	else if (nowTargetType == LockTargetType::Enemy2) {
-		if (!enemy2[targetIndex].isAlive) {
-			nowTargetType = LockTargetType::None;
-			return;
-		}
-		targetPos = enemy2[targetIndex].pos;
-	}
-
-	// 回転処理
-	float dx = targetPos.x - player.pos.x;
-	float dy = targetPos.y - player.pos.y;
-
-	float targetTheta = atan2f(dy, dx);
-	float diff = targetTheta - player.rotateTheta;
-
-	//差を-π~πに正規化
-	while (diff > ToFloat(M_PI)) {
-		diff -= ToFloat(M_PI) * 2;
-	}
-	while (diff < -ToFloat(M_PI)) {
-		diff += ToFloat(M_PI) * 2;
-	}
-
-	player.rotateTheta += diff * player.lockOnRotateSpeed;
-}
-
-/// <summary>
-/// ターゲットの決定処理
-/// </summary>
-/// <param name=""></param>
-static void LockOn(void) {
-	if (!CheckInputAction(InputAction::TriggerLock)) return;
 	if (!player.isAlive) return;
 
 	float closestDis = 99999.0f;
@@ -439,6 +378,171 @@ static void LockOn(void) {
 			nowTargetType = LockTargetType::Boss;
 		}
 	}
+
+	// ターゲットが死んだらロック解除
+	if (nowTargetType == LockTargetType::None) return;
+
+	Vector2 targetPos = {};
+
+	//ボス
+	if (nowTargetType == LockTargetType::Boss) {
+		if (!boss->isAlive) {
+			nowTargetType = LockTargetType::None;
+			return;
+		}
+		targetPos = boss->pos;
+	}
+	else if (nowTargetType == LockTargetType::Enemy1) {
+		if (!enemy1[targetIndex].isAlive) {
+			nowTargetType = LockTargetType::None;
+			return;
+		}
+		targetPos = enemy1[targetIndex].pos;
+	}
+	else if (nowTargetType == LockTargetType::Enemy2) {
+		if (!enemy2[targetIndex].isAlive) {
+			nowTargetType = LockTargetType::None;
+			return;
+		}
+		targetPos = enemy2[targetIndex].pos;
+	}
+
+	// 回転処理
+	float dx = targetPos.x - player.pos.x;
+	float dy = targetPos.y - player.pos.y;
+
+	float targetTheta = atan2f(dy, dx);
+	float diff = targetTheta - player.rotateTheta;
+
+	//差を-π~πに正規化
+	while (diff > ToFloat(M_PI)) {
+		diff -= ToFloat(M_PI) * 2;
+	}
+	while (diff < -ToFloat(M_PI)) {
+		diff += ToFloat(M_PI) * 2;
+	}
+
+	player.rotateTheta += diff * player.lockOnRotateSpeed;
+
+}
+
+/// <summary>
+/// ロックオン時の回転処理
+/// </summary>
+/// <param name=""></param>
+static void RotatePlayerByLockOn(void) {
+	//if (!player.isLock) return;
+
+	//Enemy1* enemy1 = GetEnemy1Array();
+	//Enemy2* enemy2 = GetEnemy2Array();
+	//BossEnemy* boss = GetBossEnemy();
+
+	//// ターゲットが死んだらロック解除
+	//if (nowTargetType == LockTargetType::None) return;
+
+	//Vector2 targetPos = {};
+
+	////ボス
+	//if (nowTargetType == LockTargetType::Boss) {
+	//	if (!boss->isAlive) {
+	//		nowTargetType = LockTargetType::None;
+	//		return;
+	//	}
+	//	targetPos = boss->pos;
+	//} 
+	//else if (nowTargetType == LockTargetType::Enemy1) {
+	//	if (!enemy1[targetIndex].isAlive) {
+	//		nowTargetType = LockTargetType::None;
+	//		return;
+	//	}
+	//	targetPos = enemy1[targetIndex].pos;
+	//}
+	//else if (nowTargetType == LockTargetType::Enemy2) {
+	//	if (!enemy2[targetIndex].isAlive) {
+	//		nowTargetType = LockTargetType::None;
+	//		return;
+	//	}
+	//	targetPos = enemy2[targetIndex].pos;
+	//}
+
+	//// 回転処理
+	//float dx = targetPos.x - player.pos.x;
+	//float dy = targetPos.y - player.pos.y;
+
+	//float targetTheta = atan2f(dy, dx);
+	//float diff = targetTheta - player.rotateTheta;
+
+	////差を-π~πに正規化
+	//while (diff > ToFloat(M_PI)) {
+	//	diff -= ToFloat(M_PI) * 2;
+	//}
+	//while (diff < -ToFloat(M_PI)) {
+	//	diff += ToFloat(M_PI) * 2;
+	//}
+
+	//player.rotateTheta += diff * player.lockOnRotateSpeed;
+}
+
+/// <summary>
+/// ターゲットの決定処理
+/// </summary>
+/// <param name=""></param>
+static void LockOn(void) {
+	//if (!CheckInputAction(InputAction::TriggerLock)) return;
+	//if (!player.isAlive) return;
+
+	//float closestDis = 99999.0f;
+	//nowTargetType = LockTargetType::None;
+	//targetIndex = -1;
+
+	//Enemy1* enemy1 = GetEnemy1Array();
+	//int enemy1Limit = GetEnemy1Limit();
+
+	//// enemy1探索
+	//for (int i = 0; i < enemy1Limit; i++) {
+	//	if (!enemy1[i].isAlive) continue;
+
+	//	float dx = enemy1[i].pos.x - player.pos.x;
+	//	float dy = enemy1[i].pos.y - player.pos.y;
+	//	float dis = sqrtf(dx * dx + dy * dy);
+
+	//	if (dis < closestDis) {
+	//		closestDis = dis;
+	//		targetIndex = i;
+	//		nowTargetType = LockTargetType::Enemy1;
+	//	}
+	//}
+
+	//Enemy2* enemy2 = GetEnemy2Array();
+	//int enemy2Limit = GetEnemy2Limit();
+
+	//for (int i = 0; i < enemy2Limit; i++) {
+	//	if (!enemy2[i].isAlive) continue;
+
+	//	float dx = enemy2[i].pos.x - player.pos.x;
+	//	float dy = enemy2[i].pos.y - player.pos.y;
+	//	float dis = sqrtf(dx * dx + dy * dy);
+
+	//	if (dis < closestDis) {
+	//		closestDis = dis;
+	//		targetIndex = i;
+	//		nowTargetType = LockTargetType::Enemy2;
+	//	}
+	//}
+
+	//// boss探索
+	//BossEnemy* boss = GetBossEnemy();
+	//if (boss->isAlive) {
+	//	float dx = boss->pos.x - player.pos.x;
+	//	float dy = boss->pos.y - player.pos.y;
+	//	float dis = sqrtf(dx * dx + dy * dy);
+
+	//	if (dis < closestDis) {
+	//		closestDis = dis;
+	//		targetIndex = 0;
+	//		nowTargetType = LockTargetType::Boss;
+	//	}
+	//}
 
 }
 
