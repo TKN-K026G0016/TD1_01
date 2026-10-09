@@ -511,6 +511,28 @@ bool CheckInputAction(InputAction action) {
 		break;
 	}
 
+	case InputAction::Charge: {
+		//キーボード
+		if (!isConnectGamePad) {
+
+			if (keys[DIK_SPACE]) {
+				return true;
+			} else {
+				return false;
+			}
+		}
+		//ゲームパッド
+		else {
+			if (Novice::IsPressButton(0, kGamePadAButton)) {
+				return true;
+			} else {
+				return false;
+			}
+		}
+
+		break;
+	}
+
 	}
 
 	return false;
