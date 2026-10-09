@@ -64,6 +64,24 @@ static void ShootEnemyBullet1(void) {
 	}
 }
 
+/// <summary>
+/// デンゲキショックの生成を受け付けない状態のカウント
+/// </summary>
+/// <param name=""></param>
+static void CountIgnoreShockEnemy1(void) {
+	for (int i = 0; i < kEnemy1Limit; i++) {
+		if (!enemy1[i].isAlive) continue;
+		if (!enemy1[i].isIgnoreShock) continue;
+
+
+		enemy1[i].ignoreSpawnShockTimer.count++;
+		if (enemy1[i].ignoreSpawnShockTimer.count >= enemy1[i].ignoreSpawnShockTimer.time) {
+			enemy1[i].ignoreSpawnShockTimer.count = 0;
+			enemy1[i].isIgnoreShock = false;
+		}
+	}
+}
+
 static void DeadEnemy1(int index) {
 	enemy1[index].isAlive = false;
 	enemy1[index].hp = enemy1[index].hpMax;
@@ -133,6 +151,24 @@ static void ShootEnemyBullet2(void) {
 
 		}
 
+	}
+}
+
+/// <summary>
+/// デンゲキショックの生成を受け付けない状態のカウント
+/// </summary>
+/// <param name=""></param>
+static void CountIgnoreShockEnemy2(void) {
+	for (int i = 0; i < kEnemy2Limit; i++) {
+		if (!enemy2[i].isAlive) continue;
+		if (!enemy2[i].isIgnoreShock) continue;
+
+
+		enemy2[i].ignoreSpawnShockTimer.count++;
+		if (enemy2[i].ignoreSpawnShockTimer.count >= enemy2[i].ignoreSpawnShockTimer.time) {
+			enemy2[i].ignoreSpawnShockTimer.count = 0;
+			enemy2[i].isIgnoreShock = false;
+		}
 	}
 }
 
@@ -212,9 +248,13 @@ void InitEnemy(void) {
 
 void UpdateEnemy(void) {
 	CheckDeadEnemy1();
-	CheckDeadEnemy2();
 	ShootEnemyBullet1();
+	CountIgnoreShockEnemy1();
+
+	CheckDeadEnemy2();
+	CountIgnoreShockEnemy2();
 	ShootEnemyBullet2();
+	
 	ReSpawnEnemy();
 	Attack2Enemy2Move();
 }

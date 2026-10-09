@@ -11,7 +11,7 @@ constexpr static int kElecBulletLimit = 5;
 ElecBullet elecBullet[kElecBulletLimit] = {};
 
 
-constexpr static int kElecShockLimit = 30;
+constexpr static int kElecShockLimit = 50;
 ElecShock elecShock[kElecShockLimit] = {};
 
 #pragma region 関数: デンゲキ弾関係

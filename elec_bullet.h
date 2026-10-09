@@ -20,7 +20,7 @@ struct ElecBullet {
 	float hitRadius = 20;
 
 	//攻撃力
-	int pow = 1;
+	int pow = 2;
 
 	Texture texture = {};
 };
@@ -33,7 +33,7 @@ struct ElecShock {
 
 	//<当たり判定の大きさ>
 	float hitRadius = 60.0f;
-	int pow = 1;
+	int pow = 2;
 
 	Timer breakTimer = { 5, 0 };
 
