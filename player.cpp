@@ -1,5 +1,6 @@
 #include "player.h"
 #include "player_laser.h"
+#include "elec_bullet.h"
 #include "stage.h"
 #include "enemy.h"
 #include "gem.h"
@@ -21,6 +22,8 @@ static constexpr bool kAutoLockOnSwitch = true;
 static constexpr bool kAcceleratingSwitch = false;
 //真ん中に維持するゲーム性にするスイッチ
 static constexpr bool kModeKeepCenterSwitch = true;
+//デンゲキ弾射撃スイッチ
+static constexpr bool kShootElecBulletSwitch = true;
 
 //ギリ避けスイッチ
 constexpr bool kDodgeCloseSwitch = true;
@@ -630,6 +633,8 @@ static void DrawLockOnSign(void) {
 static void ShootLaser(void) {
 	if (!player.isAlive) return;
 
+	if (kShootElecBulletSwitch) return;
+
 	if (!kModeKeepCenterSwitch) {
 		player.shootTimer.count++;
 		if (player.shootTimer.count >= player.shootTimer.time) {
@@ -658,6 +663,24 @@ static void ShootLaser(void) {
 			ShootPlayerLaser(shootPos, player.rotateTheta, kShootDisLength);
 		}
 	}
+}
+
+static void ShootElecBullet(void) {
+	if (!player.isAlive) return;
+
+	if (!kShootElecBulletSwitch) return;
+
+	if (player.isEmptyEnergy) return;
+
+	if (CheckInputAction(InputAction::Shoot)) {
+		//射撃位置設定
+		Vector2 shootPos;
+		shootPos.x = player.pos.x + kShootDisLength * cosf(player.rotateTheta);
+		shootPos.y = player.pos.y + kShootDisLength * sinf(player.rotateTheta);
+
+		ShootElecBullet(shootPos, player.rotateTheta);
+	}
+
 }
 
 /// <summary>
@@ -855,6 +878,7 @@ void UpdatePlayer(void) {
 	UpdateLockOnSign();
 
 	ShootLaser();
+	ShootElecBullet();
 
 	CheckFailedMaintenance();
 	RecoveryEnergyDuringEmptyEnergy();

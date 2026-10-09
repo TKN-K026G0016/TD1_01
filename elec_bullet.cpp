@@ -70,6 +70,7 @@ void InitElecBullet(void) {
 
 void UpdateElecBullet(void) {
 	MoveBullet();
+	BreakBulletItSelf();
 }
 
 void DrawElecBullet(void) {
