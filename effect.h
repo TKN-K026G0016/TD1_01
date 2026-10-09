@@ -6,3 +6,4 @@ void UpdateEffect();
 void DrawEffect();
 
 void CreateJemEffect();
+void CreateGageEffect();

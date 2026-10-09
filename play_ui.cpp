@@ -1,6 +1,7 @@
 #include "play_ui.h"
 #include "player.h"
 #include "boss_enemy.h"
+#include "effect.h"
 
 #include "vector2.h"
 #include "timer.h"
