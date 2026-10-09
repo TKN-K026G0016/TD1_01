@@ -46,7 +46,7 @@ void CreateJemEffect() {
 		if (jemEffect[i].isShot == false) {
 			jemEffect[i].isShot = true;
 			jemEffect[i].pos = GetPlayerPos();
-			jemEffect[i].theta = 0.0f;
+			jemEffect[i].theta = static_cast<float>((M_PI) / 4);
 			jemEffect[i].size.x = 0;
 			jemEffect[i].size.y = 0;
 			jemEffect[i].color = 0xffffffff;
@@ -65,22 +65,23 @@ static void UpdateGemEffect(void) {
 	for (int i = 0; i < JemEffectNumber; i++)
 	{
 		if (jemEffect[i].isShot == true) {
-			if (jemEffect[i].size.x <= 64&&jemEffect[i].size.y<=64) {
-				jemEffect[i].size.y += 10;
-				jemEffect[i].size.x += 10;
+			if (jemEffect[i].size.x <= 128&&jemEffect[i].size.y<=128) {
+				jemEffect[i].size.y += 20;
+				jemEffect[i].size.x += 20;
 			}
-			jemEffect[i].theta += 0.1f;
+			
 
 			jemEffect[i].newPos.x = jemEffect[i].pos.x + (-(jemEffect[i].size.x / 2)) * cosf(jemEffect[i].theta) - (-(jemEffect[i].size.x / 2)) * sinf(jemEffect[i].theta);
 			jemEffect[i].newPos.y = jemEffect[i].pos.y + (-(jemEffect[i].size.y / 2)) * cosf(jemEffect[i].theta) + (-(jemEffect[i].size.y / 2)) * sinf(jemEffect[i].theta);
 			
 			if (jemEffect[i].color >= 0xffffff10) {
-				if (jemEffect[i].size.x < 64&&jemEffect[i].size.y) {
+				if (jemEffect[i].size.x < 128&&jemEffect[i].size.y<128) {
 					jemEffect[i].color -= 0x00000005;
 				}
 				else {
 					jemEffect[i].color -= 0x00000015;
 				}
+				jemEffect[i].texture.color = jemEffect[i].color;
 			}
 			else {
 				jemEffect[i].color = 0xffffffff;
