@@ -1,5 +1,6 @@
 #include "collision_manager.h"
 #include "player_laser.h"
+#include "elec_bullet.h"
 #include "enemy.h"
 #include"boss_enemy.h"
 #include "player.h"
@@ -8,6 +9,8 @@
 #include "tool.h"
 #include "vector2.h"
 
+
+#pragma region 関数: playerLaserVS敵の判定
 /// <summary>
 /// playerLaserとenemyの判定
 /// </summary>
@@ -70,6 +73,108 @@ static void CheckCollisionLaserVSEnemy(void) {
 }
 
 /// <summary>
+/// PlayerLaserとBossEnemyの判定
+/// </summary> 
+void CheckCollisionLaserVSBossEnemy(void) {
+	PlayerLaser* laser = GetPlayerLaserArray();
+	int laserLimit = GetPlayerLaserLimit();
+	BossEnemy* boss = GetBossEnemy();
+	if (!boss->isAlive) return;
+	for (int i = 0; i < laserLimit; i++) {
+		if (!laser[i].isShoot) continue;
+		if (CheckCollisionOBBvsCircle(boss->pos, boss->hitRadius, laser[i].hitBoxVertex)) {
+			BreakLaser(i);
+
+			int pow = GetLaserPow(i);
+
+			boss->remainLife -= pow - 1;
+		}
+	}
+}
+
+#pragma endregion
+
+#pragma region 関数: elecBulletVS敵の当たり判定
+
+/// <summary>
+/// ElecBulletとenemyの判定
+/// </summary>
+/// <param name=""></param>
+static void CheckCollisionElecBulletVSEnemy(void) {
+	Enemy1* enemy1 = GetEnemy1Array();
+	int enemy1Limit = GetEnemy1Limit();
+
+	Enemy2* enemy2 = GetEnemy2Array();
+	int enemy2Limit = GetEnemy2Limit();
+
+	ElecBullet* elecBullet = GetElecBulletArray();
+	int elecBulletLimit = GetElecBulletLimit();
+
+#pragma region VSEnemy1
+	for (int i = 0; i < enemy1Limit; i++) {
+		if (!enemy1[i].isAlive) continue;
+
+		for (int j = 0; j < elecBulletLimit; j++) {
+			if (!elecBullet[j].isShoot) continue;
+
+			if (CheckCollisionCircleVSCircle(enemy1[i].pos, enemy1[i].hitRadius, elecBullet[j].pos,  elecBullet[j].hitRadius)) {
+				BreakElecBullet(j);
+
+				int pow = elecBullet[j].pow;
+
+				enemy1[i].hp -= pow;
+			}
+		}
+	}
+
+
+#pragma endregion
+
+#pragma region VSEnemy2
+	for (int i = 0; i < enemy2Limit; i++) {
+		if (!enemy2[i].isAlive) continue;
+
+		for (int j = 0; j < elecBulletLimit; j++) {
+			if (!elecBullet[j].isShoot) continue;
+
+			if (CheckCollisionCircleVSCircle(enemy2[i].pos, enemy2[i].hitRadius, elecBullet[j].pos, elecBullet[j].hitRadius)) {
+				BreakElecBullet(j);
+
+				int pow = elecBullet[j].pow;
+
+				enemy2[i].hp -= pow;
+			}
+		}
+	}
+
+
+#pragma endregion
+}
+
+/// <summary>
+/// ElecBulletとBossEnemyの判定
+/// </summary> 
+void CheckCollisionElecBulletVSBossEnemy(void) {
+	ElecBullet* elecBullet = GetElecBulletArray();
+	int elecBulletLimit = GetElecBulletLimit();
+	BossEnemy* boss = GetBossEnemy();
+	if (!boss->isAlive) return;
+	for (int i = 0; i < elecBulletLimit; i++) {
+		if (!elecBullet[i].isShoot) continue;
+		if (CheckCollisionCircleVSCircle(boss->pos, boss->hitRadius, elecBullet[i].pos, elecBullet[i].hitRadius)) {
+			BreakElecBullet(i);
+
+			int pow = elecBullet[i].pow;
+
+			boss->remainLife -= pow - 1;
+		}
+	}
+}
+
+#pragma endregion
+
+#pragma region 関数: PlayerVS敵弾の判定
+/// <summary>
 /// PlayerとenemyBulletの判定
 /// </summary>
 static void CheckCollisionPlayerVSEnemyBullet(void) {
@@ -129,26 +234,7 @@ static void CheckCollisionPlayerVSEnemyLaser(void) {
 	}
 }
 
-
-/// <summary>
-/// PlayerLaserとBossEnemyの判定
-/// </summary> 
-void CheckCollisionLaserVSBossEnemy(void) {
-	PlayerLaser* laser = GetPlayerLaserArray();
-	int laserLimit = GetPlayerLaserLimit();
-	BossEnemy* boss = GetBossEnemy();
-	if (!boss->isAlive) return;
-	for (int i = 0; i < laserLimit; i++) {
-		if (!laser[i].isShoot) continue;
-		if (CheckCollisionOBBvsCircle(boss->pos, boss->hitRadius, laser[i].hitBoxVertex)) {
-			BreakLaser(i);
-
-			int pow = GetLaserPow(i);
-
-			boss->remainLife -= pow-1;
-		}
-	}
-}
+#pragma endregion
 
 void InitCollision() {
 
@@ -156,7 +242,12 @@ void InitCollision() {
 
 void UpdateCollision() {
 	CheckCollisionLaserVSEnemy();
-	CheckCollisionPlayerVSEnemyBullet();
 	CheckCollisionLaserVSBossEnemy();
+
+	CheckCollisionElecBulletVSEnemy();
+	CheckCollisionElecBulletVSBossEnemy();
+
+	CheckCollisionPlayerVSEnemyBullet();
 	CheckCollisionPlayerVSEnemyLaser();
+
 }

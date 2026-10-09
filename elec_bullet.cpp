@@ -9,27 +9,7 @@
 
 constexpr static int kElecBulletLimit = 5;
 
-//デンゲキ弾
-struct ElecBullet {
-	Vector2 pos;
-	Vector2 size = { 32, 32 };
 
-	//<移動関係>
-	float moveSpeed = 20.0f;
-	float moveTheta = 0.0f;
-
-	//<射撃フラグ>
-	bool isShoot = false;
-	Timer breakTimer = { 60, 0 };
-
-	//当たり判定
-	float hitRadius = 20;
-
-	//攻撃力
-	int pow = 1;
-
-	Texture texture = {};
-};
 ElecBullet elecBullet[kElecBulletLimit] = {};
 
 //デンゲキショック
@@ -115,6 +95,14 @@ void ShootElecBullet(Vector2 pos, float moveTheta) {
 void BreakElecBullet(int index) {
 	elecBullet[index].isShoot = false;
 	elecBullet[index].breakTimer.count = 0;
+}
+
+ElecBullet* GetElecBulletArray(void) {
+	return elecBullet;
+}
+
+int GetElecBulletLimit(void) {
+	return kElecBulletLimit;
 }
 
 #pragma endregion
