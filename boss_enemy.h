@@ -50,6 +50,10 @@ struct BossEnemy {
 	//回転速度
 	float rotateSpeed = 0.05f;
 
+	//ショックを無視している状態
+	bool isIgnoreElecShock = false;
+	Timer ignoreElecShockTimer = { 20, 0 };
+
 	//状態
 	int nowsSates=BossStates::Attack1;
 

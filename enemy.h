@@ -2,6 +2,7 @@
 #include "vector2.h"
 #include "texture.h"
 #include "timer.h"
+#include "texture.h"
 
 //ザコ敵の種類
 enum class EnemyType {
@@ -26,6 +27,11 @@ struct Enemy1 {
 	//<射撃処理関係>
 	Timer shootTimer = { 300, 0 };
 
+	//ショックの生成無視状態
+	bool isIgnoreShock = false;
+	//ショック生成無視タイマー
+	Timer ignoreSpawnShockTimer = { 20, 0 };
+
 	Texture texture = {};
 };
 
@@ -43,6 +49,11 @@ struct Enemy2 {
 
 	//<射撃処理関係>
 	Timer shootTimer = { 75, 0 };
+
+	//ショックの生成無視状態
+	bool isIgnoreShock = false;
+	//ショック生成無視タイマー
+	Timer ignoreSpawnShockTimer = { 20, 0 };
 
 	Texture texture = {};
 };

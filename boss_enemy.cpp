@@ -298,6 +298,7 @@ void MoveAttack3(void) {
 				data.readyShootTimer.count = 0;
 
 				data.nowMode = ModeShootLaser::Shoot;
+				data.nowRotateSpeed = 0.0f;
 			}
 
 #pragma region 回転処理
@@ -399,6 +400,22 @@ void MoveAttack3(void) {
 	}
 }
 
+/// <summary>
+/// デンゲキショックを無視する状態カウント
+/// </summary>
+/// <param name=""></param>
+static void CountIgnoreElecShock(void) {
+	if (!bossEnemy.isAlive) return;
+	if (!bossEnemy.isIgnoreElecShock) return;
+
+	bossEnemy.ignoreElecShockTimer.count++;
+	if (bossEnemy.ignoreElecShockTimer.count >= bossEnemy.ignoreElecShockTimer.time) {
+		bossEnemy.ignoreElecShockTimer.count = 0;
+		bossEnemy.isIgnoreElecShock = false;
+	}
+
+}
+
 void DeathBossEnemy(void) {
 	if (bossEnemy.remainLife <= 0) {
 		bossEnemy.isAlive = false;
@@ -430,6 +447,8 @@ void UpdateBossEnemy(void) {
 	MoveAttack1();
 	MoveAttack2();
 	MoveAttack3();
+
+	CountIgnoreElecShock();
 
 	DeathBossEnemy();
 };

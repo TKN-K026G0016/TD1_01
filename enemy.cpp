@@ -1,5 +1,6 @@
 #include "enemy.h"
 #include "player.h"
+#include "stage.h"
 #include "enemy_bullet.h"
 #include "gem.h"
 #include "boss_enemy.h"
@@ -13,26 +14,25 @@
 #include <math.h>
 
 constexpr int kEnemy1Limit = 10;
-
 static Enemy1 enemy1[kEnemy1Limit];
-
 int nowEnemy1IsAliveCount = 0;
-
+//ジェムの生成量
 constexpr int enemy1GemLimit = 3;
 
 
 constexpr int kEnemy2Limit = 10;
-
 static Enemy2 enemy2[kEnemy2Limit];
 
 struct Spawner {
 	Timer spawnTimer = { 0, 0 };
 
-	Vector2 spawnPos = {};
+	Vector2 spawnRange[2] = {};
 
 	int kSpawnTime = 20;
 };
 Spawner spawner;
+
+
 
 #pragma region 関数: enemy1
 
@@ -61,6 +61,24 @@ static void ShootEnemyBullet1(void) {
 
 		}
 
+	}
+}
+
+/// <summary>
+/// デンゲキショックの生成を受け付けない状態のカウント
+/// </summary>
+/// <param name=""></param>
+static void CountIgnoreShockEnemy1(void) {
+	for (int i = 0; i < kEnemy1Limit; i++) {
+		if (!enemy1[i].isAlive) continue;
+		if (!enemy1[i].isIgnoreShock) continue;
+
+
+		enemy1[i].ignoreSpawnShockTimer.count++;
+		if (enemy1[i].ignoreSpawnShockTimer.count >= enemy1[i].ignoreSpawnShockTimer.time) {
+			enemy1[i].ignoreSpawnShockTimer.count = 0;
+			enemy1[i].isIgnoreShock = false;
+		}
 	}
 }
 
@@ -98,8 +116,10 @@ void ReSpawnEnemy(void) {
 	spawner.spawnTimer.count++;
 	if (spawner.spawnTimer.count >= spawner.spawnTimer.time) {
 		spawner.spawnTimer.count = 0;
-		spawner.spawnPos = { ToFloat(GetRand(0, 2000)), ToFloat(GetRand(0, 1300)) };
-		SpawnEnemy(spawner.spawnPos, EnemyType::Enemy1);
+		Vector2i spawnRange[2] = { {ToInt(spawner.spawnRange[0].x), ToInt(spawner.spawnRange[0].y) }, {ToInt(spawner.spawnRange[1].x), ToInt(spawner.spawnRange[1].y)} };
+
+		Vector2 spawnPos = { ToFloat(GetRand(spawnRange[0].x, spawnRange[1].x)), ToFloat(GetRand(spawnRange[0].y, spawnRange[1].y))};
+		SpawnEnemy(spawnPos, EnemyType::Enemy1);
 	}
 }
 #pragma endregion
@@ -131,6 +151,24 @@ static void ShootEnemyBullet2(void) {
 
 		}
 
+	}
+}
+
+/// <summary>
+/// デンゲキショックの生成を受け付けない状態のカウント
+/// </summary>
+/// <param name=""></param>
+static void CountIgnoreShockEnemy2(void) {
+	for (int i = 0; i < kEnemy2Limit; i++) {
+		if (!enemy2[i].isAlive) continue;
+		if (!enemy2[i].isIgnoreShock) continue;
+
+
+		enemy2[i].ignoreSpawnShockTimer.count++;
+		if (enemy2[i].ignoreSpawnShockTimer.count >= enemy2[i].ignoreSpawnShockTimer.time) {
+			enemy2[i].ignoreSpawnShockTimer.count = 0;
+			enemy2[i].isIgnoreShock = false;
+		}
 	}
 }
 
@@ -198,19 +236,25 @@ void InitEnemy(void) {
 	InitEnemy1();
 	InitEnemy2();
 
-	for (int i = 0; i < 5; i++) {
-		Vector2 pos = { ToFloat(GetRand(0, 2000)), ToFloat(GetRand(0, 1300)) };
+	//for (int i = 0; i < 5; i++) {
+	//	Vector2 pos = { ToFloat(GetRand(0, 2000)), ToFloat(GetRand(0, 1300)) };
 
-		SpawnEnemy(pos, EnemyType::Enemy1);
-	}
+	//	SpawnEnemy(pos, EnemyType::Enemy1);
+	//}
+
+	GetMovablePos(spawner.spawnRange);
 
 }
 
 void UpdateEnemy(void) {
 	CheckDeadEnemy1();
-	CheckDeadEnemy2();
 	ShootEnemyBullet1();
+	CountIgnoreShockEnemy1();
+
+	CheckDeadEnemy2();
+	CountIgnoreShockEnemy2();
 	ShootEnemyBullet2();
+	
 	ReSpawnEnemy();
 	Attack2Enemy2Move();
 }

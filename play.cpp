@@ -4,6 +4,7 @@
 
 #include "player.h"
 #include "player_laser.h"
+#include "elec_bullet.h"
 #include "gem.h"
 #include "enemy.h"
 #include "boss_enemy.h"
@@ -25,6 +26,7 @@ static void Pause(void) {
 void InitPlay(void) {
 	InitPlayer();
 	InitPlayerLaser();
+	InitElecBullet();
 	InitGem();
 
 	InitEnemy();
@@ -44,6 +46,7 @@ void InitPlay(void) {
 void UpdatePlay(void) {
 	UpdatePlayer();
 	UpdatePlayerLaser();
+	UpdateElecBullet();
 	UpdateGem();
 
 	UpdateEnemy();
@@ -73,6 +76,8 @@ void DrawPlay(void) {
 	DrawEnemyBullet();
 
 	DrawBossEnemy();
+
+	DrawElecBullet();
 
 	DrawPlayer();
 	DrawEffect();

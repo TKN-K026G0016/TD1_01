@@ -11,6 +11,7 @@
 #include <math.h>
 
 constexpr int kGemLimit = 100;
+Gem gem[kGemLimit];
 
 //散らばる範囲(最大)
 constexpr int kScatterLengthMax = 60;
@@ -25,36 +26,13 @@ struct GemSpec {
 
 	Texture texture = {};
 };
+
 GemSpec spec[ToInt(GemType::Count)] = {
 	//type //size //hitRadius // //回復量
-	{GemType::S, {20,20}, 15.0f, 10.0f, {}},
-	{GemType::M, {30,30}, 25.0f, 25.0f, {}},
+	{GemType::S, {20,20}, 5.0f, 10.0f, {}},
+	{GemType::M, {30,30}, 15.0f, 25.0f, {}},
 	{GemType::L, {40,40}, 35.0f, 40.0f, {}},
 };
-
-#pragma region データ: ジェム本体
-
-struct Gem {
-	Vector2 pos = { 0, 0 };
-	Vector2 size = { 32, 32 };
-
-	bool isAlive = false;
-	Timer breakTimer = { 3000, 0 };
-
-	//種類
-	GemType type = GemType::S;
-
-	//当たり判定の大きさ
-	float hitRadius = 0.0f;
-
-	//エネルギー回復量
-	float recoveryEnergy = 0.0f;
-
-	Texture texture = {};
-};
-Gem gem[kGemLimit];
-
-#pragma endregion
 
 #pragma region 関数: 本体
 
@@ -67,6 +45,24 @@ static void BreakGem(int index) {
 	gem[index].breakTimer.count = 0;
 }
 
+static void CountIgnoreElecShock(void) {
+	for (int i = 0; i < kGemLimit; i++) {
+		if (!gem[i].isAlive) continue;
+
+		if (!gem[i].isIgnoreElecShock) continue;
+
+		gem[i].ignoreElecShockTimer.count++;
+		if (gem[i].ignoreElecShockTimer.count >= gem[i].ignoreElecShockTimer.time) {
+			gem[i].ignoreElecShockTimer.count = 0;
+			gem[i].isIgnoreElecShock = false;
+		}
+	}
+}
+
+/// <summary>
+/// プレイヤーとの当たり判定処理
+/// </summary>
+/// <param name=""></param>
 static void CheckHitVSPlayer(void) {
 	Vector2 playerPos = GetPlayerPos();
 	float playerHitRadius = GetPlayerHitRadius();
@@ -136,6 +132,7 @@ void InitGem(void) {
 
 void UpdateGem(void) {
 	CheckHitVSPlayer();
+	CountIgnoreElecShock();
 	CountBreakTimer();
 }
 
@@ -169,6 +166,14 @@ void SpawnGem(Vector2 pos, GemType type) {
 
 		break;
 	}
+}
+
+Gem* GetGemArray(void) {
+	return gem;
+}
+
+int GetGemLimit(void) {
+	return kGemLimit;
 }
 
 #pragma endregion

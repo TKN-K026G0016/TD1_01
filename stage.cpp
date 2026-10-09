@@ -15,7 +15,7 @@
 #pragma region データ: 可動域
 
 constexpr Vector2 movablePos[2] = { {0, 0}, {2560, 1440} };
-constexpr Vector2 cameraMovablePos[2] = { {640, 360}, {1920, 1080} };
+constexpr Vector2 cameraMovablePos[2] = { {movablePos[0].x + 640, movablePos[0].y +360}, {movablePos[1].x - 640, movablePos[1].y - 360} };
 constexpr float cameraMovablePosOffset = 64;
 
 #pragma endregion

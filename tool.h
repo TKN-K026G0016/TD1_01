@@ -5,7 +5,7 @@
 //頂点の数
 constexpr int kVertexNum = 4;
 //当たり判定の透明度
-constexpr unsigned int kDebugHitColor = 0x77;
+constexpr unsigned int kDebugHitColor = 0x55;
 
 template <typename T>
 //static_cast<int>()の代わり
@@ -22,7 +22,7 @@ constexpr float ToFloat(T value) {
 void InitTool(void);
 
 /// <summary>
-/// ランダムなcutinを取得
+/// ランダムなintを取得
 /// </summary>
 /// <param name="min">最小値</param>
 /// <param name="max">最大値</param>
