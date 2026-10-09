@@ -4,6 +4,7 @@
 #include "texture.h"
 #include "tool.h"
 
+
 enum class LaserLevel {
 	Level0,
 	Level1,
@@ -36,6 +37,7 @@ struct PlayerLaser {
 
 	Texture texture = {};
 };
+
 
 void InitPlayerLaser(void);
 void UpdatePlayerLaser(void);

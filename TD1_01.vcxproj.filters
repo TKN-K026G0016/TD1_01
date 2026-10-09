@@ -83,6 +83,9 @@
     <Filter Include="effect">
       <UniqueIdentifier>{d44ed254-1db2-459c-945f-a25e6cd08a72}</UniqueIdentifier>
     </Filter>
+    <Filter Include="player\elec_bullet">
+      <UniqueIdentifier>{128c1bb3-0188-48fa-a431-0e044a97f0c1}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp" />
@@ -151,6 +154,9 @@
     </ClCompile>
     <ClCompile Include="effect.cpp">
       <Filter>effect</Filter>
+    </ClCompile>
+    <ClCompile Include="elec_bullet.cpp">
+      <Filter>player\elec_bullet</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -301,6 +307,9 @@
     </ClInclude>
     <ClInclude Include="effect.h">
       <Filter>effect</Filter>
+    </ClInclude>
+    <ClInclude Include="elec_bullet.h">
+      <Filter>player\elec_bullet</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
