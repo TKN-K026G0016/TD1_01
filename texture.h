@@ -85,7 +85,7 @@ enum class TextureType {
 	EffectSquare,
 	EffectSquareMini,
 	EffectCircle,
-	EffectTriangle
+	EffectTriangle,
 
 	//===============
 	//Pause
