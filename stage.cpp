@@ -340,17 +340,17 @@ static void GoGameoverScene(void) {
 }
 
 static void GoClearScene(void) {
-	//生存していたらスキップ
-	if(GetBossEnemyIsAlive()) return;
+	////生存していたらスキップ
+	//if(GetBossEnemyIsAlive()) return;
 
-	//フェードアウトし始めたらスキップ
-	if (GetNowModeFade() != ModeFade::Standby) return;
+	////フェードアウトし始めたらスキップ
+	//if (GetNowModeFade() != ModeFade::Standby) return;
 
-	goToClearTimer.count++;
-	if (goToClearTimer.count >= goToClearTimer.time) {
-		ChangeModeFade(ModeFade::FadeOut);
-		ChangeFadeTarget(FadeTarget::Clear);
-	}
+	//goToClearTimer.count++;
+	//if (goToClearTimer.count >= goToClearTimer.time) {
+	//	ChangeModeFade(ModeFade::FadeOut);
+	//	ChangeFadeTarget(FadeTarget::Clear);
+	//}
 }
 
 #pragma endregion

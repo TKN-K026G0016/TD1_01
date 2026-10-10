@@ -75,8 +75,11 @@ enum class TextureType {
 
 	//UI
 	LifeIcon,
+
 	EnergyGaugeFrame,
 	EnergyGaugeMeter,
+	MiniEnergyGaugeFrame,
+	MiniEnergyGaugeMeter,
 
 	BossHpGaugeFrame,
 	BossHpGaugeMeter,

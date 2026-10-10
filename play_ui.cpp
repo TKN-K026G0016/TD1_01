@@ -29,6 +29,9 @@ struct EnergyGaugeFrame {
 	Vector2 pos = { 640, 120 };
 	Vector2 size = { 512, 128 };
 
+	//警告表示のタイミング
+	float warnEmpty = 20.0f;
+
 	Texture texture = {};
 };
 EnergyGaugeFrame energyGaugeFrame;
@@ -39,6 +42,16 @@ struct EnergyGaugeMeter {
 	Texture texture = {};
 };
 EnergyGaugeMeter energyGaugeMeter;
+
+struct MiniEnergyGauge {
+	Vector2 pos = {};
+	Vector2 size = { 64, 16 };
+	Vector2 offset = { 0, 40 };
+
+	Texture frameTexture = {};
+	Texture meterTexture = {};
+};
+MiniEnergyGauge miniEnergyGauge;
 
 #pragma endregion
 
@@ -97,18 +110,51 @@ static void DrawLifeIcon(void) {
 static void InitEnergyGauge(void) {
 	energyGaugeFrame.texture = GetTexture(TextureType::EnergyGaugeFrame);
 	energyGaugeMeter.texture = GetTexture(TextureType::EnergyGaugeMeter);
+
+	miniEnergyGauge.frameTexture = GetTexture(TextureType::MiniEnergyGaugeFrame);
+	miniEnergyGauge.meterTexture = GetTexture(TextureType::MiniEnergyGaugeMeter);
 }
 
 static void UpdateEnergyGauge(void) {
-	energyGaugeMeter.gaugeRate = GetPlayerRemainEnergy() / GetPlayerEnergyLimit();
+	float remainEnergy = GetPlayerRemainEnergy();
+	float energyLimit = GetPlayerEnergyLimit();
+
+	energyGaugeMeter.gaugeRate = remainEnergy / energyLimit;
+
+	//警告表示のラインを下回ったら
+	if (remainEnergy <= energyGaugeFrame.warnEmpty) {
+		UpdateAnimation(energyGaugeFrame.texture);
+		UpdateAnimation(miniEnergyGauge.frameTexture);
+	}
+	else {
+		energyGaugeFrame.texture.animNum = 0;
+		energyGaugeFrame.texture.animChangeTimer.count = 0;
+
+		miniEnergyGauge.frameTexture.animNum = 0;
+		miniEnergyGauge.frameTexture.animChangeTimer.count = 0;
+	}
+
+	//miniGaugeの座標を更新
+	Vector2 playerPos = GetPlayerPos();
+	miniEnergyGauge.pos = { playerPos.x + miniEnergyGauge.offset.x, playerPos.y + miniEnergyGauge.offset.y };
+
 }
 
 static void DrawEnergyGauge(void) {
+	//通常ゲージ
 	//フレーム
 	DrawTextureUI(energyGaugeFrame.texture, energyGaugeFrame.pos, energyGaugeFrame.size);
 	//メーター
 	DrawGaugeAsUI(energyGaugeMeter.texture, energyGaugeFrame.pos, energyGaugeFrame.size, energyGaugeMeter.gaugeRate);
+
+	//ミニゲージ
+	//フレーム
+	DrawTextureObj(miniEnergyGauge.frameTexture, miniEnergyGauge.pos, miniEnergyGauge.size);
+	//メーター
+	DrawGaugeAsObj(miniEnergyGauge.meterTexture, miniEnergyGauge.pos, miniEnergyGauge.size, energyGaugeMeter.gaugeRate);
 }
+
+
 
 #pragma endregion
 

@@ -60,7 +60,7 @@ struct Player {
 	float decelerationSpeed = 0.15f;
 
 	//移動速度(等速)
-	float moveSpeed[2] = {6.0f, 1.3f};
+	float moveSpeed[2] = { 6.0f, 1.3f };
 
 	Vector2 inputVec = { 0, 0 };
 
@@ -615,7 +615,7 @@ static void UpdateLockOnSign(void) {
 		lockOnSign.pos = enemy1[targetIndex].pos;
 	}
 	//enemy2
-	else if (nowTargetType == LockTargetType::Enemy2){
+	else if (nowTargetType == LockTargetType::Enemy2) {
 		Enemy2* enemy2 = GetEnemy2Array();
 		lockOnSign.pos = enemy2[targetIndex].pos;
 	}
@@ -652,8 +652,7 @@ static void ShootLaser(void) {
 
 			ShootPlayerLaser(shootPos, player.rotateTheta, kShootDisLength);
 		}
-	} 
-	else {
+	} else {
 		if (player.isEmptyEnergy) return;
 
 		player.shootTimer.count++;
@@ -685,8 +684,16 @@ static void ShootElecBullet(void) {
 	if (CheckInputAction(InputAction::Charge)) {
 		if (chargeElecBulletTimer.count >= chargeElecBulletTimer.time) return;
 
+		if (chargeElecBulletTimer.count > chargeElecBulletTimer.time) return;
+
 		chargeElecBulletTimer.count++;
-	} 
+
+		//チャージ完了したら、エネルギー消費
+		if (chargeElecBulletTimer.count >= chargeElecBulletTimer.time) {
+
+			player.remainEnergy -= consumptionShootCharge;
+		}
+	}
 	//離す
 	else {
 		if (chargeElecBulletTimer.count <= 0) return;
@@ -704,7 +711,6 @@ static void ShootElecBullet(void) {
 		//チャージ弾
 		else {
 			ShootElecBullet(shootPos, player.rotateTheta, ElecBulletType::Charge);
-			player.remainEnergy -= consumptionShootCharge;
 		}
 
 		chargeElecBulletTimer.count = 0;
@@ -750,7 +756,7 @@ static void ConsumptionEnergy(void) {
 			player.laserLevel = PlayerLaserLevel::Level0;
 			player.remainEnergy = 0.0f;
 		}
-	} 
+	}
 	//中心に保つゲーム性
 	else {
 		player.remainEnergy -= kConsumptionEnergy;
