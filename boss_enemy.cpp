@@ -468,6 +468,11 @@ void DrawBossEnemy(void) {
 
 #pragma region 関数: 外部参照関係
 
+void SpawnBoss(Vector2 pos) {
+	bossEnemy.isAlive = true;
+	bossEnemy.pos = pos;
+}
+
 bool GetBossEnemyIsAlive(void) {
 	return bossEnemy.isAlive;
 }

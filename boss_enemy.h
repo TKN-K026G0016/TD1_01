@@ -24,7 +24,7 @@ struct BossEnemy {
 	Vector2 size = { 256, 256 };
 
 	//<生存関係>
-	bool isAlive = true;
+	bool isAlive = false;
 	//当たり判定の大きさ
 	float hitRadius =	128.0f;
 	int remainLife = 10000;
@@ -79,6 +79,7 @@ struct Attack2Enemy2Pos {
 	};
 };
 
+void SpawnBoss(Vector2 pos);
 
 bool GetBossEnemyIsAlive(void);
 Vector2 GetBossEnemyPos(void);
