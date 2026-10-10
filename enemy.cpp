@@ -113,14 +113,14 @@ static void DrawEnemy1(void) {
 }
 
 void ReSpawnEnemy(void) {
-	spawner.spawnTimer.count++;
-	if (spawner.spawnTimer.count >= spawner.spawnTimer.time) {
-		spawner.spawnTimer.count = 0;
-		Vector2i spawnRange[2] = { {ToInt(spawner.spawnRange[0].x), ToInt(spawner.spawnRange[0].y) }, {ToInt(spawner.spawnRange[1].x), ToInt(spawner.spawnRange[1].y)} };
+	//spawner.spawnTimer.count++;
+	//if (spawner.spawnTimer.count >= spawner.spawnTimer.time) {
+	//	spawner.spawnTimer.count = 0;
+	//	Vector2i spawnRange[2] = { {ToInt(spawner.spawnRange[0].x), ToInt(spawner.spawnRange[0].y) }, {ToInt(spawner.spawnRange[1].x), ToInt(spawner.spawnRange[1].y)} };
 
-		Vector2 spawnPos = { ToFloat(GetRand(spawnRange[0].x, spawnRange[1].x)), ToFloat(GetRand(spawnRange[0].y, spawnRange[1].y))};
-		SpawnEnemy(spawnPos, EnemyType::Enemy1);
-	}
+	//	Vector2 spawnPos = { ToFloat(GetRand(spawnRange[0].x, spawnRange[1].x)), ToFloat(GetRand(spawnRange[0].y, spawnRange[1].y))};
+	//	SpawnEnemy(spawnPos, EnemyType::Enemy1);
+	//}
 }
 #pragma endregion
 

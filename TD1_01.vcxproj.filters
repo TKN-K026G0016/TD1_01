@@ -86,6 +86,9 @@
     <Filter Include="player\elec_bullet">
       <UniqueIdentifier>{128c1bb3-0188-48fa-a431-0e044a97f0c1}</UniqueIdentifier>
     </Filter>
+    <Filter Include="timer">
+      <UniqueIdentifier>{a1bfe540-e0e8-443f-be10-c137cebddcbd}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp" />
@@ -157,6 +160,9 @@
     </ClCompile>
     <ClCompile Include="elec_bullet.cpp">
       <Filter>player\elec_bullet</Filter>
+    </ClCompile>
+    <ClCompile Include="timer.cpp">
+      <Filter>timer</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -243,7 +249,6 @@
     </ClInclude>
     <ClInclude Include="common.h" />
     <ClInclude Include="vector2.h" />
-    <ClInclude Include="timer.h" />
     <ClInclude Include="input.h">
       <Filter>input</Filter>
     </ClInclude>
@@ -310,6 +315,9 @@
     </ClInclude>
     <ClInclude Include="elec_bullet.h">
       <Filter>player\elec_bullet</Filter>
+    </ClInclude>
+    <ClInclude Include="timer.h">
+      <Filter>timer</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
