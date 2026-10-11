@@ -994,6 +994,10 @@ static void DrawChargeOrb(void) {
 
 #pragma region 関数: 死亡判定など
 
+/// <summary>
+/// ノックバック処理
+/// </summary>
+/// <param name=""></param>
 static void KnockBack(void) {
 	if (!player.isAlive) return;
 	if (!player.isKnockBack) return;
