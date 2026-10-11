@@ -315,7 +315,7 @@ static void MovePlayer(void) {
 		}
 
 		//異常発生時は移動速度を変更
-		float moveSpeed = (player.nowState != PlayerState::Normal) ? player.moveSpeed[0] : player.moveSpeed[1];
+		float moveSpeed = (player.nowState == PlayerState::Normal) ? player.moveSpeed[0] : player.moveSpeed[1];
 
 		player.pos.x += moveSpeed * moveVec.x;
 		player.pos.y += moveSpeed * moveVec.y;
