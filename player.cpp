@@ -64,29 +64,28 @@ struct Player {
 
 	Vector2 inputVec = { 0, 0 };
 
+
 	//<回転関係>
 	float rotateTheta = 0.0f;
 	//回転速度
 	float rotateSpeed = 0.05f;
 
+
 	//<ロックオン関係>
 	//ロック状態フラグ
 	bool isLock = false;
-
 	//回転速度
 	float lockOnRotateSpeed = 0.2f;
+
+
+	//<プレイヤー状態>
+	PlayerState nowState = PlayerState::Normal;
 
 	//<射撃関係>
 	//射撃スパン
 	Timer shootTimer = { 2, 0 };
-
-	//<エネルギー関係>
-	bool isEmptyEnergy = false;
 	//エネルギー残量
 	float remainEnergy = 0.0f;
-
-	//故障時のenergy回復量
-	float recoveryEnergyDuringEmpty = 0.3f;
 
 	//<レベル関係>
 	//レーザーのレベル
@@ -162,10 +161,13 @@ constexpr float kEnergyMin = 0.0f;
 //エネルギーゲージの中間
 constexpr float kEnergyCenter = (kEnergyMax - kEnergyMin) / 2;
 
-//エネルギー消費量
+//エネルギー消費量(常時)
 constexpr float kConsumptionEnergy = 0.05f;
 //エネルギー消費量(レベルごと)
 constexpr float kConsumptionEnergys[ToInt(PlayerLaserLevel::Count)] = { 0.0f, 0.1f, 0.7f };
+
+//故障時のenergy回復量
+constexpr float kRecoveryEnergyDuringEmpty = 0.3f;
 
 #pragma endregion
 
@@ -312,7 +314,8 @@ static void MovePlayer(void) {
 			moveVec.y /= moveVecLength;
 		}
 
-		float moveSpeed = (!player.isEmptyEnergy) ? player.moveSpeed[0] : player.moveSpeed[1];
+		//異常発生時は移動速度を変更
+		float moveSpeed = (player.nowState != PlayerState::Normal) ? player.moveSpeed[0] : player.moveSpeed[1];
 
 		player.pos.x += moveSpeed * moveVec.x;
 		player.pos.y += moveSpeed * moveVec.y;
@@ -652,8 +655,10 @@ static void ShootLaser(void) {
 
 			ShootPlayerLaser(shootPos, player.rotateTheta, kShootDisLength);
 		}
-	} else {
-		if (player.isEmptyEnergy) return;
+	}
+	else {
+		//異常発生時は発射しない
+		if (player.nowState != PlayerState::Normal) return;
 
 		player.shootTimer.count++;
 		if (player.shootTimer.count >= player.shootTimer.time) {
@@ -678,7 +683,8 @@ static void ShootElecBullet(void) {
 
 	if (!kShootElecBulletSwitch) return;
 
-	if (player.isEmptyEnergy) return;
+	//異常発生時は発射しない
+	if (player.nowState != PlayerState::Normal) return;
 
 	//押し
 	if (CheckInputAction(InputAction::Charge)) {
@@ -759,6 +765,8 @@ static void ConsumptionEnergy(void) {
 	}
 	//中心に保つゲーム性
 	else {
+		if (player.nowState != PlayerState::Normal) return;
+
 		player.remainEnergy -= kConsumptionEnergy;
 
 		if (player.remainEnergy <= 0.0f) {
@@ -800,11 +808,17 @@ static void CheckFailedMaintenance(void) {
 	if (!player.isAlive) return;
 
 	if (kModeKeepCenterSwitch) {
-		if (player.isEmptyEnergy) return;
+		if (player.nowState != PlayerState::Normal) return;
 
-		if (player.remainEnergy <= kEnergyMin || player.remainEnergy >= kEnergyMax) {
-			player.isEmptyEnergy = true;
+		//デンリョク不足
+		if (player.remainEnergy <= kEnergyMin) {
+			player.nowState = PlayerState::DeadEnergy;
 			player.remainEnergy = 0.0f;
+		}
+		//過ジュウデン
+		else if (player.remainEnergy >= kEnergyMax) {
+			player.nowState = PlayerState::OverHeat;
+			player.remainEnergy = kEnergyMax;
 		}
 	}
 }
@@ -813,16 +827,25 @@ static void CheckFailedMaintenance(void) {
 /// 故障中のエネルギー回復処理
 /// </summary>
 /// <param name=""></param>
-static void RecoveryEnergyDuringEmptyEnergy(void) {
+static void RecoveryPlayerState(void) {
 	if (!player.isAlive) return;
 
 	if (kModeKeepCenterSwitch) {
-		if (!player.isEmptyEnergy) return;
 
-		player.remainEnergy += player.recoveryEnergyDuringEmpty;
-		if (player.remainEnergy >= kEnergyCenter) {
-			player.isEmptyEnergy = false;
+		if (player.nowState == PlayerState::DeadEnergy) {
+			player.remainEnergy += kRecoveryEnergyDuringEmpty;
+			if (player.remainEnergy >= kEnergyCenter) {
+				player.nowState = PlayerState::Normal;
+			}
 		}
+		else if (player.nowState == PlayerState::OverHeat) {
+			player.remainEnergy -= kRecoveryEnergyDuringEmpty;
+			if (player.remainEnergy <= kEnergyCenter) {
+				player.nowState = PlayerState::Normal;
+			}
+		}
+
+
 	}
 }
 
@@ -917,7 +940,7 @@ void UpdatePlayer(void) {
 	ShootElecBullet();
 
 	CheckFailedMaintenance();
-	RecoveryEnergyDuringEmptyEnergy();
+	RecoveryPlayerState();
 
 	ConsumptionEnergy();
 	LevelUp();
@@ -1020,6 +1043,10 @@ void TriggerDodgeClose(Vector2 eBulletPos) {
 
 		SpawnGem(eBulletPos, GemType::S);
 	}
+}
+
+PlayerState GetPlayerNowState(void) {
+	return player.nowState;
 }
 
 #pragma endregion

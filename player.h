@@ -9,6 +9,14 @@ enum class PlayerLaserLevel {
 	Count
 };
 
+enum class PlayerState {
+	Normal,
+	DeadEnergy,
+	OverHeat,
+
+	Count
+};
+
 void InitPlayer(void);
 void UpdatePlayer(void);
 void DrawPlayer(void);
@@ -94,3 +102,9 @@ float GetPlayerDodgeCloseRadius(void);
 /// </summary>
 /// <param name="eBulletPos">敵弾の座標</param>
 void TriggerDodgeClose(Vector2 eBulletPos);
+
+/// <summary>
+/// playerの現在状態を取得
+/// </summary>
+/// <returns>player.nowState</returns>
+PlayerState GetPlayerNowState(void);
