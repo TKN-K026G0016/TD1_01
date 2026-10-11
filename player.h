@@ -92,8 +92,8 @@ PlayerLaserLevel GetPlayerNowLaserLevel(void);
 /// <summary>
 /// playerの被弾処理
 /// </summary>
-/// <param name=""></param>
-void PlayerDamage(void);
+/// <param name="hitPos">接触した相手の座標</param>
+void PlayerDamage(Vector2 hitPos);
 
 bool GetDodgeCloseSwitch(void);
 

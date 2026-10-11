@@ -229,7 +229,7 @@ void MoveAttack1(void) {
 				float DiffY = bossBomb[i].pos.y - playerPos.y;
 				float distance = sqrtf(DiffX * DiffX + DiffY * DiffY);
 				if (distance <= bossBomb[i].burstRadius) {
-					PlayerDamage();
+					PlayerDamage(bossBomb[i].pos);
 				}
 				bossBomb[i].isAlive = false;
 			}

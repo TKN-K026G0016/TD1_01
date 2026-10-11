@@ -365,7 +365,7 @@ static void CheckCollisionPlayerVSEnemyBullet(void) {
 
 		//被弾判定
 		if (CheckCollisionCircleVSCircle(eBullet[i].pos, eBullet[i].hitRadius, playerPos, playerHitRadius)) {
-			PlayerDamage();
+			PlayerDamage(eBullet[i].pos);
 		}
 
 	}
@@ -395,7 +395,7 @@ static void CheckCollisionPlayerVSEnemyLaser(void) {
 
 		//被弾判定
 		if (CheckCollisionOBBvsCircle(playerPos, playerHitRadius, eLaser[i].hitBoxVertex)) {
-			PlayerDamage();
+			PlayerDamage(eLaser[i].pos);
 		}
 
 	}

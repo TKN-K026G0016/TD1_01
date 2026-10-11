@@ -49,7 +49,8 @@ struct Player {
 	bool isInvincible = false;
 	//無敵の持続時間
 	Timer invincibleTimer = { 100, 0 };
-
+	//ノックバック関係
+	bool isKnockBack = false;
 
 	//<移動関係>
 	Vector2 velocity = { 0.0f, 0.0f };
@@ -173,10 +174,19 @@ constexpr float kRecoveryEnergyDuringEmpty = 0.15f;
 
 #pragma endregion
 
-#pragma region データ: ギリ避け関係
+#pragma region データ: ギリ避け・ノックバック関係
 
 //ギリ避け時のボーナススパン
 static Timer dodgeCloseBonusTimer = { 8, 0 };
+
+//ノックバックの初速度
+static constexpr float kFirstKnockBackPow = 20.0f;
+//ノックバックの減速度
+static constexpr float kDecelerationKnockBackPow = 0.1f;
+
+static float knockBackPow = kFirstKnockBackPow;
+static Vector2 knockBackVec = {};
+static Timer knockBackTimer = { 20, 0 };
 
 #pragma endregion
 
@@ -984,6 +994,23 @@ static void DrawChargeOrb(void) {
 
 #pragma region 関数: 死亡判定など
 
+static void KnockBack(void) {
+	if (!player.isAlive) return;
+	if (!player.isKnockBack) return;
+
+	//ノックバック処理
+	player.pos.x += knockBackVec.x * knockBackPow;
+	player.pos.y += knockBackVec.y * knockBackPow;
+
+	knockBackPow -= kDecelerationKnockBackPow;
+
+	knockBackTimer.count++;
+	if (knockBackTimer.count >= knockBackTimer.time) {
+		knockBackTimer.count = 0;
+		player.isKnockBack = false;
+	}
+}
+
 /// <summary>
 /// 無敵時の処理
 /// </summary>
@@ -1082,6 +1109,7 @@ void UpdatePlayer(void) {
 
 	UpdatePlayerEffect();
 
+	KnockBack();
 	UpdateInvinciblePlayer();
 	DeadPlayer();
 
@@ -1154,11 +1182,25 @@ PlayerLaserLevel GetPlayerNowLaserLevel(void) {
 	return player.laserLevel;
 }
 
-void PlayerDamage(void) {
+void PlayerDamage(Vector2 hitPos) {
 	if (!player.isAlive || player.isInvincible) return;
 
 	//体力減らす
 	player.hp--;
+
+#pragma region ノックバック方向設定
+
+	knockBackVec = { player.pos.x - hitPos.x, player.pos.y - hitPos.y };
+	float length = sqrtf(knockBackVec.x * knockBackVec.x + knockBackVec.y * knockBackVec.y);
+	if (length != 0.0f) {
+		knockBackVec.x /= length;
+		knockBackVec.y /= length;
+	}
+
+	knockBackPow = kFirstKnockBackPow;
+	player.isKnockBack = true;
+
+#pragma endregion
 
 	if (player.hp > 0) {
 		//無敵開始
