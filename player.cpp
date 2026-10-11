@@ -4,6 +4,7 @@
 #include "stage.h"
 #include "enemy.h"
 #include "gem.h"
+#include "effect.h"
 #include "boss_enemy.h"
 
 #include "vector2.h"
@@ -180,6 +181,7 @@ static Timer dodgeCloseBonusTimer = { 8, 0 };
 
 #pragma region データ: 演出関係
 
+//プレイヤーの色管理データ
 struct ColorManager {
 	static constexpr int colorValueMin = 32;
 	static constexpr int colorValueMax = 255;
@@ -193,7 +195,12 @@ struct ColorManager {
 };
 ColorManager colorManager;
 
-
+//オーバーヒート時の生成範囲(player中心で)
+constexpr int kCreateSmokeRange = 40;
+//オーバーヒート時に出す煙の数
+constexpr int kCreateSmokeNum = 4;
+//オーバーヒート時のケムリ生成スパン
+Timer createSmokeTimer = { 15, 0 };
 
 #pragma endregion
 
@@ -838,6 +845,17 @@ static void CheckFailedMaintenance(void) {
 		else if (player.remainEnergy >= kEnergyMax) {
 			player.nowState = PlayerState::OverHeat;
 			player.remainEnergy = kEnergyMax;
+
+#pragma region 煙生成
+			for (int i = 0; i < kCreateSmokeNum; i++) {
+				float posX = player.pos.x + ToFloat(GetRand(-kCreateSmokeRange, kCreateSmokeRange));
+				float posY = player.pos.y + ToFloat(GetRand(-kCreateSmokeRange, kCreateSmokeRange));
+
+				CreateSmokeEffect({ posX, posY });
+			}
+
+#pragma endregion
+
 		}
 	}
 }
@@ -862,6 +880,21 @@ static void RecoveryPlayerState(void) {
 			if (player.remainEnergy <= kEnergyCenter) {
 				player.nowState = PlayerState::Normal;
 			}
+
+#pragma region ケムリの生成
+
+			createSmokeTimer.count++;
+			if (createSmokeTimer.count >= createSmokeTimer.time) {
+				createSmokeTimer.count = 0;
+
+				float posX = player.pos.x + ToFloat(GetRand(-kCreateSmokeRange, kCreateSmokeRange));
+				float posY = player.pos.y + ToFloat(GetRand(-kCreateSmokeRange, kCreateSmokeRange));
+
+				CreateSmokeEffect({ posX, posY });
+			}
+
+#pragma endregion
+
 		}
 
 
@@ -872,7 +905,7 @@ static void RecoveryPlayerState(void) {
 
 #pragma region 関数: 演出関係
 
-static void UpdateEffect(void) {
+static void UpdatePlayerEffect(void) {
 	//
 
 	//モードごとによる演出
@@ -1021,7 +1054,7 @@ void UpdatePlayer(void) {
 	LevelUp();
 	UpdateSustainLv2Bonus();
 
-	UpdateEffect();
+	UpdatePlayerEffect();
 
 	UpdateInvinciblePlayer();
 	DeadPlayer();

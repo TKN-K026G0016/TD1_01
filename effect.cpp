@@ -82,7 +82,7 @@ struct SmokeEffect {
 	int alpha = 220;
 	int alphaMax = 220;
 	int alphaMin = 0;
-	int changeAlphaSpeed = 10;
+	int changeAlphaSpeed = 12;
 
 	//<残像関係>
 	float preSizeValue[kSmokeAfterimageLimit] = {};
@@ -93,7 +93,7 @@ struct SmokeEffect {
 	int diffAlpha = 30;
 
 	Texture texture = {};
-	unsigned int color = 0x444444FF;
+	unsigned int color = 0x333333FF;
 };
 SmokeEffect smokeEffect[kSmokeEffectLimit];
 
