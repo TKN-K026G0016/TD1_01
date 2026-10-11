@@ -75,6 +75,20 @@ Enemy1* GetEnemy1Array(void);
 
 int GetEnemy1Limit(void);
 
+/// <summary>
+/// Enemy1へのダメージ処理
+/// </summary>
+/// <param name="enemy"></param>
+/// <param name="pow"></param>
+void DamageEnemy1(Enemy1& enemy, int pow);
+
 Enemy2* GetEnemy2Array(void);
 
 int GetEnemy2Limit(void);
+
+/// <summary>
+/// Enemy2へのダメージ処理
+/// </summary>
+/// <param name="enemy"></param>
+/// <param name="pow"></param>
+void DamageEnemy2(Enemy2& enemy, int pow);

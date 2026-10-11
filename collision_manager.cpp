@@ -123,10 +123,7 @@ static void CheckCollisionElecBulletVSEnemy(void) {
 				//ホウデンの生成
 				SpawnElecShock(enemy1[i].pos, elecBullet[j].type);
 
-
-				int pow = elecBullet[j].pow;
-
-				enemy1[i].hp -= pow;
+				DamageEnemy1(enemy1[i], elecBullet[j].pow);
 			}
 		}
 	}
@@ -145,10 +142,7 @@ static void CheckCollisionElecBulletVSEnemy(void) {
 				BreakElecBullet(j);
 				SpawnElecShock(enemy2[i].pos, elecBullet[j].type);
 
-
-				int pow = elecBullet[j].pow;
-
-				enemy2[i].hp -= pow;
+				DamageEnemy2(enemy2[i], elecBullet[j].pow);
 			}
 		}
 	}
@@ -213,8 +207,7 @@ static void CheckCollisionElecShockVSEnemy(void) {
 				}
 				//ダメージ判定()
 				if (elecShock[j].breakTimer.count == elecShock[j].triggerDamageFrame) {
-					int pow = elecShock[j].pow;
-					enemy1[i].hp -= pow;
+					DamageEnemy1(enemy1[i], elecShock[j].pow);
 				}
 			}
 
@@ -242,8 +235,7 @@ static void CheckCollisionElecShockVSEnemy(void) {
 				}
 				//ダメージ判定()
 				if (elecShock[j].breakTimer.count == elecShock[j].triggerDamageFrame) {
-					int pow = elecShock[j].pow;
-					enemy2[i].hp -= pow;
+					DamageEnemy2(enemy2[i], elecShock[j].pow);
 				}
 			}
 		}
@@ -305,7 +297,7 @@ static void CheckCollisionElecBulletVSGem(void) {
 				SpawnElecShock(gem[j].pos, elecBullet[i].type);
 				gem[j].isIgnoreElecShock = true;
 
-				BreakElecBullet(i);
+				//BreakElecBullet(i);
 			}
 		}
 
