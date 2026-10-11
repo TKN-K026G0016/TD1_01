@@ -65,7 +65,7 @@ enum class TextureType {
 	//BossEnemy
 	BossEnemy,
 
-	BossBom,
+	BossBomb,
 	BossBomBurstRange,
 
 	//MapChip
@@ -78,11 +78,14 @@ enum class TextureType {
 
 	EnergyGaugeFrame,
 	EnergyGaugeMeter,
+	EnergyGaugeDelayMeter,
 	MiniEnergyGaugeFrame,
+	MiniEnergyGaugeDelayMeter,
 	MiniEnergyGaugeMeter,
 
 	BossHpGaugeFrame,
 	BossHpGaugeMeter,
+	BossHpGaugeDelayMeter,
 
 	//effect
 	EffectSquare,

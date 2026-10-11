@@ -434,7 +434,7 @@ void InitBossEnemy(void) {
 	bossEnemy.texture = GetTexture(TextureType::BossEnemy);
 	for (int i = 0;i < 6;i++) {
 		bossBomb[i] = {};
-		bossBomb[i].texture = GetTexture(TextureType::BossBom);
+		bossBomb[i].texture = GetTexture(TextureType::BossBomb);
 		bossBomb[i].burstTexture = GetTexture(TextureType::BossBomBurstRange);
 	}
 
