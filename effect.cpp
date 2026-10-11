@@ -13,7 +13,14 @@
 #include <math.h>
 #include <time.h>
 
-//データ
+#pragma region データ: 共通
+
+Texture whiteBoxTexture = {};
+
+#pragma endregion
+
+#pragma region データ: ジェム取得エフェクト
+
 const int KJemEffectNumber=10;
 struct JemEffect
 {
@@ -26,6 +33,10 @@ struct JemEffect
 	Texture texture = {};
 };
 JemEffect jemEffect[KJemEffectNumber];
+
+#pragma endregion
+
+#pragma region データ: ゲージエフェクト
 
 const int KGageEffectNumber = 20;
 struct GageEffect
@@ -41,11 +52,54 @@ GageEffect gageEffect[KGageEffectNumber];
 bool isGage = false;
 Timer GageTimer = {5,0};
 
+#pragma endregion
 
+#pragma region 関数: 煙エフェクト
+//煙エフェクトの数
+static constexpr int kSmokeEffectLimit = 10;
+//残像の数
+static constexpr int kSmokeAfterimageLimit = 2;
+
+struct SmokeEffect {
+	Vector2 pos = {};
+	//Vector2 size = { 24, 24 };
+
+	bool isShoot = false;
+
+	//移動速度
+	float moveSpeed = 5.0f;
+
+	//<サイズ関係>
+	float firstSizeValue = 8;
+	float sizeValue = firstSizeValue;
+	float changeSizeSpeed = 4;
+
+	//<回転関係>
+	float rotateTheta = 0.0f;
+	float rotateSpeed = ToFloat(M_PI) / 20.0f;
+
+	//透明度関係
+	int alpha = 220;
+	int alphaMax = 220;
+	int alphaMin = 0;
+	int changeAlphaSpeed = 10;
+
+	//<残像関係>
+	float preSizeValue[kSmokeAfterimageLimit] = {};
+	float preRotateTheta[kSmokeAfterimageLimit] = {};
+	//本体との座標のずれ
+	float posOffset = 10;
+	//本体との透明度のズレ
+	int diffAlpha = 30;
+
+	Texture texture = {};
+	unsigned int color = 0x444444FF;
+};
+SmokeEffect smokeEffect[kSmokeEffectLimit];
+
+#pragma endregion
 
 #pragma region 関数: ジェム取得effect
-
-
 
 void CreateJemEffect() {
 	for (int i = 0; i < KJemEffectNumber; i++)
@@ -97,6 +151,7 @@ static void UpdateGemEffect(void) {
 		}
 	}
 }
+
 void DrawGetEffect() {
 	for (int i = 0; i < KJemEffectNumber; i++)
 	{
@@ -169,24 +224,138 @@ void DrawGageEffect() {
 }
 #pragma endregion
 
-#pragma region
+#pragma region 関数: smokeEffect
+
+static void InitSmokeEffect(void) {
+	for (int i = 0; i < kSmokeEffectLimit; i++) {
+		smokeEffect[i] = {};
+		smokeEffect[i].texture = GetTexture(TextureType::White1x1);
+		smokeEffect[i].texture.color = smokeEffect[i].color;
+	}
+}
+
+static void UpdateSmokeEffect(void) {
+	for (int i = 0; i < kSmokeEffectLimit; i++) {
+		if (!smokeEffect[i].isShoot) continue;
+
+#pragma region 残像の更新処理
+		//prePos(残像位置の更新)
+		for (int j = 0; j < kSmokeAfterimageLimit; j++) {
+			if (j == 0) {
+				smokeEffect[i].preSizeValue[j] = smokeEffect[i].sizeValue;
+				smokeEffect[i].preRotateTheta[j] = smokeEffect[i].rotateTheta;
+			} else {
+				smokeEffect[i].preSizeValue[j] = smokeEffect[i].preSizeValue[j - 1];
+				smokeEffect[i].preRotateTheta[j] = smokeEffect[i].preRotateTheta[j - 1];
+			}
+		}
+
+#pragma endregion
+
+		//本体の移動処理
+		smokeEffect[i].pos.y += smokeEffect[i].moveSpeed;
+
+		//拡大処理
+		smokeEffect[i].sizeValue += smokeEffect[i].changeSizeSpeed;
+		//回転処理
+		smokeEffect[i].rotateTheta += smokeEffect[i].rotateSpeed;
+		//alpha値の変更
+		smokeEffect[i].alpha -= smokeEffect[i].changeAlphaSpeed;
+
+		//消滅処理
+		if (smokeEffect[i].alpha <= smokeEffect[i].alphaMin) {
+			smokeEffect[i].alpha = smokeEffect[i].alphaMin;
+			smokeEffect[i].isShoot = false;
+		}
+
+	}
+}
+
+static void DrawSmokeEffect(void) {
+	for (int i = 0; i < kSmokeEffectLimit; i++) {
+		if (!smokeEffect[i].isShoot) continue;
+
+		//残像の処理
+		for (int j = 0; j < kSmokeAfterimageLimit; j++) {
+			Vector2 pos = { smokeEffect[i].pos.x, smokeEffect[i].pos.y - smokeEffect[i].posOffset * (j + 1) };
+			Vector2 size = { smokeEffect[i].preSizeValue[j], smokeEffect[i].preSizeValue[j] };
+
+			Texture afterFadeTexture = smokeEffect[i].texture;
+			
+			//透明度の変更
+			int alpha = smokeEffect[i].alpha - smokeEffect[i].diffAlpha * (j + 1);
+			if (alpha < 0) {
+				alpha = 0;
+			}
+			unsigned int color = (smokeEffect[i].texture.color & 0xFFFFFF00) | alpha;
+			afterFadeTexture.color = color;
+
+
+			DrawTextureRotateObj(afterFadeTexture, pos, size, smokeEffect[i].preRotateTheta[j]);
+		}
+
+		//本体の描写
+		Vector2 size = { smokeEffect[i].sizeValue, smokeEffect[i].sizeValue };
+		Texture texture = smokeEffect[i].texture;
+		//透明度の変更
+		unsigned int color = (smokeEffect[i].texture.color & 0xFFFFFF00) | smokeEffect[i].alpha;
+		texture.color = color;
+
+		DrawTextureRotateObj(texture, smokeEffect[i].pos, size, smokeEffect[i].rotateTheta);
+	}
+}
+
+void CreateSmokeEffect(Vector2 pos) {
+	for (int i = 0; i < kSmokeEffectLimit; i++) {
+		if (smokeEffect[i].isShoot) continue;
+
+		smokeEffect[i].isShoot = true;
+		smokeEffect[i].pos = pos;
+
+		//初期化
+		smokeEffect[i].sizeValue = smokeEffect[i].firstSizeValue;
+		smokeEffect[i].rotateTheta = 0.0f;
+		smokeEffect[i].alpha = smokeEffect[i].alphaMax;
+		for (int j = 0; j < kSmokeAfterimageLimit; j++) {
+			//smokeEffect[i].prePos[j] = smokeEffect[i].pos;
+			smokeEffect[i].preRotateTheta[j] = smokeEffect[i].rotateTheta;
+		}
+
+		break;
+	}
+}
+
+#pragma endregion
 
 
 
 void InitEffect() {
 	InitGemEffect();
-	CreateJemEffect();
+	
 	InitGageEffect();
+
+	InitSmokeEffect();
+
+#ifdef _DEBUG
+
+	CreateJemEffect();
+
 	CreateGageEffect();
+
+	CreateSmokeEffect({GetPlayerPos()});
+
+#endif // _DEBUG
 
 }
 void UpdateEffect() {
 	
 	UpdateGemEffect();
 	UodateGageEffect();
+	UpdateSmokeEffect();
 
 }
 void DrawEffect() {
 	DrawGetEffect();
 	DrawGageEffect();
+	DrawSmokeEffect();
 }
