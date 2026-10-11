@@ -72,6 +72,12 @@ float GetPlayerLaserPowRate(void);
 void RecoveryEnergy(float recoveryValue);
 
 /// <summary>
+/// 射撃位置取得
+/// </summary>
+/// <returns>shootPos</returns>
+Vector2 GetPlayerShootPos(void);
+
+/// <summary>
 /// playerの方向取得
 /// </summary>
 /// <returns>player.rotateTheta</returns>

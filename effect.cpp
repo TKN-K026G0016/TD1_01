@@ -54,7 +54,7 @@ Timer GageTimer = {5,0};
 
 #pragma endregion
 
-#pragma region 関数: 煙エフェクト
+#pragma region データ: 煙エフェクト
 //煙エフェクトの数
 static constexpr int kSmokeEffectLimit = 10;
 //残像の数
@@ -97,6 +97,61 @@ struct SmokeEffect {
 	unsigned int color = 0x444444FF;
 };
 SmokeEffect smokeEffect[kSmokeEffectLimit];
+
+#pragma endregion
+
+#pragma region データ: Shockエフェクト
+
+constexpr int kElecShockEffectLimit = 30;
+struct ElecShockEffect {
+	Vector2 pos = {};
+
+	bool isShoot = false;
+
+	//サイズ関係
+	float firstSizeValue = 10.0f;
+	float endSizeValue = 300.0f;
+	float sizeValue = firstSizeValue;
+
+	//不透明度
+	int alphaMax = 255;
+	int alphaMin = 0;
+	int alpha = alphaMax;
+
+	float keepAlphaT = 0.4f;
+
+	//サイズなどの変更速度
+	float easingT = 0.0f;
+	float changeSpeed = 0.08f;
+
+	Texture texture = {};
+};
+ElecShockEffect elecShockEffect[kElecShockEffectLimit];
+
+struct ElecShockChargedEffect {
+	Vector2 pos = {};
+
+	bool isShoot = false;
+
+	//サイズ関係
+	float firstSizeValue = 10.0f;
+	float endSizeValue = 500.0f;
+	float sizeValue = firstSizeValue;
+
+	//不透明度
+	int alphaMax = 255;
+	int alphaMin = 0;
+	int alpha = alphaMax;
+
+	float keepAlphaT = 0.4f;
+
+	//サイズなどの変更速度
+	float easingT = 0.0f;
+	float changeSpeed = 0.08f;
+
+	Texture texture = {};
+};
+ElecShockChargedEffect elecShockChargedEffect[kElecShockEffectLimit];
 
 #pragma endregion
 
@@ -364,7 +419,150 @@ void CreateSmokeEffect(Vector2 pos, TypeDrawEffect drawType) {
 
 #pragma endregion
 
+#pragma region 関数: elecShockEffect
 
+static void InitElecShockEffect(void) {
+	for (int i = 0; i < kElecShockEffectLimit; i++) {
+		elecShockEffect[i] = {};
+
+		elecShockEffect[i].texture = GetTexture(TextureType::ElecShock);
+	}
+}
+
+static void UpdateElecShockEffect(void) {
+	for (int i = 0; i < kElecShockEffectLimit; i++) {
+		if (!elecShockEffect[i].isShoot) continue;
+
+		//媒介変数の更新
+		elecShockEffect[i].easingT += elecShockEffect[i].changeSpeed;
+		if (elecShockEffect[i].easingT > 1.0f) {
+			elecShockEffect[i].easingT = 1.0f;
+		}
+
+		//サイズ変更処理
+		elecShockEffect[i].sizeValue = UpdateValueByEasing(elecShockEffect[i].firstSizeValue, elecShockEffect[i].endSizeValue, elecShockEffect[i].easingT, EasingMode::EaseInOut);
+		//フェード処理
+#pragma region 0.6まではキープ
+		if (elecShockEffect[i].easingT < elecShockEffect[i].keepAlphaT) {
+			elecShockEffect[i].alpha = elecShockEffect[i].alphaMax;
+		} 
+		else {
+			float t = (elecShockEffect[i].easingT - 0.6f) / 0.4f;  // 0.6→1.0 を 0→1 に正規化
+			if (t > 1.0f) t = 1.0f;
+
+			elecShockEffect[i].alpha = UpdateValueByEasing(elecShockEffect[i].alphaMax, elecShockEffect[i].alphaMin, t, EasingMode::EaseOut);
+		}
+
+#pragma endregion
+
+		//消滅処理
+		if (elecShockEffect[i].easingT >= 1.0f) {
+			elecShockEffect[i].isShoot = false;
+		}
+	}
+}
+
+static void DrawElecShockEffect(void) {
+	for (int i = 0; i < kElecShockEffectLimit; i++) {
+		if (!elecShockEffect[i].isShoot) continue;
+
+		//size
+		Vector2 size = { elecShockEffect[i].sizeValue, elecShockEffect[i].sizeValue };
+
+		//color
+		Texture texture = elecShockEffect[i].texture;
+		texture.color = (texture.color & 0xFFFFFF00) | elecShockEffect[i].alpha;
+
+		DrawTextureObj(texture, elecShockEffect[i].pos, size);
+	}
+}
+
+void CreateElecShockEffect(Vector2 pos) {
+	for (int i = 0; i < kElecShockEffectLimit; i++) {
+		if (elecShockEffect[i].isShoot) continue;
+
+		elecShockEffect[i].isShoot = true;
+		elecShockEffect[i].pos = pos;
+
+		elecShockEffect[i].sizeValue = elecShockEffect[i].firstSizeValue;
+		elecShockEffect[i].alpha = elecShockEffect[i].alphaMax;
+		elecShockEffect[i].easingT = 0.0f;
+
+		break;
+	}
+}
+
+static void InitElecShockChargedEffect(void) {
+	for (int i = 0; i < kElecShockEffectLimit; i++) {
+		elecShockChargedEffect[i] = {};
+
+		elecShockChargedEffect[i].texture = GetTexture(TextureType::ElecShockCharged);
+	}
+}
+
+static void UpdateElecShockChargedEffect(void) {
+	for (int i = 0; i < kElecShockEffectLimit; i++) {
+		if (!elecShockChargedEffect[i].isShoot) continue;
+
+		//媒介変数の更新
+		elecShockChargedEffect[i].easingT += elecShockChargedEffect[i].changeSpeed;
+		if (elecShockChargedEffect[i].easingT > 1.0f) {
+			elecShockChargedEffect[i].easingT = 1.0f;
+		}
+
+		//サイズ変更処理
+		elecShockChargedEffect[i].sizeValue = UpdateValueByEasing(elecShockChargedEffect[i].firstSizeValue, elecShockChargedEffect[i].endSizeValue, elecShockChargedEffect[i].easingT, EasingMode::EaseInOut);
+		//フェード処理
+#pragma region 0.6まではキープ
+		if (elecShockChargedEffect[i].easingT < elecShockChargedEffect[i].keepAlphaT) {
+			elecShockChargedEffect[i].alpha = elecShockChargedEffect[i].alphaMax;
+		} else {
+			float t = (elecShockChargedEffect[i].easingT - 0.6f) / 0.4f;  // 0.6→1.0 を 0→1 に正規化
+			if (t > 1.0f) t = 1.0f;
+
+			elecShockChargedEffect[i].alpha = UpdateValueByEasing(elecShockChargedEffect[i].alphaMax, elecShockChargedEffect[i].alphaMin, t, EasingMode::EaseOut);
+		}
+
+#pragma endregion
+
+		//消滅処理
+		if (elecShockChargedEffect[i].easingT >= 1.0f) {
+			elecShockChargedEffect[i].isShoot = false;
+		}
+	}
+}
+
+static void DrawElecShockChargedEffect(void) {
+	for (int i = 0; i < kElecShockEffectLimit; i++) {
+		if (!elecShockChargedEffect[i].isShoot) continue;
+
+		//size
+		Vector2 size = { elecShockChargedEffect[i].sizeValue, elecShockChargedEffect[i].sizeValue };
+
+		//color
+		Texture texture = elecShockChargedEffect[i].texture;
+		texture.color = (texture.color & 0xFFFFFF00) | elecShockChargedEffect[i].alpha;
+
+		DrawTextureObj(texture, elecShockChargedEffect[i].pos, size);
+	}
+}
+
+void CreateElecShockChargedEffect(Vector2 pos) {
+	for (int i = 0; i < kElecShockEffectLimit; i++) {
+		if (elecShockChargedEffect[i].isShoot) continue;
+
+		elecShockChargedEffect[i].isShoot = true;
+		elecShockChargedEffect[i].pos = pos;
+
+		elecShockChargedEffect[i].sizeValue = elecShockChargedEffect[i].firstSizeValue;
+		elecShockChargedEffect[i].alpha = elecShockChargedEffect[i].alphaMax;
+		elecShockChargedEffect[i].easingT = 0.0f;
+
+		break;
+	}
+}
+
+#pragma endregion
 
 void InitEffect() {
 	InitGemEffect();
@@ -372,6 +570,9 @@ void InitEffect() {
 	InitGageEffect();
 
 	InitSmokeEffect();
+
+	InitElecShockEffect();
+	InitElecShockChargedEffect();
 
 #ifdef _DEBUG
 
@@ -387,12 +588,15 @@ void UpdateEffect() {
 	UpdateGemEffect();
 	UodateGageEffect();
 	UpdateSmokeEffect();
-
+	UpdateElecShockEffect();
+	UpdateElecShockChargedEffect();
 }
 void DrawEffect() {
 	DrawGetEffect();
 	DrawGageEffect();
 	DrawSmokeEffect();
+	DrawElecShockEffect();
+	DrawElecShockChargedEffect();
 }
 
 void DrawEffectAsUI() {

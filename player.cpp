@@ -134,7 +134,7 @@ LockOnSign lockOnSign;
 
 #pragma region データ: 射撃関係
 
-Vector2 shootPos = {};
+static Vector2 shootPos = {};
 //プレイヤーの中心からの発射位置の距離
 constexpr float kShootDisLength = 15.0f;
 
@@ -202,6 +202,13 @@ constexpr int kCreateSmokeRange = 45;
 constexpr int kCreateSmokeNum = 4;
 //オーバーヒート時のケムリ生成スパン
 Timer createSmokeTimer = { 15, 0 };
+
+struct ChargeOrb {
+	Vector2 size = { 32, 32 };
+
+	Texture texture = {};
+};
+ChargeOrb chargeOrb;
 
 #pragma endregion
 
@@ -662,6 +669,14 @@ static void DrawLockOnSign(void) {
 
 #pragma region 関数: 射撃・エネルギー関係
 
+static void UpdateShootPos(void) {
+	if (!player.isAlive) return;
+
+	//射撃位置設定
+	shootPos.x = player.pos.x + kShootDisLength * cosf(player.rotateTheta);
+	shootPos.y = player.pos.y + kShootDisLength * sinf(player.rotateTheta);
+}
+
 /// <summary>
 /// レーザーの射撃処理
 /// </summary>
@@ -676,7 +691,6 @@ static void ShootLaser(void) {
 			player.shootTimer.count = 0;
 
 			//射撃位置設定
-			Vector2 shootPos;
 			shootPos.x = player.pos.x + kShootDisLength * cosf(player.rotateTheta);
 			shootPos.y = player.pos.y + kShootDisLength * sinf(player.rotateTheta);
 
@@ -691,9 +705,7 @@ static void ShootLaser(void) {
 		if (player.shootTimer.count >= player.shootTimer.time) {
 			player.shootTimer.count = 0;
 
-			//射撃位置設定
-			shootPos.x = player.pos.x + kShootDisLength * cosf(player.rotateTheta);
-			shootPos.y = player.pos.y + kShootDisLength * sinf(player.rotateTheta);
+
 
 			ShootPlayerLaser(shootPos, player.rotateTheta, kShootDisLength);
 		}
@@ -730,10 +742,9 @@ static void ShootElecBullet(void) {
 	else {
 		if (chargeElecBulletTimer.count <= 0) return;
 
-		//射撃位置設定
-		Vector2 shootPos;
-		shootPos.x = player.pos.x + kShootDisLength * cosf(player.rotateTheta);
-		shootPos.y = player.pos.y + kShootDisLength * sinf(player.rotateTheta);
+		////射撃位置設定
+		//shootPos.x = player.pos.x + kShootDisLength * cosf(player.rotateTheta);
+		//shootPos.y = player.pos.y + kShootDisLength * sinf(player.rotateTheta);
 
 		//通常弾
 		if (chargeElecBulletTimer.count < chargeElecBulletTimer.time) {
@@ -840,11 +851,13 @@ static void CheckFailedMaintenance(void) {
 		if (player.remainEnergy <= kEnergyMin) {
 			player.nowState = PlayerState::DeadEnergy;
 			player.remainEnergy = 0.0f;
+			chargeElecBulletTimer.count = 0;
 		}
 		//過ジュウデン
 		else if (player.remainEnergy >= kEnergyMax) {
 			player.nowState = PlayerState::OverHeat;
 			player.remainEnergy = kEnergyMax;
+			chargeElecBulletTimer.count = 0;
 
 #pragma region 煙生成
 			for (int i = 0; i < kCreateSmokeNum; i++) {
@@ -957,6 +970,16 @@ static void UpdatePlayerEffect(void) {
 	}
 }
 
+/// <summary>
+/// チャージ中の玉の描画処理
+/// </summary>
+/// <param name=""></param>
+static void DrawChargeOrb(void) {
+	if (chargeElecBulletTimer.count < chargeElecBulletTimer.time) return;
+
+	DrawTextureObj(chargeOrb.texture, shootPos, chargeOrb.size);
+}
+
 #pragma endregion
 
 #pragma region 関数: 死亡判定など
@@ -1029,6 +1052,8 @@ void InitPlayer(void) {
 	player.texture = GetTexture(TextureType::Player);
 	player.remainEnergy = kEnergyCenter;
 
+	chargeOrb.texture = GetTexture(TextureType::ChargeOrb);
+
 	GetMovablePos(movablePos);
 	InitLockSign();
 }
@@ -1044,6 +1069,7 @@ void UpdatePlayer(void) {
 	RotatePlayerByLockOn();
 	UpdateLockOnSign();
 
+	UpdateShootPos();
 	ShootLaser();
 	ShootElecBullet();
 
@@ -1065,8 +1091,10 @@ void UpdatePlayer(void) {
 void DrawPlayer(void) {
 	if (!player.isAlive || isInvisible) return;
 
+	//本体の描画
 	DrawTextureRotateObj(player.texture, player.pos, player.size, player.rotateTheta);
 
+	DrawChargeOrb();
 
 	DrawLockOnSign();
 
@@ -1113,6 +1141,10 @@ void RecoveryEnergy(float recoveryValue) {
 		player.remainEnergy = kEnergyMax;
 	}
 }
+
+Vector2 GetPlayerShootPos(void) {
+	return shootPos;
+}	
 
 float GetPlayerRotateTheta(void) {
 	return player.rotateTheta;

@@ -1,4 +1,5 @@
 #include "elec_bullet.h"
+#include "effect.h"
 
 #include "vector2.h"
 #include "timer.h"
@@ -193,6 +194,13 @@ void SpawnElecShock(Vector2 pos, ElecBulletType type) {
 		elecShock[i].type = type;
 		elecShock[i].hitRadius = elecShockSpec[ToInt(type)].hitRadius;
 		elecShock[i].pow = elecShockSpec[ToInt(type)].pow;
+
+		//エフェクトの生成
+		if (type == ElecBulletType::Normal) {
+			CreateElecShockEffect(pos);
+		} else if(type == ElecBulletType::Charge){
+			CreateElecShockChargedEffect(pos);
+		}
 
 		break;
 	}
