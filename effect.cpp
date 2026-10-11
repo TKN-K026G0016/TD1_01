@@ -94,7 +94,7 @@ struct SmokeEffect {
 	int diffAlpha = 30;
 
 	Texture texture = {};
-	unsigned int color = 0x333333FF;
+	unsigned int color = 0x444444FF;
 };
 SmokeEffect smokeEffect[kSmokeEffectLimit];
 
