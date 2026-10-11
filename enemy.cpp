@@ -291,12 +291,20 @@ int GetEnemy1Limit(void) {
 	return kEnemy1Limit;
 }
 
+void DamageEnemy1(Enemy1& enemy,int pow) {
+	enemy.hp -= pow;
+}
+
 Enemy2* GetEnemy2Array(void) {
 	return enemy2;
 }
 
 int GetEnemy2Limit(void) {
 	return kEnemy2Limit;
+}
+
+void DamageEnemy2(Enemy2& enemy, int pow) {
+	enemy.hp -= pow;
 }
 
 #pragma endregion

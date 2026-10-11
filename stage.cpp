@@ -31,7 +31,7 @@ struct Camera {
 	float zoomMin = 0.5f;
 
 	//<移動処理関係>
-	float moveSpeed = 7.0f;
+	float moveSpeed = 6.5f;
 	float moveSpeedDece = 1.0f;
 	//減速するまでの距離
 	float deceleratonDis = 60.0f;
