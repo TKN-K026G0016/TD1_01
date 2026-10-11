@@ -29,8 +29,17 @@ struct EnergyGaugeFrame {
 	Vector2 pos = { 640, 60 };
 	Vector2 size = { 512, 100 };
 
-	//警告表示のタイミング
-	float warnEmpty = 20.0f;
+	//デンリョク不足警告表示のタイミング
+	float warnDeadEnergy = 20.0f;
+	//過ジュウデン警告表示のタイミング
+	float warnOverHeat = 80.0f;
+
+	//ケムリの生成範囲(frameのposを中心に)
+	Vector2i spawnSmokeRange = { 250, 60 };
+	//警告中の煙エフェクト生成スパン
+	Timer createSmokeWarningTimer = { 15, 0 };
+	//オーバーヒート中の煙エフェクト生成スパン
+	Timer createSmokeOverHeatTimer = { 7, 0 };
 
 	Texture texture = {};
 };
@@ -208,7 +217,7 @@ static void UpdateEnergyGauge(void) {
 #pragma region 点滅処理
 
 	//警告表示のラインを下回るor故障状態時
-	if (remainEnergy <= energyGaugeFrame.warnEmpty || GetPlayerNowState() != PlayerState::Normal) {
+	if (remainEnergy <= energyGaugeFrame.warnDeadEnergy || GetPlayerNowState() != PlayerState::Normal) {
 		UpdateAnimation(energyGaugeFrame.texture);
 		UpdateAnimation(miniEnergyGauge.frameTexture);
 	}
@@ -218,6 +227,29 @@ static void UpdateEnergyGauge(void) {
 
 		miniEnergyGauge.frameTexture.animNum = 0;
 		miniEnergyGauge.frameTexture.animChangeTimer.count = 0;
+	}
+
+#pragma endregion
+
+#pragma region ケムリ生成処理
+
+	if (remainEnergy >= energyGaugeFrame.warnOverHeat) {
+		energyGaugeFrame.createSmokeWarningTimer.count++;
+	}
+	else if (GetPlayerNowState() == PlayerState::OverHeat) {
+		energyGaugeFrame.createSmokeOverHeatTimer.count++;
+	}
+
+	if (energyGaugeFrame.createSmokeWarningTimer.count >= energyGaugeFrame.createSmokeWarningTimer.time
+		|| energyGaugeFrame.createSmokeOverHeatTimer.count >= energyGaugeFrame.createSmokeOverHeatTimer.time) {
+		energyGaugeFrame.createSmokeWarningTimer.count = 0;
+		energyGaugeFrame.createSmokeOverHeatTimer.count = 0;
+
+		//生成座標を設定
+		float posX = energyGaugeFrame.pos.x + ToFloat(GetRand(-energyGaugeFrame.spawnSmokeRange.x, energyGaugeFrame.spawnSmokeRange.x));
+		float posY = energyGaugeFrame.pos.y + ToFloat(GetRand(0, energyGaugeFrame.spawnSmokeRange.y));
+
+		CreateSmokeEffect({ posX, posY }, TypeDrawEffect::UI);
 	}
 
 #pragma endregion

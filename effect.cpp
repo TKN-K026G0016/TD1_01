@@ -62,7 +62,8 @@ static constexpr int kSmokeAfterimageLimit = 2;
 
 struct SmokeEffect {
 	Vector2 pos = {};
-	//Vector2 size = { 24, 24 };
+
+	TypeDrawEffect drawType = TypeDrawEffect::Obj;
 
 	bool isShoot = false;
 
@@ -274,6 +275,7 @@ static void UpdateSmokeEffect(void) {
 static void DrawSmokeEffect(void) {
 	for (int i = 0; i < kSmokeEffectLimit; i++) {
 		if (!smokeEffect[i].isShoot) continue;
+		if (smokeEffect[i].drawType != TypeDrawEffect::Obj) continue;
 
 		//残像の処理
 		for (int j = 0; j < kSmokeAfterimageLimit; j++) {
@@ -305,19 +307,54 @@ static void DrawSmokeEffect(void) {
 	}
 }
 
-void CreateSmokeEffect(Vector2 pos) {
+static void DrawSmokeEffectAsUI(void) {
+	for (int i = 0; i < kSmokeEffectLimit; i++) {
+		if (!smokeEffect[i].isShoot) continue;
+		if (smokeEffect[i].drawType != TypeDrawEffect::UI) continue;
+
+		//残像の処理
+		for (int j = 0; j < kSmokeAfterimageLimit; j++) {
+			Vector2 pos = { smokeEffect[i].pos.x, smokeEffect[i].pos.y - smokeEffect[i].posOffset * (j + 1) };
+			Vector2 size = { smokeEffect[i].preSizeValue[j], smokeEffect[i].preSizeValue[j] };
+
+			Texture afterFadeTexture = smokeEffect[i].texture;
+
+			//透明度の変更
+			int alpha = smokeEffect[i].alpha - smokeEffect[i].diffAlpha * (j + 1);
+			if (alpha < 0) {
+				alpha = 0;
+			}
+			unsigned int color = (smokeEffect[i].texture.color & 0xFFFFFF00) | alpha;
+			afterFadeTexture.color = color;
+
+
+			DrawTextureRotateUI(afterFadeTexture, pos, size, smokeEffect[i].preRotateTheta[j]);
+		}
+
+		//本体の描写
+		Vector2 size = { smokeEffect[i].sizeValue, smokeEffect[i].sizeValue };
+		Texture texture = smokeEffect[i].texture;
+		//透明度の変更
+		unsigned int color = (smokeEffect[i].texture.color & 0xFFFFFF00) | smokeEffect[i].alpha;
+		texture.color = color;
+
+		DrawTextureRotateUI(texture, smokeEffect[i].pos, size, smokeEffect[i].rotateTheta);
+	}
+}
+
+void CreateSmokeEffect(Vector2 pos, TypeDrawEffect drawType) {
 	for (int i = 0; i < kSmokeEffectLimit; i++) {
 		if (smokeEffect[i].isShoot) continue;
 
 		smokeEffect[i].isShoot = true;
 		smokeEffect[i].pos = pos;
+		smokeEffect[i].drawType = drawType;
 
 		//初期化
 		smokeEffect[i].sizeValue = smokeEffect[i].firstSizeValue;
 		smokeEffect[i].rotateTheta = 0.0f;
 		smokeEffect[i].alpha = smokeEffect[i].alphaMax;
 		for (int j = 0; j < kSmokeAfterimageLimit; j++) {
-			//smokeEffect[i].prePos[j] = smokeEffect[i].pos;
 			smokeEffect[i].preRotateTheta[j] = smokeEffect[i].rotateTheta;
 		}
 
@@ -342,8 +379,6 @@ void InitEffect() {
 
 	CreateGageEffect();
 
-	CreateSmokeEffect({GetPlayerPos()});
-
 #endif // _DEBUG
 
 }
@@ -358,4 +393,8 @@ void DrawEffect() {
 	DrawGetEffect();
 	DrawGageEffect();
 	DrawSmokeEffect();
+}
+
+void DrawEffectAsUI() {
+	DrawSmokeEffectAsUI();
 }

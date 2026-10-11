@@ -178,6 +178,8 @@ void DrawTextureBG(Texture texture, Vector2 centerPos, Vector2 size, float scrol
 /// <param name="size">サイズ</param>
 void DrawTextureUI(Texture texture, Vector2 centerPos, Vector2 size);
 
+void DrawTextureRotateUI(Texture texture, Vector2 centerPos, Vector2 size, float rotateTheta);
+
 /// <summary>
 /// ゲージの描画処理(Obj)
 /// </summary>

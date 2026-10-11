@@ -83,6 +83,7 @@ void DrawPlay(void) {
 	DrawEffect();
 
 	DrawPlayUI();
+	DrawEffectAsUI();
 
 #ifdef _DEBUG
 

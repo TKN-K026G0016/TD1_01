@@ -74,7 +74,10 @@ static void CheckHitVSPlayer(void) {
 		if (CheckCollisionCircleVSCircle(playerPos, playerHitRadius, gem[i].pos, gem[i].hitRadius)) {
 			CreateJemEffect();
 			BreakGem(i);
-			RecoveryEnergy(gem[i].recoveryEnergy);
+
+			if (GetPlayerNowState() != PlayerState::OverHeat) {
+				RecoveryEnergy(gem[i].recoveryEnergy);
+			}
 		}
 	}
 

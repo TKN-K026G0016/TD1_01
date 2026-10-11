@@ -247,6 +247,34 @@ void DrawTextureUI(Texture texture, Vector2 centerPos, Vector2 size) {
 }
 
 /// <summary>
+/// 回転するUI(HUD)の描画関数
+/// </summary>
+/// <param name="texture">テクスチャデータ</param>
+/// <param name="centerPos">中心座標</param>
+/// <param name="size">サイズ</param>
+/// <param name="rotateTheta">回転量</param>
+void DrawTextureRotateUI(Texture texture, Vector2 centerPos, Vector2 size, float rotateTheta) {
+	Vector2 vertexW[kVertexNum] = { 0, 0 };
+	Vector2i vertexS[kVertexNum] = { 0, 0 };
+
+	//頂点座標を更新
+	SetVertexRotate(centerPos, size, vertexW, rotateTheta);
+
+	for (int i = 0; i < kVertexNum; i++) {
+		vertexS[i] = ConvertPosWToSUI(vertexW[i]);
+	}
+
+	Novice::DrawQuad(
+		vertexS[0].x, vertexS[0].y,
+		vertexS[1].x, vertexS[1].y,
+		vertexS[2].x, vertexS[2].y,
+		vertexS[3].x, vertexS[3].y,
+		texture.refSize.x * texture.animNum, 0, texture.refSize.x, texture.refSize.y,
+		texture.tHandle, texture.color
+	);
+}
+
+/// <summary>
 /// ゲージの描画処理(Obj)
 /// </summary>
 /// <param name="texture">テクスチャデータ</param>

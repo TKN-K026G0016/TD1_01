@@ -168,7 +168,7 @@ constexpr float kConsumptionEnergy = 0.05f;
 constexpr float kConsumptionEnergys[ToInt(PlayerLaserLevel::Count)] = { 0.0f, 0.1f, 0.7f };
 
 //故障時のenergy回復量
-constexpr float kRecoveryEnergyDuringEmpty = 0.3f;
+constexpr float kRecoveryEnergyDuringEmpty = 0.15f;
 
 #pragma endregion
 
@@ -851,7 +851,7 @@ static void CheckFailedMaintenance(void) {
 				float posX = player.pos.x + ToFloat(GetRand(-kCreateSmokeRange, kCreateSmokeRange));
 				float posY = player.pos.y + ToFloat(GetRand(-kCreateSmokeRange, kCreateSmokeRange));
 
-				CreateSmokeEffect({ posX, posY });
+				CreateSmokeEffect({ posX, posY }, TypeDrawEffect::Obj);
 			}
 
 #pragma endregion
@@ -890,7 +890,7 @@ static void RecoveryPlayerState(void) {
 				float posX = player.pos.x + ToFloat(GetRand(-kCreateSmokeRange, kCreateSmokeRange));
 				float posY = player.pos.y + ToFloat(GetRand(-kCreateSmokeRange, kCreateSmokeRange));
 
-				CreateSmokeEffect({ posX, posY });
+				CreateSmokeEffect({ posX, posY }, TypeDrawEffect::Obj);
 			}
 
 #pragma endregion
