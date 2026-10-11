@@ -43,6 +43,15 @@ struct EnergyGaugeMeter {
 };
 EnergyGaugeMeter energyGaugeMeter;
 
+struct EnergyGaugeDelayMeter {
+	float gaugeRate = 0.0f;
+	//追従速度
+	float followSpeed = 0.001f;
+
+	Texture texture = {};
+};
+EnergyGaugeDelayMeter energyGaugeDelayMeter;
+
 struct MiniEnergyGauge {
 	Vector2 pos = {};
 	Vector2 size = { 64, 16 };
@@ -50,6 +59,7 @@ struct MiniEnergyGauge {
 
 	Texture frameTexture = {};
 	Texture meterTexture = {};
+	Texture delayMeterTexture = {};
 };
 MiniEnergyGauge miniEnergyGauge;
 
@@ -71,6 +81,14 @@ struct BossHpGaugeMeter {
 	Texture texture = {};
 };
 BossHpGaugeMeter bossHpGaugeMeter;
+
+struct BossHpGaugeDelayMeter {
+	float gaugeRate = 1.0f;
+	float followSpeed = 0.01f;
+
+	Texture texture = {};
+};
+BossHpGaugeDelayMeter bossHpGaugeDelayMeter;
 
 #pragma endregion
 
@@ -110,16 +128,39 @@ static void DrawLifeIcon(void) {
 static void InitEnergyGauge(void) {
 	energyGaugeFrame.texture = GetTexture(TextureType::EnergyGaugeFrame);
 	energyGaugeMeter.texture = GetTexture(TextureType::EnergyGaugeMeter);
+	energyGaugeDelayMeter.texture = GetTexture(TextureType::EnergyGaugeDelayMeter);
 
 	miniEnergyGauge.frameTexture = GetTexture(TextureType::MiniEnergyGaugeFrame);
 	miniEnergyGauge.meterTexture = GetTexture(TextureType::MiniEnergyGaugeMeter);
+	miniEnergyGauge.delayMeterTexture = GetTexture(TextureType::MiniEnergyGaugeDelayMeter);
 }
 
 static void UpdateEnergyGauge(void) {
 	float remainEnergy = GetPlayerRemainEnergy();
 	float energyLimit = GetPlayerEnergyLimit();
 
+#pragma region 残量の変化処理
+
 	energyGaugeMeter.gaugeRate = remainEnergy / energyLimit;
+
+#pragma endregion
+
+#pragma region DelayMeterの変化処理
+
+	//残量が減ったらすこしずつdelayMeterの残量を減らす
+	if (energyGaugeDelayMeter.gaugeRate > energyGaugeMeter.gaugeRate) {
+		energyGaugeDelayMeter.gaugeRate -= energyGaugeDelayMeter.followSpeed;
+		if (energyGaugeDelayMeter.gaugeRate < energyGaugeMeter.gaugeRate) {
+			energyGaugeDelayMeter.gaugeRate = energyGaugeMeter.gaugeRate;
+		}
+	}
+	else if (energyGaugeMeter.gaugeRate > energyGaugeDelayMeter.gaugeRate) {
+		energyGaugeDelayMeter.gaugeRate = energyGaugeMeter.gaugeRate;
+	}
+
+#pragma endregion
+
+#pragma region 点滅処理
 
 	//警告表示のラインを下回ったら
 	if (remainEnergy <= energyGaugeFrame.warnEmpty) {
@@ -134,9 +175,14 @@ static void UpdateEnergyGauge(void) {
 		miniEnergyGauge.frameTexture.animChangeTimer.count = 0;
 	}
 
+#pragma endregion
+
+#pragma region ミニゲージの座標更新
 	//miniGaugeの座標を更新
 	Vector2 playerPos = GetPlayerPos();
 	miniEnergyGauge.pos = { playerPos.x + miniEnergyGauge.offset.x, playerPos.y + miniEnergyGauge.offset.y };
+
+#pragma endregion
 
 }
 
@@ -144,12 +190,16 @@ static void DrawEnergyGauge(void) {
 	//通常ゲージ
 	//フレーム
 	DrawTextureUI(energyGaugeFrame.texture, energyGaugeFrame.pos, energyGaugeFrame.size);
+	//delayメーター
+	DrawGaugeAsUI(energyGaugeDelayMeter.texture, energyGaugeFrame.pos, energyGaugeFrame.size, energyGaugeDelayMeter.gaugeRate);
 	//メーター
 	DrawGaugeAsUI(energyGaugeMeter.texture, energyGaugeFrame.pos, energyGaugeFrame.size, energyGaugeMeter.gaugeRate);
 
 	//ミニゲージ
 	//フレーム
 	DrawTextureObj(miniEnergyGauge.frameTexture, miniEnergyGauge.pos, miniEnergyGauge.size);
+	//delayメーター
+	DrawGaugeAsObj(miniEnergyGauge.delayMeterTexture, miniEnergyGauge.pos, miniEnergyGauge.size, energyGaugeDelayMeter.gaugeRate);
 	//メーター
 	DrawGaugeAsObj(miniEnergyGauge.meterTexture, miniEnergyGauge.pos, miniEnergyGauge.size, energyGaugeMeter.gaugeRate);
 }

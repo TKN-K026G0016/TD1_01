@@ -163,7 +163,7 @@ constexpr float kEnergyMin = 0.0f;
 constexpr float kEnergyCenter = (kEnergyMax - kEnergyMin) / 2;
 
 //エネルギー消費量
-constexpr float kConsumptionEnergy = 0.075f;
+constexpr float kConsumptionEnergy = 0.05f;
 //エネルギー消費量(レベルごと)
 constexpr float kConsumptionEnergys[ToInt(PlayerLaserLevel::Count)] = { 0.0f, 0.1f, 0.7f };
 

@@ -79,9 +79,10 @@ enum class TextureType {
 	EnergyGaugeFrame,
 	EnergyGaugeMeter,
 	EnergyGaugeDelayMeter,
+
 	MiniEnergyGaugeFrame,
-	MiniEnergyGaugeDelayMeter,
 	MiniEnergyGaugeMeter,
+	MiniEnergyGaugeDelayMeter,
 
 	BossHpGaugeFrame,
 	BossHpGaugeMeter,
