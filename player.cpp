@@ -134,6 +134,7 @@ LockOnSign lockOnSign;
 
 #pragma region データ: 射撃関係
 
+Vector2 shootPos = {};
 //プレイヤーの中心からの発射位置の距離
 constexpr float kShootDisLength = 15.0f;
 
@@ -691,7 +692,6 @@ static void ShootLaser(void) {
 			player.shootTimer.count = 0;
 
 			//射撃位置設定
-			Vector2 shootPos;
 			shootPos.x = player.pos.x + kShootDisLength * cosf(player.rotateTheta);
 			shootPos.y = player.pos.y + kShootDisLength * sinf(player.rotateTheta);
 

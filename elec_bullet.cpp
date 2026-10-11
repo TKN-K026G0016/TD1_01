@@ -21,7 +21,7 @@ ElecBulletSpec elecBulletSpec[ToInt(ElecBulletType::Count)] = {
 	//Normal弾
 	{ {32, 32}, 20, 1, {}},
 	//Charge弾
-	{ {64, 64}, 32, 3, {} },
+	{ {100, 100}, 32, 3, {} },
 };
 
 //レベルごとの性能
@@ -54,8 +54,8 @@ static void InitBullet(void) {
 		elecBullet[i] = {};
 	}
 
-	elecBulletSpec[ToInt(ElecBulletType::Normal)].texture = GetTexture(TextureType::PlayerLaser0);
-	elecBulletSpec[ToInt(ElecBulletType::Charge)].texture = GetTexture(TextureType::PlayerLaser1);
+	elecBulletSpec[ToInt(ElecBulletType::Normal)].texture = GetTexture(TextureType::ElecBullet);
+	elecBulletSpec[ToInt(ElecBulletType::Charge)].texture = GetTexture(TextureType::ElecBulletCharged);
 }
 
 /// <summary>

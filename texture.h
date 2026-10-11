@@ -49,6 +49,13 @@ enum class TextureType {
 	PlayerLaser1,
 	PlayerLaser2,
 
+	ElecBullet,
+	ElecBulletCharged,
+	ChargeOrb,
+
+	ElecShock,
+	ElecShockCharged,
+
 	LockOnSign,
 
 	//Item
