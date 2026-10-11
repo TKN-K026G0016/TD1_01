@@ -32,6 +32,10 @@ struct Enemy1 {
 	//ショック生成無視タイマー
 	Timer ignoreSpawnShockTimer = { 20, 0 };
 
+	//<フラッシュ関係>
+	bool isFlash = false;
+	Timer flashTimer = { 7, 0 };
+
 	Texture texture = {};
 };
 
@@ -54,6 +58,10 @@ struct Enemy2 {
 	bool isIgnoreShock = false;
 	//ショック生成無視タイマー
 	Timer ignoreSpawnShockTimer = { 20, 0 };
+
+	//<フラッシュ関係>
+	bool isFlash = false;
+	Timer flashTimer = { 7, 0 };
 
 	Texture texture = {};
 };
