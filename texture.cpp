@@ -52,7 +52,8 @@ void InitTexture(void) {
 
 		//Item
 		{ Novice::LoadTexture("./resources/texture/item/gem.png"), { 32, 32 }, {0, 0}, 0, 0, WHITE },
-		{ Novice::LoadTexture("./resources/texture/item/gem_small.png"), { 16, 16 }, {0, 0}, 0, 0, WHITE },
+		{ Novice::LoadTexture("./resources/texture/item/gem_small.png"), { 16, 16 }, {7, 0}, 2, 0, WHITE },
+		{ Novice::LoadTexture("./resources/texture/item/gem_small_light.png"), { 16, 16 }, {7, 0}, 2, 0, WHITE },
 
 		//Enemy
 		{ Novice::LoadTexture("./resources/texture/enemy/enemy1.png"), { 128, 128 }, {0, 0}, 0, 0, WHITE },

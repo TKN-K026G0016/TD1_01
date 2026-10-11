@@ -61,6 +61,7 @@ enum class TextureType {
 	//Item
 	Gem,
 	GemSmall,
+	GemSmallLight,
 
 	//Enemy
 	Enemy1,

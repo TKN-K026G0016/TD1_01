@@ -25,6 +25,7 @@ struct GemSpec {
 	float recoveryEnergy;
 
 	Texture texture = {};
+	Texture lightTexture = {};
 };
 
 GemSpec spec[ToInt(GemType::Count)] = {
@@ -56,6 +57,9 @@ static void CountIgnoreElecShock(void) {
 			gem[i].ignoreElecShockTimer.count = 0;
 			gem[i].isIgnoreElecShock = false;
 		}
+
+		UpdateAnimation(gem[i].texture);
+		UpdateAnimation(gem[i].lightTexture);
 	}
 }
 
@@ -123,14 +127,15 @@ Vector2 CreateScatterPos(Vector2 centerPos) {
 
 void InitGem(void) {
 	spec[ToInt(GemType::S)].texture = GetTexture(TextureType::GemSmall);
+	spec[ToInt(GemType::S)].lightTexture = GetTexture(TextureType::GemSmallLight);
 	spec[ToInt(GemType::M)].texture = GetTexture(TextureType::Gem);
+	spec[ToInt(GemType::M)].lightTexture = GetTexture(TextureType::GemSmallLight);
 	spec[ToInt(GemType::L)].texture = GetTexture(TextureType::Gem);
+	spec[ToInt(GemType::L)].lightTexture = GetTexture(TextureType::GemSmallLight);
 
 	for (int i = 0; i < kGemLimit; i++) {
 		gem[i] = {};
 	}
-
-	SpawnGem({ 500, 500 }, GemType::S);
 }
 
 void UpdateGem(void) {
@@ -143,7 +148,12 @@ void DrawGem(void) {
 	for (int i = 0; i < kGemLimit; i++) {
 		if (!gem[i].isAlive) continue;
 
-		DrawTextureObj(gem[i].texture, gem[i].pos, gem[i].size);
+		if (!gem[i].isIgnoreElecShock) {
+			DrawTextureObj(gem[i].texture, gem[i].pos, gem[i].size);
+		}
+		else {
+			DrawTextureObj(gem[i].lightTexture, gem[i].pos, gem[i].size);
+		}
 
 #ifdef _DEBUG
 		DrawHitEllipse(gem[i].pos, gem[i].hitRadius, BLUE, false);
@@ -165,7 +175,9 @@ void SpawnGem(Vector2 pos, GemType type) {
 		gem[i].size = spec[ToInt(type)].size;
 		gem[i].hitRadius = spec[ToInt(type)].hitRadius;
 		gem[i].recoveryEnergy = spec[ToInt(type)].recoveryEnergy;
+
 		gem[i].texture = spec[ToInt(type)].texture;
+		gem[i].lightTexture = spec[ToInt(type)].lightTexture;
 
 		break;
 	}

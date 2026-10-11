@@ -32,6 +32,7 @@ struct Gem {
 	Timer ignoreElecShockTimer = { 20, 0 };
 
 	Texture texture = {};
+	Texture lightTexture = {};
 };
 
 void InitGem(void);
