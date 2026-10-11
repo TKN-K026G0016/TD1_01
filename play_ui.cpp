@@ -45,8 +45,17 @@ EnergyGaugeMeter energyGaugeMeter;
 
 struct EnergyGaugeDelayMeter {
 	float gaugeRate = 0.0f;
+
 	//追従速度
-	float followSpeed = 0.001f;
+	float followSpeed = 0.007f;
+
+	//イージングを使うかどうかの判定値
+	float threshold = 0.01f;
+
+	//イージング用
+	float easingT = 0.0f;
+	float startRate = 0.0f;
+	float endRate = 0.0f;
 
 	Texture texture = {};
 };
@@ -147,16 +156,71 @@ static void UpdateEnergyGauge(void) {
 
 #pragma region DelayMeterの変化処理
 
-	//残量が減ったらすこしずつdelayMeterの残量を減らす
-	if (energyGaugeDelayMeter.gaugeRate > energyGaugeMeter.gaugeRate) {
-		energyGaugeDelayMeter.gaugeRate -= energyGaugeDelayMeter.followSpeed;
-		if (energyGaugeDelayMeter.gaugeRate < energyGaugeMeter.gaugeRate) {
-			energyGaugeDelayMeter.gaugeRate = energyGaugeMeter.gaugeRate;
+	float nowRate = energyGaugeMeter.gaugeRate;
+	float diff = energyGaugeDelayMeter.gaugeRate - nowRate;
+
+
+
+	//delayゲージが本ゲージより大きい(減少した際)
+	if (energyGaugeDelayMeter.gaugeRate > nowRate) {
+
+		//エージングでの更新
+		if (diff > energyGaugeDelayMeter.threshold) {
+			//始点と終点を更新
+			energyGaugeDelayMeter.startRate = energyGaugeDelayMeter.gaugeRate;
+			energyGaugeDelayMeter.endRate = nowRate;
+
+			//easingTを更新
+			energyGaugeDelayMeter.easingT += energyGaugeDelayMeter.followSpeed;
+			if (energyGaugeDelayMeter.easingT > 1.0f) {
+				energyGaugeDelayMeter.easingT = 1.0f;
+			}
+
+			//更新
+			energyGaugeDelayMeter.gaugeRate =
+				UpdateValueByEasing(
+					energyGaugeDelayMeter.startRate,
+					energyGaugeDelayMeter.endRate,
+					energyGaugeDelayMeter.easingT,
+					EasingMode::EaseIn
+				);
 		}
+		else {
+			energyGaugeDelayMeter.gaugeRate = nowRate;
+			energyGaugeDelayMeter.easingT = 0.0f;
+		}
+
+	} else {
+		energyGaugeDelayMeter.gaugeRate = nowRate;
+		energyGaugeDelayMeter.easingT = 0.0f;
 	}
-	else if (energyGaugeMeter.gaugeRate > energyGaugeDelayMeter.gaugeRate) {
-		energyGaugeDelayMeter.gaugeRate = energyGaugeMeter.gaugeRate;
-	}
+
+	////delayゲージが本ゲージより大きい(減少した際)
+	//if (energyGaugeDelayMeter.gaugeRate > nowRate) {
+	//	//始点と終点を更新
+	//	energyGaugeDelayMeter.startRate = energyGaugeDelayMeter.gaugeRate;
+	//	energyGaugeDelayMeter.endRate = nowRate;
+
+	//	//easingTを更新
+	//	energyGaugeDelayMeter.easingT += energyGaugeDelayMeter.followSpeed;
+	//	if (energyGaugeDelayMeter.easingT > 1.0f) {
+	//		energyGaugeDelayMeter.easingT = 1.0f;
+	//	}
+
+	//	//更新
+	//	energyGaugeDelayMeter.gaugeRate =
+	//		UpdateValueByEasing(
+	//			energyGaugeDelayMeter.startRate,
+	//			energyGaugeDelayMeter.endRate,
+	//			energyGaugeDelayMeter.easingT,
+	//			EasingMode::EaseInOut
+	//		);
+	//}
+	//else {
+	//	energyGaugeDelayMeter.gaugeRate = nowRate;
+	//	energyGaugeDelayMeter.easingT = 0.0f;
+	//}
+
 
 #pragma endregion
 

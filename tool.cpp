@@ -240,7 +240,7 @@ Vector2 MoveByEasing(Vector2 startPos, Vector2 endPos, float t, EasingMode mode)
 }
 
 /// <summary>
-/// 線形補正での数値の更新
+/// 線形補正での数値(int)の更新
 /// </summary>
 /// <param name="startPos">最初の数値</param>
 /// <param name="endPos">最終的な数値</param>
@@ -282,6 +282,51 @@ int UpdateValueByEasing(int startNum, int endNum, float t, EasingMode mode) {
 	}
 
 	return static_cast<int>((1.0f - easedT) * startNum + easedT * endNum);
+}
+
+/// <summary>
+/// 線形補正での数値(float)の更新
+/// </summary>
+/// <param name="startPos">最初の数値</param>
+/// <param name="endPos">最終的な数値</param>
+/// <param name="t">媒介変数(この関数の前に更新しておく)</param>
+/// <param name="mode">動き方</param>
+/// <returns>更新後の数値</returns>
+float UpdateValueByEasing(float startNum, float endNum, float t, EasingMode mode) {
+	float easedT = 0.0f;
+
+	switch (mode) {
+	case  EasingMode::Linear:
+	{
+		easedT = t;
+
+		break;
+	}
+	case  EasingMode::EaseIn:
+	{
+		easedT = t * t;
+
+		break;
+	}
+	case  EasingMode::EaseOut:
+	{
+		easedT = 1.0f - powf(1.0f - t, 3.0f);
+
+		break;
+	}
+	case  EasingMode::EaseInOut:
+	{
+		easedT = -(cosf(static_cast<float>(M_PI) * t) - 1.0f) / 2.0f;
+
+		break;
+	}
+	}
+
+	if (easedT > 1.0f) {
+		easedT = 1.0f;
+	}
+
+	return (1.0f - easedT) * startNum + easedT * endNum;
 }
 
 /// <summary>

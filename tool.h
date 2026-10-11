@@ -118,6 +118,8 @@ Vector2 MoveByEasing(Vector2 startPos, Vector2 endPos, float t, EasingMode mode)
 
 int UpdateValueByEasing(int startNum, int endNum, float t, EasingMode mode);
 
+float UpdateValueByEasing(float startNum, float endNum, float t, EasingMode mode);
+
 void DrawHitBox(Vector2 hitVertex0, Vector2 hitVertex1);
 
 /// <summary>
