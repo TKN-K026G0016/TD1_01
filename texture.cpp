@@ -68,11 +68,11 @@ void InitTexture(void) {
 		//UI
 		{ Novice::LoadTexture("./resources/texture/ui/play/life_icon.png"), { 64, 64 }, {0, 0}, 0, 0, WHITE },
 
-		{ Novice::LoadTexture("./resources/texture/ui/play/energy_gauge_frame.png"), { 512, 128 }, {7, 0}, 6, 0, WHITE },
+		{ Novice::LoadTexture("./resources/texture/ui/play/energy_gauge_frame.png"), { 512, 128 }, {7, 0}, 5, 0, WHITE },
 		{ Novice::LoadTexture("./resources/texture/ui/play/energy_gauge_meter.png"), { 512, 128 }, {0, 0}, 0, 0, WHITE },
 		{ Novice::LoadTexture("./resources/texture/ui/play/energy_gauge_delay_meter.png"), { 512, 128 }, {0, 0}, 0, 0, WHITE },
 
-		{ Novice::LoadTexture("./resources/texture/ui/play/mini_energy_gauge_frame.png"), { 128, 32 }, {7, 0}, 6, 0, WHITE },
+		{ Novice::LoadTexture("./resources/texture/ui/play/mini_energy_gauge_frame.png"), { 128, 32 }, {7, 0}, 5, 0, WHITE },
 		{ Novice::LoadTexture("./resources/texture/ui/play/mini_energy_gauge_meter.png"), { 128, 32 }, {0, 0}, 0, 0, WHITE },
 		{ Novice::LoadTexture("./resources/texture/ui/play/mini_energy_gauge_delay_meter.png"), { 128, 32 }, {0, 0}, 0, 0, WHITE },
 

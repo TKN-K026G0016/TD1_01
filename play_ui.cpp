@@ -207,8 +207,8 @@ static void UpdateEnergyGauge(void) {
 
 #pragma region 点滅処理
 
-	//警告表示のラインを下回ったら
-	if (remainEnergy <= energyGaugeFrame.warnEmpty) {
+	//警告表示のラインを下回るor故障状態時
+	if (remainEnergy <= energyGaugeFrame.warnEmpty || GetPlayerNowState() != PlayerState::Normal) {
 		UpdateAnimation(energyGaugeFrame.texture);
 		UpdateAnimation(miniEnergyGauge.frameTexture);
 	}

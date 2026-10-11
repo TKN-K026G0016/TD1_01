@@ -178,6 +178,25 @@ static Timer dodgeCloseBonusTimer = { 8, 0 };
 
 #pragma endregion
 
+#pragma region データ: 演出関係
+
+struct ColorManager {
+	static constexpr int colorValueMin = 32;
+	static constexpr int colorValueMax = 255;
+	//現在のプレイヤーの色
+	int colorValue = 255;
+
+	//イージング用
+	float easingT = 0.0f;
+	float changeSpeed = 0.05f;
+	bool isGoToBlack = true;
+};
+ColorManager colorManager;
+
+
+
+#pragma endregion
+
 /// <summary>
 /// 入力検知
 /// </summary>
@@ -851,6 +870,62 @@ static void RecoveryPlayerState(void) {
 
 #pragma endregion
 
+#pragma region 関数: 演出関係
+
+static void UpdateEffect(void) {
+	//
+
+	//モードごとによる演出
+	switch (player.nowState) {
+	case PlayerState::DeadEnergy: {
+		//プレイヤーを青・黒に点灯させる処理
+
+#pragma region イージングでの点滅
+		if (colorManager.isGoToBlack) {
+			colorManager.easingT += colorManager.changeSpeed;
+			if (colorManager.easingT > 1.0f) {
+				colorManager.easingT = 1.0f;
+				//反転
+				colorManager.isGoToBlack = false;
+			}
+		}
+		else {
+			colorManager.easingT -= colorManager.changeSpeed;
+			if (colorManager.easingT < 0.0f) {
+				colorManager.easingT = 0.0f;
+				//反転
+				colorManager.isGoToBlack = true;
+			}
+		}
+
+		colorManager.colorValue = UpdateValueByEasing(colorManager.colorValueMax, colorManager.colorValueMin, colorManager.easingT, EasingMode::EaseInOut);
+
+#pragma endregion
+
+		unsigned int newColor = (colorManager.colorValue << 24) | (colorManager.colorValue << 16) | (colorManager.colorValue << 8) | (0xFF);
+		player.texture.color = newColor;
+
+		break;
+	}
+
+	case PlayerState::OverHeat: {
+
+
+		break;
+	}
+
+	case PlayerState::Normal: {
+		player.texture.color = WHITE;
+		colorManager.isGoToBlack = true;
+		colorManager.easingT = 0.0f;
+
+		break;
+	}
+	}
+}
+
+#pragma endregion
+
 #pragma region 関数: 死亡判定など
 
 /// <summary>
@@ -946,6 +1021,7 @@ void UpdatePlayer(void) {
 	LevelUp();
 	UpdateSustainLv2Bonus();
 
+	UpdateEffect();
 
 	UpdateInvinciblePlayer();
 	DeadPlayer();
