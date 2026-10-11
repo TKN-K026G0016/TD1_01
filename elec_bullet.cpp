@@ -123,7 +123,7 @@ static void DrawElecShock(void) {
 	for (int i = 0; i < kElecShockLimit; i++) {
 		if (!elecShock[i].isShoot) continue;
 
-		DrawHitEllipse(elecShock[i].pos, elecShock[i].hitRadius, elecShock[i].color, true);
+		//DrawHitEllipse(elecShock[i].pos, elecShock[i].hitRadius, elecShock[i].color, true);
 	}
 }
 

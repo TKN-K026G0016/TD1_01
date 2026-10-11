@@ -13,6 +13,9 @@
 #define _USE_MATH_DEFINES
 #include <math.h>
 
+static constexpr unsigned int kNormalColor = 0xE01068FF;
+static constexpr unsigned int kFlashColor = 0x333333FF;
+
 constexpr int kEnemy1Limit = 10;
 static Enemy1 enemy1[kEnemy1Limit];
 int nowEnemy1IsAliveCount = 0;
@@ -82,6 +85,20 @@ static void CountIgnoreShockEnemy1(void) {
 	}
 }
 
+static void UpdateFlashTimerEnemy1(void) {
+	for (int i = 0; i < kEnemy1Limit; i++) {
+		if (!enemy1[i].isAlive) continue;
+		if (!enemy1[i].isFlash) continue;
+
+		enemy1[i].flashTimer.count++;
+		if (enemy1[i].flashTimer.count >= enemy1[i].flashTimer.time) {
+			enemy1[i].flashTimer.count = 0;
+			enemy1[i].isFlash = false;
+		}
+
+	}
+}
+
 static void DeadEnemy1(int index) {
 	enemy1[index].isAlive = false;
 	enemy1[index].hp = enemy1[index].hpMax;
@@ -108,7 +125,12 @@ static void DrawEnemy1(void) {
 	for (int i = 0; i < kEnemy1Limit; i++) {
 		if (!enemy1[i].isAlive) continue;
 
-		DrawTextureObj(enemy1[i].texture, enemy1[i].pos, enemy1[i].size);
+		Texture texture = enemy1[i].texture;
+		if (enemy1[i].isFlash) {
+			texture.color = kFlashColor;
+		}
+
+		DrawTextureObj(texture, enemy1[i].pos, enemy1[i].size);
 	}
 }
 
@@ -172,6 +194,19 @@ static void CountIgnoreShockEnemy2(void) {
 	}
 }
 
+static void UpdateFlashTimerEnemy2(void) {
+	for (int i = 0; i < kEnemy2Limit; i++) {
+		if (!enemy2[i].isAlive) continue;
+		if (!enemy2[i].isFlash) continue;
+
+		enemy2[i].flashTimer.count++;
+		if (enemy2[i].flashTimer.count >= enemy2[i].flashTimer.time) {
+			enemy2[i].flashTimer.count = 0;
+			enemy2[i].isFlash = false;
+		}
+	}
+}
+
 static void DeadEnemy2(int index) {
 	enemy2[index].isAlive = false;
 	enemy2[index].hp = enemy2[index].hpMax;
@@ -194,7 +229,12 @@ static void DrawEnemy2(void) {
 	for (int i = 0; i < kEnemy2Limit; i++) {
 		if (!enemy2[i].isAlive) continue;
 
-		DrawTextureObj(enemy2[i].texture, enemy2[i].pos, enemy2[i].size);
+		Texture texture = enemy2[i].texture;
+		if (enemy2[i].isFlash) {
+			texture.color = kFlashColor;
+		}
+
+		DrawTextureObj(texture, enemy2[i].pos, enemy2[i].size);
 	}
 }
 
@@ -249,9 +289,11 @@ void InitEnemy(void) {
 void UpdateEnemy(void) {
 	CheckDeadEnemy1();
 	ShootEnemyBullet1();
+	UpdateFlashTimerEnemy1();
 	CountIgnoreShockEnemy1();
 
 	CheckDeadEnemy2();
+	UpdateFlashTimerEnemy2();
 	CountIgnoreShockEnemy2();
 	ShootEnemyBullet2();
 	
@@ -293,6 +335,10 @@ int GetEnemy1Limit(void) {
 
 void DamageEnemy1(Enemy1& enemy,int pow) {
 	enemy.hp -= pow;
+
+	//フラッシュさせる
+	enemy.isFlash = true;
+	enemy.flashTimer.count = 0;
 }
 
 Enemy2* GetEnemy2Array(void) {
@@ -305,6 +351,10 @@ int GetEnemy2Limit(void) {
 
 void DamageEnemy2(Enemy2& enemy, int pow) {
 	enemy.hp -= pow;
+
+	//フラッシュさせる
+	enemy.isFlash = true;
+	enemy.flashTimer.count = 0;
 }
 
 #pragma endregion
