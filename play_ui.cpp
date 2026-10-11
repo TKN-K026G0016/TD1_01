@@ -26,8 +26,8 @@ LifeIcon lifeIcon;
 #pragma region データ: エネルギーゲージ
 
 struct EnergyGaugeFrame {
-	Vector2 pos = { 640, 120 };
-	Vector2 size = { 512, 128 };
+	Vector2 pos = { 640, 60 };
+	Vector2 size = { 512, 100 };
 
 	//警告表示のタイミング
 	float warnEmpty = 20.0f;
@@ -77,7 +77,7 @@ MiniEnergyGauge miniEnergyGauge;
 #pragma region データ: ボスHPゲージ
 
 struct BossHpGaugeFrame {
-	Vector2 pos = { 640, 40 };
+	Vector2 pos = { 640, 680 };
 	Vector2 size = { 768, 32 };
 
 	Texture texture = {};
@@ -93,7 +93,17 @@ BossHpGaugeMeter bossHpGaugeMeter;
 
 struct BossHpGaugeDelayMeter {
 	float gaugeRate = 1.0f;
-	float followSpeed = 0.01f;
+
+	//追従速度
+	float followSpeed = 0.007f;
+
+	//イージングを使うかどうかの判定値
+	float threshold = 0.01f;
+
+	//イージング用
+	float easingT = 0.0f;
+	float startRate = 0.0f;
+	float endRate = 0.0f;
 
 	Texture texture = {};
 };
@@ -159,8 +169,6 @@ static void UpdateEnergyGauge(void) {
 	float nowRate = energyGaugeMeter.gaugeRate;
 	float diff = energyGaugeDelayMeter.gaugeRate - nowRate;
 
-
-
 	//delayゲージが本ゲージより大きい(減少した際)
 	if (energyGaugeDelayMeter.gaugeRate > nowRate) {
 
@@ -194,33 +202,6 @@ static void UpdateEnergyGauge(void) {
 		energyGaugeDelayMeter.gaugeRate = nowRate;
 		energyGaugeDelayMeter.easingT = 0.0f;
 	}
-
-	////delayゲージが本ゲージより大きい(減少した際)
-	//if (energyGaugeDelayMeter.gaugeRate > nowRate) {
-	//	//始点と終点を更新
-	//	energyGaugeDelayMeter.startRate = energyGaugeDelayMeter.gaugeRate;
-	//	energyGaugeDelayMeter.endRate = nowRate;
-
-	//	//easingTを更新
-	//	energyGaugeDelayMeter.easingT += energyGaugeDelayMeter.followSpeed;
-	//	if (energyGaugeDelayMeter.easingT > 1.0f) {
-	//		energyGaugeDelayMeter.easingT = 1.0f;
-	//	}
-
-	//	//更新
-	//	energyGaugeDelayMeter.gaugeRate =
-	//		UpdateValueByEasing(
-	//			energyGaugeDelayMeter.startRate,
-	//			energyGaugeDelayMeter.endRate,
-	//			energyGaugeDelayMeter.easingT,
-	//			EasingMode::EaseInOut
-	//		);
-	//}
-	//else {
-	//	energyGaugeDelayMeter.gaugeRate = nowRate;
-	//	energyGaugeDelayMeter.easingT = 0.0f;
-	//}
-
 
 #pragma endregion
 
@@ -268,8 +249,6 @@ static void DrawEnergyGauge(void) {
 	DrawGaugeAsObj(miniEnergyGauge.meterTexture, miniEnergyGauge.pos, miniEnergyGauge.size, energyGaugeMeter.gaugeRate);
 }
 
-
-
 #pragma endregion
 
 #pragma region 関数: ボスHPゲージ
@@ -277,14 +256,65 @@ static void DrawEnergyGauge(void) {
 static void InitBossHpGauge(void) {
 	bossHpGaugeFrame.texture = GetTexture(TextureType::BossHpGaugeFrame);
 	bossHpGaugeMeter.texture = GetTexture(TextureType::BossHpGaugeMeter);
+	bossHpGaugeDelayMeter.texture = GetTexture(TextureType::BossHpGaugeMeter);
 }
 
 static void UpdateBossHpGauge(void) {
+	if (!GetBossEnemyIsAlive()) return;
+
 	bossHpGaugeMeter.gaugeRate = ToFloat(GetBossEnemyRemainLife()) / ToFloat(GetBossEnemyRemainLifeMax());
+
+#pragma region delayMeterの変化処理
+
+
+	float nowRate = bossHpGaugeMeter.gaugeRate;
+	float diff = bossHpGaugeDelayMeter.gaugeRate - nowRate;
+
+	//delayゲージが本ゲージより大きい(減少した際)
+	if (bossHpGaugeDelayMeter.gaugeRate > nowRate) {
+
+		//エージングでの更新
+		if (diff > bossHpGaugeDelayMeter.threshold) {
+			//始点と終点を更新
+			bossHpGaugeDelayMeter.startRate = bossHpGaugeDelayMeter.gaugeRate;
+			bossHpGaugeDelayMeter.endRate = nowRate;
+
+			//easingTを更新
+			bossHpGaugeDelayMeter.easingT += bossHpGaugeDelayMeter.followSpeed;
+			if (bossHpGaugeDelayMeter.easingT > 1.0f) {
+				bossHpGaugeDelayMeter.easingT = 1.0f;
+			}
+
+			//更新
+			bossHpGaugeDelayMeter.gaugeRate =
+				UpdateValueByEasing(
+					bossHpGaugeDelayMeter.startRate,
+					bossHpGaugeDelayMeter.endRate,
+					bossHpGaugeDelayMeter.easingT,
+					EasingMode::EaseIn
+				);
+		} else {
+			bossHpGaugeDelayMeter.gaugeRate = nowRate;
+			bossHpGaugeDelayMeter.easingT = 0.0f;
+		}
+
+	} else {
+		bossHpGaugeDelayMeter.gaugeRate = nowRate;
+		bossHpGaugeDelayMeter.easingT = 0.0f;
+	}
+
+#pragma endregion
+
 }
 
 static void DrawBossHpGauge(void) {
+	if (!GetBossEnemyIsAlive()) return;
+
+	//フレーム
 	DrawTextureUI(bossHpGaugeFrame.texture, bossHpGaugeFrame.pos, bossHpGaugeFrame.size);
+	//delayMeter
+	DrawGaugeAsUI(bossHpGaugeDelayMeter.texture, bossHpGaugeFrame.pos, bossHpGaugeFrame.size, bossHpGaugeDelayMeter.gaugeRate);
+	//メーター
 	DrawGaugeAsUI(bossHpGaugeMeter.texture, bossHpGaugeFrame.pos, bossHpGaugeFrame.size, bossHpGaugeMeter.gaugeRate);
 
 #ifdef _DEBUG

@@ -115,21 +115,21 @@ Vector2 playerPos;
 
 
 void StatesCount(void) {
+	if (!bossEnemy.isAlive) return;
+
 	if (bossEnemy.nowsSates == BossStates::Normal) {
 		statesTimer.normal.count++;
 		if (statesTimer.normal.count == statesTimer.normal.time) {
 			statesTimer.normal.count = 0;
 			bossEnemy.nowsSates = ToInt(GetRand(1, 3));
 		}
-	}
-	else if (bossEnemy.nowsSates == BossStates::Attack1) {
+	} else if (bossEnemy.nowsSates == BossStates::Attack1) {
 		statesTimer.attack1.count++;
 		if (statesTimer.attack1.count == statesTimer.attack1.time) {
 			statesTimer.attack1.count = 0;
 			bossEnemy.nowsSates = BossStates::Normal;
 		}
-	}
-	else if (bossEnemy.nowsSates == BossStates::Attack2) {
+	} else if (bossEnemy.nowsSates == BossStates::Attack2) {
 		statesTimer.attack2.count++;
 		if (statesTimer.attack2.count == statesTimer.attack2.time) {
 			statesTimer.attack2.count = 0;
@@ -139,6 +139,8 @@ void StatesCount(void) {
 }
 
 void MoveNormal(void) {
+	if (!bossEnemy.isAlive) return;
+
 	if (bossEnemy.nowsSates == BossStates::Normal) {
 		playerPos = GetPlayerPos();
 		float DiffX = playerPos.x - bossEnemy.pos.x;
@@ -156,8 +158,7 @@ void MoveNormal(void) {
 			if (bossEnemy.nowSpeed > bossEnemy.moveSpeedLimit) {
 				bossEnemy.nowSpeed = bossEnemy.moveSpeedLimit;
 			}
-		}
-		else {
+		} else {
 			if (DiffX != 0) {
 				bossEnemy.velocity.x = (DiffX / distance);
 			}
@@ -175,7 +176,9 @@ void MoveNormal(void) {
 }
 
 void MoveAttack1(void) {
-		playerPos = GetPlayerPos();
+	if (!bossEnemy.isAlive) return;
+
+	playerPos = GetPlayerPos();
 	if (bossEnemy.nowsSates == BossStates::Attack1) {
 		if (statesTimer.attack1.count == 30 || statesTimer.attack1.count == 60 || statesTimer.attack1.count == 90) {
 			for (int i = 0;i < 6;i++) {
@@ -208,16 +211,14 @@ void MoveAttack1(void) {
 			if (bossBomb[i].pos.x <= 0) {
 				bossBomb[i].pos.x = 0;
 				bossBomb[i].velocity.x *= -1;
-			}
-			else if (bossBomb[i].pos.x >= 2560) {
+			} else if (bossBomb[i].pos.x >= 2560) {
 				bossBomb[i].pos.x = 2560;
 				bossBomb[i].velocity.x *= -1;
 			}
 			if (bossBomb[i].pos.y <= 0) {
 				bossBomb[i].pos.y = 0;
 				bossBomb[i].velocity.y *= -1;
-			}
-			else if (bossBomb[i].pos.y >= 1440) {
+			} else if (bossBomb[i].pos.y >= 1440) {
 				bossBomb[i].pos.y = 1440;
 				bossBomb[i].velocity.y *= -1;
 			}
@@ -237,6 +238,8 @@ void MoveAttack1(void) {
 }
 
 void MoveAttack2(void) {
+	if (!bossEnemy.isAlive) return;
+
 	if (bossEnemy.nowsSates == BossStates::Attack2) {
 		playerPos = GetPlayerPos();
 		float DiffX = playerPos.x - bossEnemy.pos.x;
@@ -254,8 +257,7 @@ void MoveAttack2(void) {
 			if (bossEnemy.nowSpeed > bossEnemy.moveSpeedLimit) {
 				bossEnemy.nowSpeed = bossEnemy.moveSpeedLimit;
 			}
-		}
-		else {
+		} else {
 			if (DiffX != 0) {
 				bossEnemy.velocity.x = (DiffX / distance);
 			}
@@ -274,6 +276,8 @@ void MoveAttack2(void) {
 }
 
 void MoveAttack3(void) {
+	if (!bossEnemy.isAlive) return;
+
 	if (bossEnemy.nowsSates == BossStates::Attack3) {
 
 		DataShootLaser& data = dataShootLaser;
@@ -322,8 +326,7 @@ void MoveAttack3(void) {
 			}
 			if (diff > 0) {
 				data.rotateDiff = 1;
-			}
-			else if (diff <= 0) {
+			} else if (diff <= 0) {
 				data.rotateDiff = -1;
 			}
 
@@ -339,7 +342,7 @@ void MoveAttack3(void) {
 
 			//射撃処理
 			data.shootLaserTimer.count++;
-			if (data.shootLaserTimer.count >= data.shootLaserTimer.time&&data.shootTimer.count<data.shootTimer.time-60) {
+			if (data.shootLaserTimer.count >= data.shootLaserTimer.time && data.shootTimer.count < data.shootTimer.time - 60) {
 				data.shootLaserTimer.count = 0;
 				ShootEnemyLaser(bossEnemy.pos, bossEnemy.rotateTheta, 0.0f);
 			}
@@ -366,7 +369,7 @@ void MoveAttack3(void) {
 						data.rotateDiff += ToFloat(M_PI) * 2;
 					}
 				}*/
-				if (data.nowRotateTheta < data.rotateThetaMax&&data.nowRotateTheta>-1*data.rotateThetaMax) {
+				if (data.nowRotateTheta < data.rotateThetaMax && data.nowRotateTheta>-1 * data.rotateThetaMax) {
 					bossEnemy.rotateTheta += data.rotateDiff * data.nowRotateSpeed;
 					data.nowRotateTheta += data.rotateDiff * data.nowRotateSpeed;
 				}
@@ -417,6 +420,8 @@ static void CountIgnoreElecShock(void) {
 }
 
 void DeathBossEnemy(void) {
+	if (!bossEnemy.isAlive) return;
+
 	if (bossEnemy.remainLife <= 0) {
 		bossEnemy.isAlive = false;
 	}
