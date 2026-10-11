@@ -17,7 +17,7 @@ constexpr int kEnemy1Limit = 10;
 static Enemy1 enemy1[kEnemy1Limit];
 int nowEnemy1IsAliveCount = 0;
 //ジェムの生成量
-constexpr int enemy1GemLimit = 3;
+constexpr int enemy1GemLimit = 4;
 
 
 constexpr int kEnemy2Limit = 10;
@@ -98,7 +98,7 @@ static void CheckDeadEnemy1(void) {
 
 			//ジェムの生成処理
 			for (int j = 0;j < enemy1GemLimit;j++) {
-				SpawnGem(enemy1[i].pos, GemType::M);
+				SpawnGem(enemy1[i].pos, GemType::S);
 			}
 		}
 	}

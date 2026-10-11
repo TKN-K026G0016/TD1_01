@@ -196,7 +196,7 @@ struct ColorManager {
 ColorManager colorManager;
 
 //オーバーヒート時の生成範囲(player中心で)
-constexpr int kCreateSmokeRange = 40;
+constexpr int kCreateSmokeRange = 45;
 //オーバーヒート時に出す煙の数
 constexpr int kCreateSmokeNum = 4;
 //オーバーヒート時のケムリ生成スパン

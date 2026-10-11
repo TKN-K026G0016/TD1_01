@@ -14,7 +14,7 @@ constexpr int kGemLimit = 100;
 Gem gem[kGemLimit];
 
 //散らばる範囲(最大)
-constexpr int kScatterLengthMax = 60;
+constexpr int kScatterLengthMax = 100;
 //散らばる範囲(最小)
 constexpr int kScatterLengthMin = 0;
 
@@ -29,8 +29,8 @@ struct GemSpec {
 
 GemSpec spec[ToInt(GemType::Count)] = {
 	//type //size //hitRadius // //回復量
-	{GemType::S, {20,20}, 3.0f, 10.0f, {}},
-	{GemType::M, {30,30}, 8.0f, 25.0f, {}},
+	{GemType::S, {20,20}, 10.0f, 8.0f, {}},
+	{GemType::M, {30,30}, 20.0f, 15.0f, {}},
 	{GemType::L, {40,40}, 15.0f, 40.0f, {}},
 };
 

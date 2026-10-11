@@ -32,12 +32,12 @@ struct EnergyGaugeFrame {
 	//デンリョク不足警告表示のタイミング
 	float warnDeadEnergy = 20.0f;
 	//過ジュウデン警告表示のタイミング
-	float warnOverHeat = 80.0f;
+	float warnOverHeat = 75.0f;
 
 	//ケムリの生成範囲(frameのposを中心に)
 	Vector2i spawnSmokeRange = { 250, 60 };
 	//警告中の煙エフェクト生成スパン
-	Timer createSmokeWarningTimer = { 15, 0 };
+	Timer createSmokeWarningTimer = { 20, 0 };
 	//オーバーヒート中の煙エフェクト生成スパン
 	Timer createSmokeOverHeatTimer = { 7, 0 };
 
@@ -217,7 +217,7 @@ static void UpdateEnergyGauge(void) {
 #pragma region 点滅処理
 
 	//警告表示のラインを下回るor故障状態時
-	if (remainEnergy <= energyGaugeFrame.warnDeadEnergy || GetPlayerNowState() != PlayerState::Normal) {
+	if (remainEnergy <= energyGaugeFrame.warnDeadEnergy || remainEnergy >= energyGaugeFrame.warnOverHeat || GetPlayerNowState() != PlayerState::Normal) {
 		UpdateAnimation(energyGaugeFrame.texture);
 		UpdateAnimation(miniEnergyGauge.frameTexture);
 	}
