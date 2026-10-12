@@ -67,6 +67,33 @@ static void ShootEnemyBullet1(void) {
 	}
 }
 
+static void MoveEnemy1(void) {
+	Vector2 playerPos = GetPlayerPos();
+	for (int i = 0;i < kEnemy1Limit;i++) {
+		if (!enemy1[i].isAlive)continue;
+
+		float diffX = playerPos.x - enemy1[i].pos.x;
+		float diffY = playerPos.y - enemy1[i].pos.y;
+		float distance = sqrtf(diffX * diffX + diffY * diffY);
+		if (distance > enemy1[i].viewRange) {
+			enemy1[i].velocity = { diffX / distance,diffY / distance };
+			enemy1[i].nowSpeed += enemy1[i].accleretionSpeed;
+			if (enemy1[i].nowSpeed > enemy1[i].moveSpeedLimit) {
+				enemy1[i].nowSpeed = enemy1[i].moveSpeedLimit;
+			}
+			enemy1[i].pos.x += enemy1[i].velocity.x * enemy1[i].nowSpeed;
+			enemy1[i].pos.y += enemy1[i].velocity.y * enemy1[i].nowSpeed;
+		}
+		else {
+			enemy1[i].nowSpeed -= enemy1[i].decelerationSpeed;
+			if (enemy1[i].nowSpeed < 0) {
+				enemy1[i].nowSpeed = 0;
+			}
+			ShootEnemyBullet1();
+		}
+	}
+}
+
 /// <summary>
 /// デンゲキショックの生成を受け付けない状態のカウント
 /// </summary>
@@ -287,8 +314,9 @@ void InitEnemy(void) {
 }
 
 void UpdateEnemy(void) {
-	CheckDeadEnemy1();
-	ShootEnemyBullet1();
+	CheckDeadEnemy1();/*
+	ShootEnemyBullet1();*/
+	MoveEnemy1();
 	UpdateFlashTimerEnemy1();
 	CountIgnoreShockEnemy1();
 

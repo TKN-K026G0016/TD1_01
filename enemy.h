@@ -36,6 +36,27 @@ struct Enemy1 {
 	bool isFlash = false;
 	Timer flashTimer = { 7, 0 };
 
+
+	//<移動関係>
+	// 視界
+	float viewRange = 400.0f;
+	//速度
+	Vector2 velocity = { 0.0f, 0.0f };
+	//スピード
+	float nowSpeed = 0.0f;
+	//加速度
+	float accleretionSpeed = 0.05f;
+	//スピード上限
+	float moveSpeedLimit = 2.0f;
+	//減速度
+	float decelerationSpeed = 0.12f;
+	Vector2 inputVec = { 0, 0 };
+
+	//<回転関係>
+	float rotateTheta = 0.0f;
+	//回転速度
+	float rotateSpeed = 0.05f;
+
 	Texture texture = {};
 };
 
