@@ -519,4 +519,12 @@ float GetCameraZoom(void) {
 	return camera.zoom;
 }
 
+TimeData GetGameTimeData(void) {
+	return gameTime;
+}
+
+TimeData GetBossRoundTimeData(void) {
+	return changeRoundTime[ToInt(Round::Count) - 1];
+}
+
 #pragma endregion

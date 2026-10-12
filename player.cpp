@@ -153,8 +153,8 @@ constexpr float kLaserPowRateIncreaseSpeed = 0.01f;
 
 //チャージタイマー
 Timer chargeElecBulletTimer = { 40, 0 };
-float consumptionShootNormal = 0.1f;
-float consumptionShootCharge = 2.0f;
+float consumptionShootNormal = 0.5f;
+float consumptionShootCharge = 5.0f;
 
 #pragma endregion
 
@@ -215,13 +215,6 @@ constexpr int kCreateSmokeRange = 45;
 constexpr int kCreateSmokeNum = 4;
 //オーバーヒート時のケムリ生成スパン
 Timer createSmokeTimer = { 15, 0 };
-
-//struct ChargeOrb {
-//	Vector2 size = { 32, 32 };
-//
-//	Texture texture = {};
-//};
-//ChargeOrb chargeOrb;
 
 Timer createChargeOrbTimer = { 10, 0 };
 Timer createChargeChipTimer = { 10, 0 };

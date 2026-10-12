@@ -1,5 +1,6 @@
 #pragma once
 #include "vector2.h"
+#include "timer.h"
 
 void InitStage(void);
 void UpdateStage(void);
@@ -24,3 +25,13 @@ Vector2 GetCameraPos(void);
 /// <param name=""></param>
 /// <returns></returns>
 float GetCameraZoom(void);
+
+/// <summary>
+/// 現在の時間を取得
+/// </summary>
+TimeData GetGameTimeData(void);
+
+/// <summary>
+/// ボスラウンド開始時間を取得
+/// </summary>
+TimeData GetBossRoundTimeData(void);

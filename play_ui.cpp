@@ -1,6 +1,7 @@
 #include "play_ui.h"
 #include "player.h"
 #include "boss_enemy.h"
+#include "stage.h"
 #include "effect.h"
 
 #include "vector2.h"
@@ -130,6 +131,24 @@ struct LaserPowRate {
 LaserPowRate laserPowRate;
 
 
+
+#pragma endregion
+
+#pragma region データ: 進捗度ゲージ
+
+static constexpr bool kShowProgressGaugeSwitch = true;
+struct ProgressGauge {
+	Vector2 pos = { 640, 680 };
+	Vector2 size = { 768, 32 };
+
+	//ボスラウンドまでの時間
+	int bossRoundTime = 0;
+	float gaugeRate = 0;
+
+	Texture frameTexture = {};
+	Texture meterTexture = {};
+};
+ProgressGauge progressGauge;
 
 #pragma endregion
 
@@ -382,16 +401,60 @@ static void DrawPowRate(void) {
 
 #pragma endregion
 
+#pragma region 関数: 進捗度ゲージ
+
+static void InitProgressGauge(void) {
+	if (!kShowProgressGaugeSwitch) return;
+	//ボスが出たら出現しない
+	if (GetBossEnemyIsAlive()) return;
+
+	progressGauge.frameTexture = GetTexture(TextureType::ProgressGaugeFrame);
+	progressGauge.meterTexture = GetTexture(TextureType::ProgressGaugeMeter);
+
+	progressGauge.bossRoundTime = ConvertTimeDataToInt(GetBossRoundTimeData());
+
+}
+
+static void UpdateProgressGauge(void) {
+	if (!kShowProgressGaugeSwitch) return;
+	//ボスが出たら出現しない
+	if (GetBossEnemyIsAlive()) return;
+
+	progressGauge.gaugeRate = ToFloat(ConvertTimeDataToInt(GetGameTimeData())) / ToFloat( progressGauge.bossRoundTime);
+
+}
+
+static void DrawProgressGauge(void) {
+	if (!kShowProgressGaugeSwitch) return;
+	//ボスが出たら出現しない
+	if (GetBossEnemyIsAlive()) return;
+
+	DrawTextureUI(progressGauge.frameTexture, progressGauge.pos, progressGauge.size);
+
+	DrawGaugeAsUI(progressGauge.meterTexture, progressGauge.pos, progressGauge.size, progressGauge.gaugeRate);
+
+}
+
+#pragma endregion
+
+#pragma region 関数: 連鎖表示
+
+
+
+#pragma endregion
+
 void InitPlayUI(void) {
 	InitLifeIcon();
 	InitEnergyGauge();
 	InitBossHpGauge();
+	InitProgressGauge();
 }
 
 void UpdatePlayUI(void){
 	UpdateEnergyGauge();
 	UpdateBossHpGauge();
 	UpdatePowRate();
+	UpdateProgressGauge();
 }
 
 void DrawPlayUI(void) {
@@ -399,6 +462,7 @@ void DrawPlayUI(void) {
 	DrawEnergyGauge();
 	DrawBossHpGauge();
 	DrawPowRate();
+	DrawProgressGauge();
 }
 
 #pragma region 関数: 外部参照関係
