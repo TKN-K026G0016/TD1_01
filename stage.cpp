@@ -67,8 +67,8 @@ TimeData gameTime = { 0, 0, 0 };
 TimeData changeRoundTime[ToInt(Round::Count)] = {
 	{ 0,0,0 },
 	{ 0,20,0 },
-	{ 0,50,0 },
-	{ 1,20,0 },
+	{ 0,30,0 },
+	{ 1,0,0 },
 	
 	//ボス
 	{ 2,0,0 },
@@ -82,7 +82,23 @@ TimeData changeRoundTime[ToInt(Round::Count)] = {
 //カメラ端からの生成位置のずれ
 float spawnPosOffset = 100;
 
-Timer spawnEnemyTimer = { 100, 0 };
+//Round1
+//enemy1生成タイマー
+Timer spawnEnemyBasicRound1Timer = { 300, 0 };
+
+//Round2
+//enemy1生成タイマー
+Timer spawnEnemyBasicRound2Timer = { 200, 0 };
+//enemySmall生成タイマー
+Timer spawnEnemySmallRound2Timer = { 300, 0 };
+
+//Round3
+Timer spawnEnemy1Round3Timer = { 240, 0 };
+
+//Round4
+Timer spawnEnemy1Round4Timer = { 200, 0 };
+Timer spawnEnemySmallRound4Timer = { 190, 0 };
+
 
 
 #pragma endregion
@@ -197,7 +213,6 @@ static void InitRound(void) {
 	ResetTimeData(gameTime);
 }
 
-
 /// <summary>
 /// ラウンドの変更処理
 /// </summary>
@@ -216,7 +231,7 @@ static void ChangeRound(void) {
 
 	//変更時間を変えたら
 	if (totalGameTime >= totalNextRoundTime) {
-		nowRound = static_cast<Round>(nextRound);
+  		nowRound = static_cast<Round>(nextRound);
 	}
 
 #pragma endregion
@@ -281,15 +296,15 @@ static void SpawnEnemyByRound(void) {
 	switch (nowRound) {
 	case Round::Round1: {
 
-#pragma region Enemy1
-		spawnEnemyTimer.count++;
-		if (spawnEnemyTimer.count >= spawnEnemyTimer.time) {
-			spawnEnemyTimer.count = 0;
+#pragma region EnemyBasic
+		spawnEnemyBasicRound1Timer.count++;
+		if (spawnEnemyBasicRound1Timer.count >= spawnEnemyBasicRound1Timer.time) {
+			spawnEnemyBasicRound1Timer.count = 0;
 
 			//ランダムな位置を生成
 			Vector2 createPos = CreatePosOutCameraZone();
 
-			SpawnEnemy(createPos, EnemyType::EnemyBomb);
+			SpawnEnemy(createPos, EnemyType::EnemyBasic);
 		}
 
 #pragma endregion
@@ -298,13 +313,111 @@ static void SpawnEnemyByRound(void) {
 	}
 	case Round::Round2: {
 
+#pragma region EnemyBasic
+
+		spawnEnemyBasicRound2Timer.count++;
+		if (spawnEnemyBasicRound2Timer.count >= spawnEnemyBasicRound2Timer.time) {
+			spawnEnemyBasicRound2Timer.count = 0;
+
+			//ランダムな位置を生成
+			Vector2 createPos = CreatePosOutCameraZone();
+
+			SpawnEnemy(createPos, EnemyType::EnemyBasic);
+		}
+
+#pragma endregion
+
+#pragma region EnemySmall
+
+		spawnEnemySmallRound2Timer.count++;
+		if (spawnEnemySmallRound2Timer.count >= spawnEnemySmallRound2Timer.time) {
+			spawnEnemySmallRound2Timer.count = 0;
+
+			//ランダムな位置を生成
+			Vector2 createPos = CreatePosOutCameraZone();
+
+			SpawnEnemy(createPos, EnemyType::EnemySmall);
+		}
+
+#pragma endregion
+
 		break;
 	}
 	case Round::Round3: {
 
+#pragma region EnemyBasic
+
+		spawnEnemyBasicRound2Timer.count++;
+		if (spawnEnemyBasicRound2Timer.count >= spawnEnemyBasicRound2Timer.time) {
+			spawnEnemyBasicRound2Timer.count = 0;
+
+			//ランダムな位置を生成
+			Vector2 createPos = CreatePosOutCameraZone();
+
+			SpawnEnemy(createPos, EnemyType::EnemyBasic);
+		}
+
+#pragma endregion
+
+#pragma region Enemy1
+
+		spawnEnemy1Round3Timer.count++;
+		if (spawnEnemy1Round3Timer.count >= spawnEnemy1Round3Timer.time) {
+			spawnEnemy1Round3Timer.count = 0;
+
+			//ランダムな位置を生成
+			Vector2 createPos = CreatePosOutCameraZone();
+
+			SpawnEnemy(createPos, EnemyType::Enemy1);
+		}
+
+#pragma endregion
+
 		break;
 	}
 	case Round::Round4: {
+
+#pragma region EnemyBasic
+
+		spawnEnemyBasicRound2Timer.count++;
+		if (spawnEnemyBasicRound2Timer.count >= spawnEnemyBasicRound2Timer.time) {
+			spawnEnemyBasicRound2Timer.count = 0;
+
+			//ランダムな位置を生成
+			Vector2 createPos = CreatePosOutCameraZone();
+
+			SpawnEnemy(createPos, EnemyType::EnemyBasic);
+		}
+
+#pragma endregion
+
+#pragma region Enemy1
+
+		spawnEnemy1Round4Timer.count++;
+		if (spawnEnemy1Round4Timer.count >= spawnEnemy1Round4Timer.time) {
+			spawnEnemy1Round4Timer.count = 0;
+
+			//ランダムな位置を生成
+			Vector2 createPos = CreatePosOutCameraZone();
+
+			SpawnEnemy(createPos, EnemyType::Enemy1);
+		}
+
+#pragma endregion
+
+#pragma region EnemySmall
+
+		spawnEnemySmallRound4Timer.count++;
+		if (spawnEnemySmallRound4Timer.count >= spawnEnemySmallRound4Timer.time) {
+			spawnEnemySmallRound4Timer.count = 0;
+
+			//ランダムな位置を生成
+			Vector2 createPos = CreatePosOutCameraZone();
+
+			SpawnEnemy(createPos, EnemyType::EnemySmall);
+		}
+
+#pragma endregion
 
 		break;
 	}

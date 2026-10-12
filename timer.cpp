@@ -22,7 +22,7 @@ int ConvertTimeDataToInt(const TimeData& data) {
 	int value = 0;
 	value += data.frame;
 	value += data.sec * 60;
-	value += data.min * 360;
+	value += data.min * 3600;
 
 	return value;
 }
