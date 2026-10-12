@@ -481,6 +481,12 @@ static void CheckCollisionElecShockVSGem(void) {
 			if (CheckCollisionCircleVSCircle(elecShock[i].pos, elecShock[i].hitRadius, gem[j].pos, gem[j].hitRadius)) {
 				SpawnElecShock(gem[j].pos, elecShock[i].type);
 				gem[j].isIgnoreElecShock = true;
+
+				//規定回数放電したら破壊
+				gem[j].hp--;
+				if (gem[j].hp <= 0) {
+					BreakGem(j);
+				}
 			}
 		}
 

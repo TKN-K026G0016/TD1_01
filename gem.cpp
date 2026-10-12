@@ -18,6 +18,9 @@ constexpr int kScatterLengthMax = 100;
 //散らばる範囲(最小)
 constexpr int kScatterLengthMin = 0;
 
+//通電できる回数
+static constexpr int kHpMax = 6;
+
 struct GemSpec {
 	GemType type;
 	Vector2 size;
@@ -36,15 +39,6 @@ GemSpec spec[ToInt(GemType::Count)] = {
 };
 
 #pragma region 関数: 本体
-
-/// <summary>
-/// ジェムの消滅処理
-/// </summary>
-/// <param name="index"></param>
-static void BreakGem(int index) {
-	gem[index].isAlive = false;
-	gem[index].breakTimer.count = 0;
-}
 
 static void CountIgnoreElecShock(void) {
 	for (int i = 0; i < kGemLimit; i++) {
@@ -170,6 +164,7 @@ void SpawnGem(Vector2 pos, GemType type) {
 
 		gem[i].isAlive = true;
 		gem[i].pos = CreateScatterPos(pos);
+		gem[i].hp = kHpMax;
 
 		gem[i].type = type;
 		gem[i].size = spec[ToInt(type)].size;
@@ -181,6 +176,11 @@ void SpawnGem(Vector2 pos, GemType type) {
 
 		break;
 	}
+}
+
+void BreakGem(int index) {
+	gem[index].isAlive = false;
+	gem[index].breakTimer.count = 0;
 }
 
 Gem* GetGemArray(void) {

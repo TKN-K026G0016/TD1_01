@@ -27,6 +27,9 @@ struct Gem {
 	//エネルギー回復量
 	float recoveryEnergy = 0.0f;
 
+	//通電する回数
+	int hp = 5;
+
 	//ショックを無視する状態
 	bool isIgnoreElecShock = false;
 	Timer ignoreElecShockTimer = { 20, 0 };
@@ -45,6 +48,12 @@ void DrawGem(void);
 /// <param name="pos">生成座標</param>
 /// <param name="pos">ジェムの大きさ</param>
 void SpawnGem(Vector2 pos, GemType type);
+
+/// <summary>
+/// ジェムの消滅処理
+/// </summary>
+/// <param name="index"></param>
+void BreakGem(int index);
 
 Gem* GetGemArray(void);
 
