@@ -175,7 +175,6 @@ struct ChargeOrbEffect {
 	float endSizeValue = 0.1f;
 	float sizeValue = 0.0f;
 
-
 	//<透明度関係>
 	int alphaMin = 0;
 	int alphaMax = 255;
@@ -185,6 +184,49 @@ struct ChargeOrbEffect {
 	unsigned int color = 0x04C1E8FF;
 };
 ChargeOrbEffect chargeOrbEffect[kChargeOrbEffectLimit];
+
+#pragma endregion
+
+#pragma region データ: ChargeChipEffect
+
+static constexpr int kChargeChipEffecLimit = 4;
+
+struct ChargeChipEffect {
+	Vector2 pos = {};
+	
+	bool isShoot = false;
+
+	//イージング
+	float easingT = 0.0f;
+	float easingSpeed = 0.03f;
+	float easingTFadeIn = 0.25f;
+
+	//サイズ
+	float startSizeValue = 15.0f;
+	float endSizeValue = 0.1f;
+	float sizeValue = 0.0f;
+
+	//<回転関係>
+	float rotateTheta = 0.0f;
+	float rotateSpeed = ToFloat(M_PI) / 10.0f;
+
+	//<公転関係>
+	float revolutionTheta = 0.0f;
+	float revolutionSpeed = ToFloat(M_PI) / 12.0f;
+
+	float startTargetVecLength = 40.0f;
+	float endTargetVecLength = 1.0f;
+	float targetVecLength = 0.0f;
+
+	//<透明度関係>
+	int alphaMin = 0;
+	int alphaMax = 255;
+	int alpha = 0;
+
+	Texture texture = {};
+	unsigned int color = 0x04C1E8FF;
+};
+ChargeChipEffect chargeChipEffect[kChargeChipEffecLimit];
 
 #pragma endregion
 
@@ -677,6 +719,100 @@ void CreateChargeOrbEffect(Vector2 pos) {
 
 #pragma endregion
 
+#pragma region 関数: chargeChipEffect
+
+static void InitChargeChipEffect(void) {
+	for (int i = 0; i < kChargeChipEffecLimit; i++) {
+		chargeChipEffect[i] = {};
+
+		chargeChipEffect[i].texture = GetTexture(TextureType::EffectTriangle);
+	}
+}
+
+static void UpdateChargeChipEffect(void) {
+	for (int i = 0; i < kChargeChipEffecLimit; i++) {
+		if (!chargeChipEffect[i].isShoot) continue;
+
+		//イージング
+		chargeChipEffect[i].easingT += chargeChipEffect[i].easingSpeed;
+		if (chargeChipEffect[i].easingT >= 1.0f) {
+			chargeChipEffect[i].easingT = 1.0f;
+			chargeChipEffect[i].isShoot = false;
+		}
+
+#pragma region サイズの変更
+
+		chargeChipEffect[i].sizeValue = UpdateValueByEasing(chargeChipEffect[i].startSizeValue, chargeChipEffect[i].endSizeValue, chargeChipEffect[i].easingT, EasingMode::EaseIn);
+
+#pragma endregion
+
+#pragma region 自転処理
+
+		chargeChipEffect[i].rotateTheta += chargeChipEffect[i].rotateSpeed;
+
+#pragma endregion
+
+#pragma region 公転処理
+
+		Vector2 shootPos = GetPlayerShootPos();
+
+		chargeChipEffect[i].revolutionTheta += chargeChipEffect[i].revolutionSpeed;
+
+		chargeChipEffect[i].targetVecLength = UpdateValueByEasing(chargeChipEffect[i].startTargetVecLength, chargeChipEffect[i].endTargetVecLength, chargeChipEffect[i].easingT, EasingMode::EaseIn);
+
+		chargeChipEffect[i].pos.x = shootPos.x + cosf(chargeChipEffect[i].revolutionTheta) * chargeChipEffect[i].targetVecLength;
+		chargeChipEffect[i].pos.y = shootPos.y + sinf(chargeChipEffect[i].revolutionTheta) * chargeChipEffect[i].targetVecLength;
+
+#pragma endregion
+
+#pragma region 透明度の変更
+
+		if (chargeChipEffect[i].easingT < chargeChipEffect[i].easingTFadeIn) {
+			float t = chargeChipEffect[i].easingT / 0.5f;  // 0.0→0.5 を 0→1 に正規化
+			if (t > 1.0f) t = 1.0f;
+
+			chargeChipEffect[i].alpha = UpdateValueByEasing(chargeChipEffect[i].alphaMin, chargeChipEffect[i].alphaMax, t, EasingMode::EaseOut);
+		} else {
+			float t = (chargeChipEffect[i].easingT - 0.5f) / 0.5f;  // 0.5→1.0 を 0→1 に正規化
+			if (t > 1.0f) t = 1.0f;
+
+			chargeChipEffect[i].alpha = UpdateValueByEasing(chargeChipEffect[i].alphaMax, chargeChipEffect[i].alphaMin, t, EasingMode::EaseIn);
+		}
+
+#pragma endregion
+
+	}
+}
+
+static void DrawChargeChipEffect(void) {
+	for (int i = 0; i < kChargeChipEffecLimit; i++) {
+		if (!chargeChipEffect[i].isShoot) continue;
+
+		Vector2 size = { chargeChipEffect[i].sizeValue, chargeChipEffect[i].sizeValue };
+
+		Texture texture = chargeChipEffect[i].texture;
+		texture.color = (chargeChipEffect[i].color & 0xFFFFFF00) | chargeChipEffect[i].alpha;
+
+		DrawTextureRotateObj(texture, chargeChipEffect[i].pos, size, chargeChipEffect[i].rotateTheta);
+	}
+}
+
+void CreateChargeChipEffect() {
+	for (int i = 0; i < kChargeChipEffecLimit; i++) {
+		if (chargeChipEffect[i].isShoot) continue;
+
+		chargeChipEffect[i].isShoot = true;
+
+		chargeChipEffect[i].easingT = 0.0f;
+		chargeChipEffect[i].rotateTheta = 0.0f;
+		chargeChipEffect[i].revolutionTheta = 0.0f;
+
+		break;
+	}
+}
+
+#pragma endregion
+
 void InitEffect() {
 	InitGemEffect();
 	
@@ -688,6 +824,7 @@ void InitEffect() {
 	InitElecShockChargedEffect();
 
 	InitChargeOrbEffect();
+	InitChargeChipEffect();
 
 #ifdef _DEBUG
 
@@ -708,6 +845,7 @@ void UpdateEffect() {
 	UpdateElecShockEffect();
 	UpdateElecShockChargedEffect();
 	UpdateChargeOrbEffect();
+	UpdateChargeChipEffect();
 }
 void DrawEffect() {
 	DrawGetEffect();
@@ -716,6 +854,7 @@ void DrawEffect() {
 	DrawElecShockEffect();
 	DrawElecShockChargedEffect();
 	DrawChargeOrbEffect();
+	DrawChargeChipEffect();
 }
 
 void DrawEffectAsUI() {

@@ -222,6 +222,7 @@ Timer createSmokeTimer = { 15, 0 };
 //ChargeOrb chargeOrb;
 
 Timer createChargeOrbTimer = { 10, 0 };
+Timer createChargeChipTimer = { 10, 0 };
 
 #pragma endregion
 
@@ -968,8 +969,6 @@ static void RecoveryPlayerState(void) {
 #pragma region 関数: 演出関係
 
 static void UpdatePlayerEffect(void) {
-	//
-
 	//モードごとによる演出
 	switch (player.nowState) {
 	case PlayerState::DeadEnergy: {
@@ -1020,16 +1019,27 @@ static void UpdatePlayerEffect(void) {
 }
 
 /// <summary>
-/// チャージ中の玉の描画処理
+/// チャージ中の演出
 /// </summary>
 /// <param name=""></param>
 static void CreateChargeOrbEffect(void) {
-	if (chargeElecBulletTimer.count < chargeElecBulletTimer.time) return;
 
-	createChargeOrbTimer.count++;
-	if (createChargeOrbTimer.count >= createChargeOrbTimer.time) {
-		createChargeOrbTimer.count = 0;
-		CreateChargeOrbEffect(shootPos);
+	if (chargeElecBulletTimer.count > 0) {
+
+		createChargeChipTimer.count++;
+		if (createChargeChipTimer.count >= createChargeChipTimer.time) {
+			createChargeChipTimer.count = 0;
+			CreateChargeChipEffect();
+		}
+	}
+
+	if (chargeElecBulletTimer.count >= chargeElecBulletTimer.time) {
+
+		createChargeOrbTimer.count++;
+		if (createChargeOrbTimer.count >= createChargeOrbTimer.time) {
+			createChargeOrbTimer.count = 0;
+			CreateChargeOrbEffect(shootPos);
+		}
 	}
 }
 
@@ -1155,6 +1165,7 @@ void UpdatePlayer(void) {
 	UpdateSustainLv2Bonus();
 
 	UpdatePlayerEffect();
+	CreateChargeOrbEffect();
 
 	KnockBack();
 	UpdateInvinciblePlayer();
@@ -1168,8 +1179,6 @@ void DrawPlayer(void) {
 
 	//本体の描画
 	DrawTextureRotateObj(player.texture, player.pos, player.size, player.rotateTheta);
-
-	CreateChargeOrbEffect();
 
 	DrawLockOnSign();
 
