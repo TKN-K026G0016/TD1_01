@@ -867,11 +867,42 @@ void SpawnEnemy(Vector2 pos, EnemyType type) {
 
 		break;
 	}
+	case EnemyType::EnemySmall: {
+		for (int i = 0; i < kEnemySmallLimit; i++) {
+			if (enemySmall[i].isAlive) continue;
+
+			enemySmall[i].isAlive = true;
+			enemySmall[i].pos = pos;
+
+			// 初期化（必要なら）
+			enemySmall[i].nowSpeed = 0.0f;
+			enemySmall[i].velocity = { 0,0 };
+
+			break;
+		}
+		break;
+	}
+	case EnemyType::EnemyM: {
+		for (int i = 0; i < kEnemyMLimit; i++) {
+			if (enemyM[i].isAlive) continue;
+
+			enemyM[i].isAlive = true;
+			enemyM[i].pos = pos;
+
+			// 初期化（必要なら）
+			enemyM[i].shootTimer.count = 0;
+
+			break;
+		}
+		break;
+	}
 	case EnemyType::EnemyBomb: {
 		for (int i = 0;i < kEnemyBombLimit;i++) {
-			if (!enemyBomb[i].isAlive)continue;
+			if (enemyBomb[i].isAlive)continue;
+
 			enemyBomb[i].isAlive = true;
 			enemyBomb[i].pos = pos;
+
 			enemyBomb[i].nowSpeed = ToFloat(GetRand(100, 170)) / 10;
 			enemyBomb[i].velocity = { ToFloat(GetRand(-10, 10)),ToFloat(GetRand(-10,10)) };
 			if (enemyBomb[i].velocity.x != 0) {
@@ -882,12 +913,11 @@ void SpawnEnemy(Vector2 pos, EnemyType type) {
 			}
 			enemyBomb[i].burst.time = GetRand(200, 600);
 			enemyBomb[i].burst.count = 0;
+
 			break;
 		}
 		break;
 	}
-
-							 break;
 	}
 }
 

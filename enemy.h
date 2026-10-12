@@ -15,7 +15,7 @@ enum class EnemyType {
 	//小雑魚召喚
 	EnemyM,
 	//小雑魚
-	EnemySmoll,
+	EnemySmall,
 	//ボム
 	EnemyBomb,
 

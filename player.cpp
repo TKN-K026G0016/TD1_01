@@ -558,6 +558,20 @@ static void RotatePlayer(void) {
 			}
 			targetPos = enemyBasic[targetIndex].pos;
 		}
+		else if (nowTargetType == LockTargetType::EnemySmall) {
+			if (!enemySmall[targetIndex].isAlive) {
+				nowTargetType = LockTargetType::None;
+				return;
+			}
+			targetPos = enemySmall[targetIndex].pos;
+		}
+		else if (nowTargetType == LockTargetType::EnemyM) {
+			if (!enemyM[targetIndex].isAlive) {
+				nowTargetType = LockTargetType::None;
+				return;
+			}
+			targetPos = enemyM[targetIndex].pos;
+		}
 
 #pragma region 回転処理
 		float dx = targetPos.x - player.pos.x;
