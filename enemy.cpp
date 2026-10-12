@@ -439,6 +439,101 @@ static void DrawEnemyBasic(void) {
 
 #pragma endregion
 
+#pragma region 関数: enemyM
+
+static void InitEnemyM(void) {
+	for (int i = 0;i < kEnemyMLimit;i++) {
+		enemyM[i] = {};
+
+		enemyM[i].texture = GetTexture(TextureType::Enemy2);
+	}
+}
+
+static void ShootEnemySmoll(void) {
+	for (int i = 0; i < kEnemyMLimit; i++) {
+		if (!enemyM[i].isAlive) continue;
+
+		enemyM[i].shootTimer.count++;
+		if (enemyM[i].shootTimer.count >= enemy2[i].shootTimer.time) {
+			enemyM[i].shootTimer.count = 0;
+			for (int j = 0;j < kEnemySmollLimit;j++) {
+				if (enemySmoll[j].isAlive)continue;
+
+				enemySmoll[j].isAlive = true;
+				enemySmoll[j].velocity = { ToFloat(GetRand(0,5)),ToFloat(GetRand(0,5)) };
+				enemySmoll[j].pos = enemyM[i].pos;
+				break;
+			}
+		}
+
+	}
+}
+
+/// <summary>
+/// デンゲキショックの生成を受け付けない状態のカウント
+/// </summary>
+/// <param name=""></param>
+static void CountIgnoreShockEnemyM(void) {
+	for (int i = 0; i < kEnemyMLimit; i++) {
+		if (!enemyM[i].isAlive) continue;
+		if (!enemyM[i].isIgnoreShock) continue;
+
+
+		enemyM[i].ignoreSpawnShockTimer.count++;
+		if (enemyM[i].ignoreSpawnShockTimer.count >= enemyM[i].ignoreSpawnShockTimer.time) {
+			enemyM[i].ignoreSpawnShockTimer.count = 0;
+			enemyM[i].isIgnoreShock = false;
+		}
+	}
+}
+
+static void UpdateFlashTimerEnemyM(void) {
+	for (int i = 0; i < kEnemyMLimit; i++) {
+		if (!enemyM[i].isAlive) continue;
+		if (!enemyM[i].isFlash) continue;
+
+		enemyM[i].flashTimer.count++;
+		if (enemyM[i].flashTimer.count >= enemyM[i].flashTimer.time) {
+			enemyM[i].flashTimer.count = 0;
+			enemyM[i].isFlash = false;
+		}
+	}
+}
+
+static void DeadEnemyM(int index) {
+	enemyM[index].isAlive = false;
+	enemyM[index].hp = enemyM[index].hpMax;
+}
+
+static void CheckDeadEnemyM(void) {
+	for (int i = 0; i < kEnemyMLimit; i++) {
+		if (!enemyM[i].isAlive) continue;
+
+		if (enemyM[i].hp <= 0) {
+			DeadEnemyM(i);
+
+			//ジェムの生成処理
+			SpawnGem(enemyM[i].pos, GemType::S);
+		}
+	}
+}
+
+static void DrawEnemyM(void) {
+	for (int i = 0; i < kEnemyMLimit; i++) {
+		if (!enemyM[i].isAlive) continue;
+
+		Texture texture = enemyM[i].texture;
+		if (enemyM[i].isFlash) {
+			texture.color = kFlashColor;
+		}
+
+		DrawTextureObj(texture, enemyM[i].pos, enemyM[i].size);
+	}
+}
+
+#pragma endregion
+
+
 #pragma region 関数: enemySmoll
 
 static void InitEnemySmoll(void) {
@@ -554,6 +649,8 @@ void InitEnemy(void) {
 	InitEnemy1();
 	InitEnemy2();
 	InitEnemyBasic();
+	InitEnemyM();
+	InitEnemySmoll();
 
 	GetMovablePos(spawner.spawnRange);
 
@@ -578,6 +675,12 @@ void UpdateEnemy(void) {
 	UpdateFlashTimerEnemyBasic();
 	CheckDeadEnemyBasic();
 
+	//enemyM
+	CheckDeadEnemyM();
+	UpdateFlashTimerEnemyM();
+	CountIgnoreShockEnemyM();
+	ShootEnemySmoll();
+
 	//enemySmoll
 	MoveEnemySmoll();
 	CountIgnoreShockEnemySmoll();
@@ -592,6 +695,8 @@ void DrawEnemy(void) {
 	DrawEnemy1();
 	DrawEnemy2();
 	DrawEnemyBasic();
+	DrawEnemyM();
+	DrawEnemySmoll();
 }
 
 #pragma region 関数: 外部参照関係

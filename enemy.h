@@ -127,7 +127,7 @@ struct EnemyM {
 	bool isAlive = false;
 
 	int hp = 60;
-	int hpMax = 30;
+	int hpMax = 60;
 
 	float hitRadius = 20.0f;
 
