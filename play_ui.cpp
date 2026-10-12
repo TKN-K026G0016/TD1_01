@@ -155,7 +155,7 @@ ProgressGauge progressGauge;
 
 #pragma region データ: ショックコンボ
 
-constexpr int kComboNumbersLimit = 2;
+constexpr int kComboNumbersLimit = 3;
 struct ShockComboNumbers {
 	Vector2 size = { 68, 128 };
 
@@ -526,8 +526,10 @@ static void DrawShockCombo(void) {
 	else if (shockCombo.combo < 10) {
 		digits = 1;
 	} 
-	else {
+	else if(shockCombo.combo < 100){
 		digits = 2;
+	} else {
+		digits = 3;
 	}
 
 	//scoreNumbers
