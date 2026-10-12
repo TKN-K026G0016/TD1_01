@@ -1,5 +1,6 @@
 #include "elec_bullet.h"
 #include "effect.h"
+#include "play_ui.h"
 
 #include "vector2.h"
 #include "timer.h"
@@ -163,6 +164,9 @@ static void UpdateShockCombo(void) {
 		if (comboTimer.count >= comboTimer.time) {
 			comboTimer.count = 0;
 			shockCombo = 0;
+
+			//コンボの終了をUIに知らせる
+			TriggerEndCombo();
 		}
 	}
 }

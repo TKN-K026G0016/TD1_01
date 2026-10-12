@@ -165,9 +165,26 @@ struct ShockComboNumbers {
 	int animNum = 0;
 };
 ShockComboNumbers comboNumbers[kComboNumbersLimit];
-int shockCombo = 0;
+
+
+
+struct ShockCombo {
+	//コンボ数
+	int combo = 0;
+
+	//前のコンボを見せている状態
+	bool isShowPreCombo = false;
+	Timer showPreComboTimer = { 60, 0 };
+
+	//透明の時間
+	bool isInvisible = false;
+	Timer invisibleTimer = { 7, 0 };
+};
+ShockCombo shockCombo;
+
 
 Texture comboNumbersTexture = {};
+
 
 #pragma endregion
 
@@ -466,22 +483,50 @@ static void InitShockCombo(void) {
 }
 
 static void UpdateShockCombo(void) {
-	shockCombo = GetShockCombo();
+	//表示の更新
+	if (!shockCombo.isShowPreCombo) {
+		shockCombo.combo = GetShockCombo();
 
-	for (int i = 0; i < kComboNumbersLimit; i++) {
-		comboNumbers[i].animNum = GetValueAtDigit(shockCombo, i);
+		for (int i = 0; i < kComboNumbersLimit; i++) {
+			comboNumbers[i].animNum = GetValueAtDigit(shockCombo.combo, i);
+		}
+	}
+	else {
+		//点滅処理
+		shockCombo.invisibleTimer.count++;
+		if (shockCombo.invisibleTimer.count >= shockCombo.invisibleTimer.time) {
+			shockCombo.invisibleTimer.count = 0;
+
+			if (!shockCombo.isInvisible) {
+				shockCombo.isInvisible = true;
+			} else {
+				shockCombo.isInvisible = false;
+			}
+		}
+
+		shockCombo.showPreComboTimer.count++;
+		if (shockCombo.showPreComboTimer.count >= shockCombo.showPreComboTimer.time) {
+			shockCombo.showPreComboTimer.count = 0;
+			shockCombo.isShowPreCombo = false;
+
+			shockCombo.isInvisible = false;
+			shockCombo.invisibleTimer.count = 0;
+		}
 	}
 }
 
 static void DrawShockCombo(void) {
 
+	if (shockCombo.isInvisible) return;
+
 	int digits = 0;
-	if (shockCombo < 3) {
+	if (shockCombo.combo < 3) {
 		return;
 	}
-	else if (shockCombo < 10) {
+	else if (shockCombo.combo < 10) {
 		digits = 1;
-	} else {
+	} 
+	else {
 		digits = 2;
 	}
 
@@ -538,6 +583,11 @@ Vector2 GetBossHpGaugeEndPos(void) {
 	float posY = bossHpGaugeFrame.pos.y - bossHpGaugeFrame.size.y / 2;
 
 	return { posX, posY };
+}
+
+void TriggerEndCombo(void) {
+	shockCombo.isShowPreCombo = true;
+	shockCombo.showPreComboTimer.count = 0;
 }
 
 #pragma endregion
