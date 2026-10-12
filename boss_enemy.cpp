@@ -3,6 +3,7 @@
 #include "player_laser.h"
 #include "stage.h"
 #include "enemy_bullet.h"
+#include "enemy.h"
 
 #include "vector2.h"
 #include "tool.h"
@@ -17,7 +18,7 @@ BossEnemy bossEnemy;
 
 #pragma region データ: Bomb攻撃
 
-struct BossBomb {
+struct EnemyBomb {
 	Vector2 pos = { 0, 0 };
 	Vector2 size = { 64, 64 };
 	//<生存関係>
@@ -45,11 +46,12 @@ struct BossBomb {
 	Texture texture = {};
 	Texture burstTexture = {};
 };
-BossBomb bossBomb[6]{};
+EnemyBomb bossBomb[6]{};
 
 struct StatesTimer {
 	Timer normal = { 300,0 };
 	Timer attack1 = { 120,0 };
+	Timer attack1ShootBom = { 30,0 };
 	Timer attack2 = { 360,0 };
 };
 StatesTimer statesTimer;
@@ -125,6 +127,7 @@ void StatesCount(void) {
 		}
 	} else if (bossEnemy.nowsSates == BossStates::Attack1) {
 		statesTimer.attack1.count++;
+		statesTimer.attack1ShootBom.count++;
 		if (statesTimer.attack1.count == statesTimer.attack1.time) {
 			statesTimer.attack1.count = 0;
 			bossEnemy.nowsSates = BossStates::Normal;
@@ -180,59 +183,9 @@ void MoveAttack1(void) {
 
 	playerPos = GetPlayerPos();
 	if (bossEnemy.nowsSates == BossStates::Attack1) {
-		if (statesTimer.attack1.count == 30 || statesTimer.attack1.count == 60 || statesTimer.attack1.count == 90) {
-			for (int i = 0;i < 6;i++) {
-				if (bossBomb[i].isAlive == false) {
-					bossBomb[i].isAlive = true;
-					bossBomb[i].pos = bossEnemy.pos;
-					bossBomb[i].nowSpeed = ToFloat(GetRand(100, 170)) / 10;
-					bossBomb[i].velocity = { ToFloat(GetRand(-10, 10)),ToFloat(GetRand(-10,10)) };
-					if (bossBomb[i].velocity.x != 0) {
-						bossBomb[i].velocity.x /= 10;
-					}
-					if (bossBomb[i].velocity.y != 0) {
-						bossBomb[i].velocity.y /= 10;
-					}
-					bossBomb[i].burst.time = GetRand(200, 600);
-					bossBomb[i].burst.count = 0;
-					break;
-				}
-			}
-		}
-	}
-	for (int i = 0;i < 6;i++) {
-		if (bossBomb[i].isAlive == true) {
-			bossBomb[i].nowSpeed -= bossBomb[i].decelerationSpeed;
-			if (bossBomb[i].nowSpeed <= 0) {
-				bossBomb[i].nowSpeed = 0;
-			}
-			bossBomb[i].pos.x += bossBomb[i].velocity.x * bossBomb[i].nowSpeed;
-			bossBomb[i].pos.y += bossBomb[i].velocity.y * bossBomb[i].nowSpeed;
-			if (bossBomb[i].pos.x <= 0) {
-				bossBomb[i].pos.x = 0;
-				bossBomb[i].velocity.x *= -1;
-			} else if (bossBomb[i].pos.x >= 2560) {
-				bossBomb[i].pos.x = 2560;
-				bossBomb[i].velocity.x *= -1;
-			}
-			if (bossBomb[i].pos.y <= 0) {
-				bossBomb[i].pos.y = 0;
-				bossBomb[i].velocity.y *= -1;
-			} else if (bossBomb[i].pos.y >= 1440) {
-				bossBomb[i].pos.y = 1440;
-				bossBomb[i].velocity.y *= -1;
-			}
-
-			bossBomb[i].burst.count++;
-			if (bossBomb[i].burst.count == bossBomb[i].burst.time) {
-				float DiffX = bossBomb[i].pos.x - playerPos.x;
-				float DiffY = bossBomb[i].pos.y - playerPos.y;
-				float distance = sqrtf(DiffX * DiffX + DiffY * DiffY);
-				if (distance <= bossBomb[i].burstRadius) {
-					PlayerDamage(bossBomb[i].pos);
-				}
-				bossBomb[i].isAlive = false;
-			}
+		if (statesTimer.attack1ShootBom.count == statesTimer.attack1ShootBom.time) {
+			statesTimer.attack1ShootBom.count = 0;
+			SpawnEnemy( bossEnemy.pos, EnemyType::EnemyBomb);
 		}
 	}
 }
