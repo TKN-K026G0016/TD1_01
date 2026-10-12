@@ -780,4 +780,36 @@ void DamageEnemyBasic(EnemyBasic& enemy, int pow) {
 	enemy.flashTimer.count = 0;
 }
 
+EnemyM* GetEnemyMArray(void) {
+	return enemyM;
+}
+
+int GetEnemyMLimit(void) {
+	return kEnemyMLimit;
+}
+
+void DamageEnemyM(EnemyM& enemy, int pow) {
+	enemy.hp -= pow;
+
+	//フラッシュさせる
+	enemy.isFlash = true;
+	enemy.flashTimer.count = 0;
+}
+
+EnemySmoll* GetEnemySmollArray(void) {
+	return enemySmoll;
+}
+
+int GetEnemySmollLimit(void) {
+	return kEnemySmollLimit;
+}
+
+void DamageEnemySmoll(EnemySmoll& enemy, int pow) {
+	enemy.hp -= pow;
+
+	//フラッシュさせる
+	enemy.isFlash = true;
+	enemy.flashTimer.count = 0;
+}
+
 #pragma endregion
