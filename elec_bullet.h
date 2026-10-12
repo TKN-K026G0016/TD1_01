@@ -109,3 +109,8 @@ ElecShock* GetElecShockArray(void);
 /// <param name=""></param>
 /// <returns></returns>
 int GetElecShockLimit(void);
+
+/// <summary>
+/// ショックコンボの増加処理
+/// </summary>
+void AddShockCombo(void);

@@ -146,17 +146,43 @@ static void DrawElecShock(void) {
 
 #pragma endregion
 
+#pragma region 関数: ショックコンボ
+
+static void InitShockCombo(void) {
+	shockCombo = 0;
+	maxShockCombo = 0;
+	comboTimer.count = 0;
+}
+
+static void UpdateShockCombo(void) {
+	//猶予時間がある際
+	if (shockCombo > 0) {
+		comboTimer.count++;
+
+		//猶予時間が切れたら
+		if (comboTimer.count >= comboTimer.time) {
+			comboTimer.count = 0;
+			shockCombo = 0;
+		}
+	}
+}
+
+#pragma endregion
+
 void InitElecBullet(void) {
 	InitBullet();
-
 	InitElecShock();
+
+	InitShockCombo();
 }
 
 void UpdateElecBullet(void) {
 	MoveBullet();
-	BreakBulletItSelf();
 
+	BreakBulletItSelf();
 	BreakElecShockItSelf();
+
+	UpdateShockCombo();
 }
 
 void DrawElecBullet(void) {
@@ -234,6 +260,12 @@ ElecShock* GetElecShockArray(void) {
 
 int GetElecShockLimit(void) {
 	return kElecShockLimit;
+}
+
+void AddShockCombo(void) {
+	//コンボ増加
+	shockCombo++;
+	comboTimer.count = 0;
 }
 
 #pragma endregion

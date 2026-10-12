@@ -286,6 +286,9 @@ static void CheckCollisionElecShockVSEnemy(void) {
 				//ダメージ判定()
 				if (elecShock[j].breakTimer.count == elecShock[j].triggerDamageFrame) {
 					DamageEnemy1(enemy1[i], elecShock[j].pow);
+
+					//コンボ
+					AddShockCombo();
 				}
 			}
 
@@ -314,6 +317,10 @@ static void CheckCollisionElecShockVSEnemy(void) {
 				//ダメージ判定()
 				if (elecShock[j].breakTimer.count == elecShock[j].triggerDamageFrame) {
 					DamageEnemy2(enemy2[i], elecShock[j].pow);
+
+
+					//コンボ
+					AddShockCombo();
 				}
 			}
 		}
@@ -341,6 +348,10 @@ static void CheckCollisionElecShockVSEnemy(void) {
 				//ダメージ判定()
 				if (elecShock[j].breakTimer.count == elecShock[j].triggerDamageFrame) {
 					DamageEnemyBasic(enemyBasic[i], elecShock[j].pow);
+
+
+					//コンボ
+					AddShockCombo();
 				}
 			}
 		}
@@ -366,6 +377,9 @@ static void CheckCollisionElecShockVSEnemy(void) {
 				//ダメージ判定()
 				if (elecShock[j].breakTimer.count == elecShock[j].triggerDamageFrame) {
 					DamageEnemySmall(enemySmall[i], elecShock[j].pow);
+
+					//コンボ
+					AddShockCombo();
 				}
 			}
 
@@ -392,6 +406,10 @@ static void CheckCollisionElecShockVSEnemy(void) {
 				//ダメージ判定()
 				if (elecShock[j].breakTimer.count == elecShock[j].triggerDamageFrame) {
 					DamageEnemyM(enemyM[i], elecShock[j].pow);
+
+
+					//コンボ
+					AddShockCombo();
 				}
 			}
 
@@ -425,6 +443,9 @@ void CheckCollisionElecShockVSBossEnemy(void) {
 			if (elecShock[i].breakTimer.count == elecShock[i].triggerDamageFrame) {
 				int pow = elecShock[i].pow;
 				boss->remainLife -= pow;
+
+				//コンボ
+				AddShockCombo();
 			}
 		}
 	}
