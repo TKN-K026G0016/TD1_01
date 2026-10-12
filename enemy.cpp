@@ -431,8 +431,6 @@ void InitEnemy(void) {
 
 void UpdateEnemy(void) {
 	//enemy1
-	CheckDeadEnemy1();
-	ShootEnemyBullet1();
 	CheckDeadEnemy1();/*
 	ShootEnemyBullet1();*/
 	MoveEnemy1();
