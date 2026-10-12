@@ -512,8 +512,15 @@ static void RotatePlayer(void) {
 			}
 			targetPos = enemy2[targetIndex].pos;
 		}
+		else if (nowTargetType == LockTargetType::EnemyBasic) {
+			if (!enemyBasic[targetIndex].isAlive) {
+				nowTargetType = LockTargetType::None;
+				return;
+			}
+			targetPos = enemyBasic[targetIndex].pos;
+		}
 
-		// 回転処理
+#pragma region 回転処理
 		float dx = targetPos.x - player.pos.x;
 		float dy = targetPos.y - player.pos.y;
 
@@ -529,6 +536,9 @@ static void RotatePlayer(void) {
 		}
 
 		player.rotateTheta += diff * player.lockOnRotateSpeed;
+
+#pragma endregion
+
 	}
 
 }
