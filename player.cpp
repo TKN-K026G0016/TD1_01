@@ -118,6 +118,7 @@ enum class LockTargetType {
 	Boss = -2,
 	Enemy1 = 0,
 	Enemy2 = 1,
+	EnemyBasic = 2,
 };
 LockTargetType nowTargetType = LockTargetType::None;
 //ターゲットの番号
@@ -423,6 +424,12 @@ static void RotatePlayer(void) {
 		Enemy1* enemy1 = GetEnemy1Array();
 		int enemy1Limit = GetEnemy1Limit();
 
+		Enemy2* enemy2 = GetEnemy2Array();
+		int enemy2Limit = GetEnemy2Limit();
+
+		EnemyBasic* enemyBasic = GetEnemyBasicArray();
+		int enemyBasicLimit = GetEnemyBasicLimit();
+
 		// enemy1探索
 		for (int i = 0; i < enemy1Limit; i++) {
 			if (!enemy1[i].isAlive) continue;
@@ -438,9 +445,6 @@ static void RotatePlayer(void) {
 			}
 		}
 
-		Enemy2* enemy2 = GetEnemy2Array();
-		int enemy2Limit = GetEnemy2Limit();
-
 		for (int i = 0; i < enemy2Limit; i++) {
 			if (!enemy2[i].isAlive) continue;
 
@@ -452,6 +456,20 @@ static void RotatePlayer(void) {
 				closestDis = dis;
 				targetIndex = i;
 				nowTargetType = LockTargetType::Enemy2;
+			}
+		}
+
+		for (int i = 0; i < enemyBasicLimit; i++) {
+			if (!enemyBasic[i].isAlive) continue;
+
+			float dx = enemyBasic[i].pos.x - player.pos.x;
+			float dy = enemyBasic[i].pos.y - player.pos.y;
+			float dis = sqrtf(dx * dx + dy * dy);
+
+			if (dis < closestDis) {
+				closestDis = dis;
+				targetIndex = i;
+				nowTargetType = LockTargetType::EnemyBasic;
 			}
 		}
 
@@ -647,6 +665,10 @@ static void InitLockSign(void) {
 	lockOnSign.texture = GetTexture(TextureType::LockOnSign);
 }
 
+/// <summary>
+/// ロックオンサインの更新
+/// </summary>
+/// <param name=""></param>
 static void UpdateLockOnSign(void) {
 	if (!player.isLock || nowTargetType == LockTargetType::None) return;
 
@@ -665,6 +687,11 @@ static void UpdateLockOnSign(void) {
 	else if (nowTargetType == LockTargetType::Enemy2) {
 		Enemy2* enemy2 = GetEnemy2Array();
 		lockOnSign.pos = enemy2[targetIndex].pos;
+	}
+	//enemyBasic
+	else if (nowTargetType == LockTargetType::EnemyBasic) {
+		EnemyBasic* enemyBasic = GetEnemyBasicArray();
+		lockOnSign.pos = enemyBasic[targetIndex].pos;
 	}
 
 }

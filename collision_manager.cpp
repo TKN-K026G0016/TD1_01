@@ -108,6 +108,9 @@ static void CheckCollisionElecBulletVSEnemy(void) {
 	Enemy2* enemy2 = GetEnemy2Array();
 	int enemy2Limit = GetEnemy2Limit();
 
+	EnemyBasic* enemyBasic = GetEnemyBasicArray();
+	int enemyBasicLimit = GetEnemyBasicLimit();
+
 	ElecBullet* elecBullet = GetElecBulletArray();
 	int elecBulletLimit = GetElecBulletLimit();
 
@@ -143,6 +146,25 @@ static void CheckCollisionElecBulletVSEnemy(void) {
 				SpawnElecShock(enemy2[i].pos, elecBullet[j].type);
 
 				DamageEnemy2(enemy2[i], elecBullet[j].pow);
+			}
+		}
+	}
+
+
+#pragma endregion
+
+#pragma region VSEnemyBasic
+	for (int i = 0; i < enemyBasicLimit; i++) {
+		if (!enemyBasic[i].isAlive) continue;
+
+		for (int j = 0; j < elecBulletLimit; j++) {
+			if (!elecBullet[j].isShoot) continue;
+
+			if (CheckCollisionCircleVSCircle(enemyBasic[i].pos, enemyBasic[i].hitRadius, elecBullet[j].pos, elecBullet[j].hitRadius)) {
+				BreakElecBullet(j);
+				SpawnElecShock(enemyBasic[i].pos, elecBullet[j].type);
+
+				DamageEnemyBasic(enemyBasic[i], elecBullet[j].pow);
 			}
 		}
 	}
@@ -187,6 +209,9 @@ static void CheckCollisionElecShockVSEnemy(void) {
 
 	Enemy2* enemy2 = GetEnemy2Array();
 	int enemy2Limit = GetEnemy2Limit();
+
+	EnemyBasic* enemyBasic = GetEnemyBasicArray();
+	int enemyBasicLimit = GetEnemyBasicLimit();
 
 	ElecShock* elecShock = GetElecShockArray();
 	int elecShockLimit = GetElecShockLimit();
@@ -236,6 +261,33 @@ static void CheckCollisionElecShockVSEnemy(void) {
 				//ダメージ判定()
 				if (elecShock[j].breakTimer.count == elecShock[j].triggerDamageFrame) {
 					DamageEnemy2(enemy2[i], elecShock[j].pow);
+				}
+			}
+		}
+	}
+
+
+#pragma endregion
+
+#pragma region VSEnemyBasic
+	for (int i = 0; i < enemyBasicLimit; i++) {
+		if (!enemyBasic[i].isAlive) continue;
+
+		for (int j = 0; j < elecShockLimit; j++) {
+			if (!elecShock[j].isShoot) continue;
+
+			//無視状態時はダメージを受けない(仮)
+			if (enemyBasic[i].isIgnoreShock) continue;
+
+			if (CheckCollisionCircleVSCircle(enemyBasic[i].pos, enemyBasic[i].hitRadius, elecShock[j].pos, elecShock[j].hitRadius)) {
+				//ホウデンの生成
+				if (!enemyBasic[i].isIgnoreShock) {
+					SpawnElecShock(enemyBasic[i].pos, elecShock[j].type);
+					enemyBasic[i].isIgnoreShock = true;
+				}
+				//ダメージ判定()
+				if (elecShock[j].breakTimer.count == elecShock[j].triggerDamageFrame) {
+					DamageEnemyBasic(enemyBasic[i], elecShock[j].pow);
 				}
 			}
 		}
