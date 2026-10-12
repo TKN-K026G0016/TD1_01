@@ -56,6 +56,16 @@ constexpr int enemySmollGemLimit = 1;
 
 #pragma endregion
 
+#pragma region データ: EnemyBomb
+constexpr int kEnemyBombLimit = 10;
+static EnemyBomb enemyBomb[kEnemyBombLimit];
+//ジェムの生成量
+constexpr int enemyBombGemLimit = 2;
+
+#pragma endregion
+
+
+
 
 
 struct Spawner {
@@ -533,7 +543,6 @@ static void DrawEnemyM(void) {
 
 #pragma endregion
 
-
 #pragma region 関数: enemySmoll
 
 static void InitEnemySmoll(void) {
@@ -645,6 +654,129 @@ static void DrawEnemySmoll(void) {
 
 #pragma endregion
 
+#pragma region 関数: enemyBomb
+
+static void InitEnemyBomb(void) {
+	for (int i = 0;i < kEnemy2Limit;i++) {
+		enemyBomb[i] = {};
+
+		enemyBomb[i].texture = GetTexture(TextureType::Enemy2);
+	}
+}
+
+
+static void MoveEnemyBomb(void) {
+	for (int i = 0;i < kEnemyBombLimit;i++) {
+		if (enemyBomb[i].isAlive == true) {
+			enemyBomb[i].nowSpeed -= enemyBomb[i].decelerationSpeed;
+			if (enemyBomb[i].nowSpeed <= 0) {
+				enemyBomb[i].nowSpeed = 0;
+			}
+			enemyBomb[i].pos.x += enemyBomb[i].velocity.x * enemyBomb[i].nowSpeed;
+			enemyBomb[i].pos.y += enemyBomb[i].velocity.y * enemyBomb[i].nowSpeed;
+			if (enemyBomb[i].pos.x <= 0) {
+				enemyBomb[i].pos.x = 0;
+				enemyBomb[i].velocity.x *= -1;
+			}
+			else if (enemyBomb[i].pos.x >= 2560) {
+				enemyBomb[i].pos.x = 2560;
+				enemyBomb[i].velocity.x *= -1;
+			}
+			if (enemyBomb[i].pos.y <= 0) {
+				enemyBomb[i].pos.y = 0;
+				enemyBomb[i].velocity.y *= -1;
+			}
+			else if (enemyBomb[i].pos.y >= 1440) {
+				enemyBomb[i].pos.y = 1440;
+				enemyBomb[i].velocity.y *= -1;
+			}
+		}
+	}
+}
+
+static void DeadEnemyBomb(int index) {
+	enemyBomb[index].isAlive = false;
+	enemyBomb[index].hp = enemyBomb[index].hpMax;
+}
+
+static void BurstEnemyBomb(void) {
+	Vector2 playerPos = GetPlayerPos();
+	for (int i = 0;i < kEnemyBombLimit;i++) {
+		enemyBomb[i].burst.count++;
+		if (enemyBomb[i].burst.count == enemyBomb[i].burst.time) {
+			float DiffX = enemyBomb[i].pos.x - playerPos.x;
+			float DiffY = enemyBomb[i].pos.y - playerPos.y;
+			float distance = sqrtf(DiffX * DiffX + DiffY * DiffY);
+			if (distance <= enemyBomb[i].burstRadius) {
+				PlayerDamage(enemyBomb[i].pos);
+			}
+			DeadEnemyBomb(i);
+		}
+	}
+}
+
+
+/// <summary>
+/// デンゲキショックの生成を受け付けない状態のカウント
+/// </summary>
+/// <param name=""></param>
+static void CountIgnoreShockEnemyBomb(void) {
+	for (int i = 0; i < kEnemyBombLimit; i++) {
+		if (!enemyBomb[i].isAlive) continue;
+		if (!enemyBomb[i].isIgnoreShock) continue;
+
+
+		enemyBomb[i].ignoreSpawnShockTimer.count++;
+		if (enemyBomb[i].ignoreSpawnShockTimer.count >= enemyBomb[i].ignoreSpawnShockTimer.time) {
+			enemyBomb[i].ignoreSpawnShockTimer.count = 0;
+			enemyBomb[i].isIgnoreShock = false;
+		}
+	}
+}
+
+static void UpdateFlashTimerEnemyBomb(void) {
+	for (int i = 0; i < kEnemyBombLimit; i++) {
+		if (!enemyBomb[i].isAlive) continue;
+		if (!enemyBomb[i].isFlash) continue;
+
+		enemyBomb[i].flashTimer.count++;
+		if (enemyBomb[i].flashTimer.count >= enemyBomb[i].flashTimer.time) {
+			enemyBomb[i].flashTimer.count = 0;
+			enemyBomb[i].isFlash = false;
+		}
+	}
+}
+
+static void CheckDeadEnemyBomb(void) {
+	for (int i = 0; i < kEnemyBombLimit; i++) {
+		if (!enemyBomb[i].isAlive) continue;
+
+		if (enemyBomb[i].hp <= 0) {
+			DeadEnemyBomb(i);
+
+			//ジェムの生成処理
+			SpawnGem(enemyBomb[i].pos, GemType::M);
+		}
+	}
+}
+
+static void DrawEnemyBomb(void) {
+	for (int i = 0; i < kEnemyBombLimit; i++) {
+		if (!enemyBomb[i].isAlive) continue;
+
+		Texture texture = enemyBomb[i].texture;
+		if (enemyBomb[i].isFlash) {
+			texture.color = kFlashColor;
+		}
+
+		DrawTextureObj(texture, enemyBomb[i].pos, enemyBomb[i].size);
+	}
+}
+
+
+#pragma endregion
+
+
 void InitEnemy(void) {
 	InitEnemy1();
 	InitEnemy2();
@@ -687,6 +819,13 @@ void UpdateEnemy(void) {
 	UpdateFlashTimerEnemySmoll();
 	CheckDeadEnemySmoll();
 
+	//enemyBomb
+	MoveEnemyBomb();
+	BurstEnemyBomb();
+	CountIgnoreShockEnemyBomb();
+	UpdateFlashTimerEnemyBomb();
+	CheckDeadEnemyBomb();
+
 	ReSpawnEnemy();
 	Attack2Enemy2Move();
 }
@@ -697,6 +836,7 @@ void DrawEnemy(void) {
 	DrawEnemyBasic();
 	DrawEnemyM();
 	DrawEnemySmoll();
+	DrawEnemyBomb();
 }
 
 #pragma region 関数: 外部参照関係
@@ -726,8 +866,27 @@ void SpawnEnemy(Vector2 pos, EnemyType type) {
 
 		break;
 	}
+	case EnemyType::EnemyBomb: {
+		for (int i = 0;i < kEnemyBombLimit;i++) {
+			if (!enemyBomb[i].isAlive)continue;
+			enemyBomb[i].isAlive = true;
+			enemyBomb[i].pos = pos;
+			enemyBomb[i].nowSpeed = ToFloat(GetRand(100, 170)) / 10;
+			enemyBomb[i].velocity = { ToFloat(GetRand(-10, 10)),ToFloat(GetRand(-10,10)) };
+			if (enemyBomb[i].velocity.x != 0) {
+				enemyBomb[i].velocity.x /= 10;
+			}
+			if (enemyBomb[i].velocity.y != 0) {
+				enemyBomb[i].velocity.y /= 10;
+			}
+			enemyBomb[i].burst.time = GetRand(200, 600);
+			enemyBomb[i].burst.count = 0;
+			break;
+		}
+		break;
+	}
 
-							  break;
+							 break;
 	}
 }
 

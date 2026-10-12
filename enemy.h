@@ -16,6 +16,8 @@ enum class EnemyType {
 	EnemyM,
 	//小雑魚
 	EnemySmoll,
+	//ボム
+	EnemyBomb,
 
 
 	Count
@@ -182,6 +184,50 @@ struct EnemySmoll {
 	Texture texture = {};
 };
 
+struct EnemyBomb {
+	Vector2 pos = { 0, 0 };
+	Vector2 size = { 64, 64 };
+	//<生存関係>
+	bool isAlive = false;
+
+	int hp = 60;
+	int hpMax = 60;
+
+	//当たり判定の大きさ
+	float hitRadius = 32.0f;
+
+	//<爆発関係>
+	//爆発までの時間
+	Timer burst = { 0,0 };
+	//爆発範囲
+	float burstRadius = 128.0f;
+	Vector2 bustSize = { 256,256 };
+	//<移動関係>
+	//速度
+	Vector2 velocity = { 0.0f, 0.0f };
+	//スピード
+	float nowSpeed = 0.0f;
+	//加速度
+	float accleretionSpeed = 0.05f;
+	//スピード上限
+	float moveSpeedLimit = 6.0f;
+	//減速度
+	float decelerationSpeed = 0.1f;
+
+	//ショックの生成無視状態
+	bool isIgnoreShock = false;
+	//ショック生成無視タイマー
+	Timer ignoreSpawnShockTimer = { 20, 0 };
+
+	//<フラッシュ関係>
+	bool isFlash = false;
+	Timer flashTimer = { 7, 0 };
+
+
+	Texture texture = {};
+	Texture burstTexture = {};
+};
+
 
 void InitEnemy(void);
 void UpdateEnemy(void);
@@ -227,3 +273,26 @@ int GetEnemyBasicLimit(void);
 /// <param name="enemy">enemyBasic</param>
 /// <param name="pow">ダメージ</param>
 void DamageEnemyBasic(EnemyBasic& enemy, int pow);
+
+Enemy2* GetEnemyMArray(void);
+
+int GetEnemyMLimit(void);
+
+/// <summary>
+/// EnemyMへのダメージ処理
+/// </summary>
+/// <param name="enemy"></param>
+/// <param name="pow"></param>
+void DamageEnemyM(EnemyM& enemy, int pow);
+
+Enemy2* GetEnemySmollArray(void);
+
+int GetEnemySmollLimit(void);
+
+/// <summary>
+/// EnemySmollへのダメージ処理
+/// </summary>
+/// <param name="enemy"></param>
+/// <param name="pow"></param>
+void DamageEnemySmoll(EnemySmoll&enemy, int pow);
+
