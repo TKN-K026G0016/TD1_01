@@ -48,11 +48,11 @@ constexpr int enemyMGemLimit = 4;
 
 #pragma endregion
 
-#pragma region データ: EnemySmoll
-constexpr int kEnemySmollLimit = 30;
-static EnemySmoll enemySmoll[kEnemySmollLimit];
+#pragma region データ: EnemySmall
+constexpr int kEnemySmallLimit = 30;
+static EnemySmall enemySmall[kEnemySmallLimit];
 //ジェムの生成量
-constexpr int enemySmollGemLimit = 1;
+constexpr int enemySmallGemLimit = 1;
 
 #pragma endregion
 
@@ -466,12 +466,12 @@ static void ShootEnemySmoll(void) {
 		enemyM[i].shootTimer.count++;
 		if (enemyM[i].shootTimer.count >= enemy2[i].shootTimer.time) {
 			enemyM[i].shootTimer.count = 0;
-			for (int j = 0;j < kEnemySmollLimit;j++) {
-				if (enemySmoll[j].isAlive)continue;
+			for (int j = 0;j < kEnemySmallLimit;j++) {
+				if (enemySmall[j].isAlive)continue;
 
-				enemySmoll[j].isAlive = true;
-				enemySmoll[j].velocity = { ToFloat(GetRand(0,5)),ToFloat(GetRand(0,5)) };
-				enemySmoll[j].pos = enemyM[i].pos;
+				enemySmall[j].isAlive = true;
+				enemySmall[j].velocity = { ToFloat(GetRand(0,5)),ToFloat(GetRand(0,5)) };
+				enemySmall[j].pos = enemyM[i].pos;
 				break;
 			}
 		}
@@ -546,10 +546,10 @@ static void DrawEnemyM(void) {
 #pragma region 関数: enemySmoll
 
 static void InitEnemySmoll(void) {
-	for (int i = 0; i < kEnemySmollLimit; i++) {
-		enemySmoll[i] = {};
+	for (int i = 0; i < kEnemySmallLimit; i++) {
+		enemySmall[i] = {};
 
-		enemySmoll[i].texture = GetTexture(TextureType::EnemyBasic);
+		enemySmall[i].texture = GetTexture(TextureType::EnemyBasic);
 	}
 }
 
@@ -558,22 +558,22 @@ static void InitEnemySmoll(void) {
 /// </summary>
 /// <param name=""></param>
 static void MoveEnemySmoll(void) {
-	for (int i = 0; i < kEnemySmollLimit; i++) {
-		if (!enemySmoll[i].isAlive) continue;
+	for (int i = 0; i < kEnemySmallLimit; i++) {
+		if (!enemySmall[i].isAlive) continue;
 
 		Vector2 targetPos = GetPlayerPos();
-		float disX = targetPos.x - enemySmoll[i].pos.x;
-		float disY = targetPos.y - enemySmoll[i].pos.y;
+		float disX = targetPos.x - enemySmall[i].pos.x;
+		float disY = targetPos.y - enemySmall[i].pos.y;
 		float disLength = sqrtf(disX * disX + disY * disY);
 		if (disLength != 0) {
-			enemySmoll[i].velocity.x = (enemySmoll[i].velocity.x + disX / disLength) / 2;
-			enemySmoll[i].velocity.x = (enemySmoll[i].velocity.y + disY / disLength) / 2;
-			enemySmoll[i].nowSpeed += enemySmoll[i].accleretionSpeed;
-			if (enemySmoll[i].nowSpeed > enemySmoll[i].moveSpeedLimit) {
-				enemySmoll[i].nowSpeed = enemySmoll[i].moveSpeedLimit;
+			enemySmall[i].velocity.x = (enemySmall[i].velocity.x + disX / disLength) / 2;
+			enemySmall[i].velocity.x = (enemySmall[i].velocity.y + disY / disLength) / 2;
+			enemySmall[i].nowSpeed += enemySmall[i].accleretionSpeed;
+			if (enemySmall[i].nowSpeed > enemySmall[i].moveSpeedLimit) {
+				enemySmall[i].nowSpeed = enemySmall[i].moveSpeedLimit;
 			}
-			enemySmoll[i].pos.x += enemySmoll[i].velocity.x * enemySmoll[i].nowSpeed;
-			enemySmoll[i].pos.y += enemySmoll[i].velocity.y * enemySmoll[i].nowSpeed;
+			enemySmall[i].pos.x += enemySmall[i].velocity.x * enemySmall[i].nowSpeed;
+			enemySmall[i].pos.y += enemySmall[i].velocity.y * enemySmall[i].nowSpeed;
 		}
 
 	}
@@ -584,15 +584,15 @@ static void MoveEnemySmoll(void) {
 /// </summary>
 /// <param name=""></param>
 static void CountIgnoreShockEnemySmoll(void) {
-	for (int i = 0; i < kEnemySmollLimit; i++) {
-		if (!enemySmoll[i].isAlive) continue;
-		if (!enemySmoll[i].isIgnoreShock) continue;
+	for (int i = 0; i < kEnemySmallLimit; i++) {
+		if (!enemySmall[i].isAlive) continue;
+		if (!enemySmall[i].isIgnoreShock) continue;
 
 
-		enemySmoll[i].ignoreSpawnShockTimer.count++;
-		if (enemySmoll[i].ignoreSpawnShockTimer.count >= enemySmoll[i].ignoreSpawnShockTimer.time) {
-			enemySmoll[i].ignoreSpawnShockTimer.count = 0;
-			enemySmoll[i].isIgnoreShock = false;
+		enemySmall[i].ignoreSpawnShockTimer.count++;
+		if (enemySmall[i].ignoreSpawnShockTimer.count >= enemySmall[i].ignoreSpawnShockTimer.time) {
+			enemySmall[i].ignoreSpawnShockTimer.count = 0;
+			enemySmall[i].isIgnoreShock = false;
 		}
 	}
 }
@@ -602,52 +602,52 @@ static void CountIgnoreShockEnemySmoll(void) {
 /// </summary>
 /// <param name=""></param>
 static void UpdateFlashTimerEnemySmoll(void) {
-	for (int i = 0; i < kEnemySmollLimit; i++) {
-		if (!enemySmoll[i].isAlive) continue;
-		if (!enemySmoll[i].isFlash) continue;
+	for (int i = 0; i < kEnemySmallLimit; i++) {
+		if (!enemySmall[i].isAlive) continue;
+		if (!enemySmall[i].isFlash) continue;
 
-		enemySmoll[i].flashTimer.count++;
-		if (enemySmoll[i].flashTimer.count >= enemySmoll[i].flashTimer.time) {
-			enemySmoll[i].flashTimer.count = 0;
-			enemySmoll[i].isFlash = false;
+		enemySmall[i].flashTimer.count++;
+		if (enemySmall[i].flashTimer.count >= enemySmall[i].flashTimer.time) {
+			enemySmall[i].flashTimer.count = 0;
+			enemySmall[i].isFlash = false;
 		}
 	}
 }
 
 static void DeadEnemySmoll(int index) {
-	enemySmoll[index].isAlive = false;
-	enemySmoll[index].hp = enemySmoll[index].hpMax;
+	enemySmall[index].isAlive = false;
+	enemySmall[index].hp = enemySmall[index].hpMax;
 	/*spawner.spawnTimer.time = spawner.kSpawnTime * nowenemyBasicIsAliveCount;*/
 }
 
 static void CheckDeadEnemySmoll(void) {
-	for (int i = 0; i < kEnemySmollLimit; i++) {
-		if (!enemySmoll[i].isAlive) continue;
+	for (int i = 0; i < kEnemySmallLimit; i++) {
+		if (!enemySmall[i].isAlive) continue;
 
-		if (enemySmoll[i].hp <= 0) {
+		if (enemySmall[i].hp <= 0) {
 			DeadEnemySmoll(i);
 
 			//ジェムの生成処理
-			for (int j = 0;j < enemySmollGemLimit;j++) {
-				SpawnGem(enemySmoll[i].pos, GemType::S);
+			for (int j = 0;j < enemySmallGemLimit;j++) {
+				SpawnGem(enemySmall[i].pos, GemType::S);
 			}
 		}
 	}
 }
 
 static void DrawEnemySmoll(void) {
-	for (int i = 0; i < kEnemySmollLimit; i++) {
-		if (!enemySmoll[i].isAlive) continue;
+	for (int i = 0; i < kEnemySmallLimit; i++) {
+		if (!enemySmall[i].isAlive) continue;
 
-		Texture texture = enemySmoll[i].texture;
-		if (enemySmoll[i].isFlash) {
+		Texture texture = enemySmall[i].texture;
+		if (enemySmall[i].isFlash) {
 			texture.color = WHITE;
 		}
 		else {
 			texture.color = kNormalColor;
 		}
 
-		DrawTextureObj(texture, enemySmoll[i].pos, enemySmoll[i].size);
+		DrawTextureObj(texture, enemySmall[i].pos, enemySmall[i].size);
 	}
 }
 
@@ -955,15 +955,15 @@ void DamageEnemyM(EnemyM& enemy, int pow) {
 	enemy.flashTimer.count = 0;
 }
 
-EnemySmoll* GetEnemySmollArray(void) {
-	return enemySmoll;
+EnemySmall* GetEnemySmallArray(void) {
+	return enemySmall;
 }
 
 int GetEnemySmollLimit(void) {
-	return kEnemySmollLimit;
+	return kEnemySmallLimit;
 }
 
-void DamageEnemySmoll(EnemySmoll& enemy, int pow) {
+void DamageEnemySmoll(EnemySmall& enemy, int pow) {
 	enemy.hp -= pow;
 
 	//フラッシュさせる

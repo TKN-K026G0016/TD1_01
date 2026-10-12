@@ -148,7 +148,7 @@ struct EnemyM {
 	Texture texture = {};
 };
 
-struct EnemySmoll {
+struct EnemySmall {
 	Vector2 pos = { 0, 0 };
 	Vector2 size = { 16, 16 };
 
@@ -274,7 +274,7 @@ int GetEnemyBasicLimit(void);
 /// <param name="pow">ダメージ</param>
 void DamageEnemyBasic(EnemyBasic& enemy, int pow);
 
-Enemy2* GetEnemyMArray(void);
+EnemyM* GetEnemyMArray(void);
 
 int GetEnemyMLimit(void);
 
@@ -285,7 +285,7 @@ int GetEnemyMLimit(void);
 /// <param name="pow"></param>
 void DamageEnemyM(EnemyM& enemy, int pow);
 
-Enemy2* GetEnemySmollArray(void);
+EnemySmall* GetEnemySmallArray(void);
 
 int GetEnemySmollLimit(void);
 
@@ -294,5 +294,5 @@ int GetEnemySmollLimit(void);
 /// </summary>
 /// <param name="enemy"></param>
 /// <param name="pow"></param>
-void DamageEnemySmoll(EnemySmoll&enemy, int pow);
+void DamageEnemySmoll(EnemySmall&enemy, int pow);
 
