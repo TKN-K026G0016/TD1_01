@@ -38,7 +38,7 @@ struct Camera {
 	//補間速度
 	float chaseLerpRate = 0.10f;
 	//デッドゾーン
-	const float deadZone = 10.0f;
+	const float deadZone = 5.0f;
 
 	Vector2 moveVec = { 0, 0 };
 };

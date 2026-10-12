@@ -104,7 +104,7 @@ struct EnemyBasic {
 	int hp = 10;
 	int hpMax = 10;
 
-	float hitRadius = 20.0f;
+	float hitRadius = 30.0f;
 
 	//移動速度
 	float moveSpeed = 1.5f;

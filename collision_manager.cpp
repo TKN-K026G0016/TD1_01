@@ -552,6 +552,51 @@ static void CheckCollisionPlayerVSEnemyLaser(void) {
 
 #pragma endregion
 
+#pragma region 関数: PlayerVS敵の判定
+
+static void CheckCollisionPlayerVSEnemy(void) {
+	if (!GetPlayerIsAlive()) return;
+
+	EnemyBasic* enemyBasic = GetEnemyBasicArray();
+	int enemyBasicLimit = GetEnemyBasicLimit();
+
+	EnemySmall* enemySmall = GetEnemySmallArray();
+	int enemySmallLimit = GetEnemySmallLimit();
+
+	Vector2 playerPos = GetPlayerPos();
+	float playerHitRadius = GetPlayerHitRadius();
+
+#pragma region VSEnemy
+
+	for (int i = 0; i < enemyBasicLimit; i++) {
+		if (!enemyBasic[i].isAlive) continue;
+
+		if (CheckCollisionCircleVSCircle(enemyBasic[i].pos, enemyBasic[i].hitRadius, playerPos, playerHitRadius) ){
+
+			PlayerDamage(enemyBasic[i].pos);
+		}
+	}
+
+#pragma endregion
+
+#pragma region VSEnemySmall
+
+	for (int i = 0; i < enemySmallLimit; i++) {
+		if (!enemySmall[i].isAlive) continue;
+
+		if (CheckCollisionCircleVSCircle(enemySmall[i].pos, enemySmall[i].hitRadius, playerPos, playerHitRadius)) {
+
+			PlayerDamage(enemySmall[i].pos);
+		}
+	}
+
+#pragma endregion
+
+
+}
+
+#pragma endregion
+
 void InitCollision() {
 
 }
@@ -571,5 +616,6 @@ void UpdateCollision() {
 
 	CheckCollisionPlayerVSEnemyBullet();
 	CheckCollisionPlayerVSEnemyLaser();
+	CheckCollisionPlayerVSEnemy();
 
 }
