@@ -18,7 +18,7 @@ BossEnemy bossEnemy;
 
 #pragma region データ: Bomb攻撃
 
-struct EnemyBomb {
+struct BossEnemyBomb {
 	Vector2 pos = { 0, 0 };
 	Vector2 size = { 64, 64 };
 	//<生存関係>
@@ -46,7 +46,7 @@ struct EnemyBomb {
 	Texture texture = {};
 	Texture burstTexture = {};
 };
-EnemyBomb bossBomb[6]{};
+BossEnemyBomb bossBomb[6]{};
 
 struct StatesTimer {
 	Timer normal = { 300,0 };
