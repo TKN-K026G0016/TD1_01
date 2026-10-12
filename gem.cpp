@@ -19,7 +19,7 @@ constexpr int kScatterLengthMax = 100;
 constexpr int kScatterLengthMin = 0;
 
 //通電できる回数
-static constexpr int kHpMax = 6;
+static constexpr int kHpMax = 8;
 
 struct GemSpec {
 	GemType type;

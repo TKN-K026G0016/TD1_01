@@ -232,6 +232,12 @@ static void ChangeRound(void) {
 	//変更時間を変えたら
 	if (totalGameTime >= totalNextRoundTime) {
   		nowRound = static_cast<Round>(nextRound);
+
+		//ボス生成
+		if (nowRound == Round::RoundBoss) {
+			SpawnBoss({ 1200, 720 });
+		}
+
 	}
 
 #pragma endregion
