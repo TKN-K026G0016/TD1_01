@@ -111,6 +111,12 @@ static void CheckCollisionElecBulletVSEnemy(void) {
 	EnemyBasic* enemyBasic = GetEnemyBasicArray();
 	int enemyBasicLimit = GetEnemyBasicLimit();
 
+	EnemySmall* enemySmall = GetEnemySmallArray();
+	int enemySmallLimit = GetEnemySmallLimit();
+
+	EnemyM* enemyM = GetEnemyMArray();
+	int enemyMLimit = GetEnemyMLimit();
+
 	ElecBullet* elecBullet = GetElecBulletArray();
 	int elecBulletLimit = GetElecBulletLimit();
 
@@ -171,6 +177,47 @@ static void CheckCollisionElecBulletVSEnemy(void) {
 
 
 #pragma endregion
+
+#pragma region VSEnemySmall
+	for (int i = 0; i < enemySmallLimit; i++) {
+		if (!enemySmall[i].isAlive) continue;
+
+		for (int j = 0; j < elecBulletLimit; j++) {
+			if (!elecBullet[j].isShoot) continue;
+
+			if (CheckCollisionCircleVSCircle(enemySmall[i].pos, enemySmall[i].hitRadius, elecBullet[j].pos, elecBullet[j].hitRadius)) {
+				BreakElecBullet(j);
+				//ホウデンの生成
+				SpawnElecShock(enemySmall[i].pos, elecBullet[j].type);
+
+				DamageEnemySmall(enemySmall[i], elecBullet[j].pow);
+			}
+		}
+	}
+
+
+#pragma endregion
+
+#pragma region VSEnemyM
+	for (int i = 0; i < enemyMLimit; i++) {
+		if (!enemyM[i].isAlive) continue;
+
+		for (int j = 0; j < elecBulletLimit; j++) {
+			if (!elecBullet[j].isShoot) continue;
+
+			if (CheckCollisionCircleVSCircle(enemyM[i].pos, enemyM[i].hitRadius, elecBullet[j].pos, elecBullet[j].hitRadius)) {
+				BreakElecBullet(j);
+				//ホウデンの生成
+				SpawnElecShock(enemyM[i].pos, elecBullet[j].type);
+
+				DamageEnemyM(enemyM[i], elecBullet[j].pow);
+			}
+		}
+	}
+
+
+#pragma endregion
+
 }
 
 /// <summary>
@@ -212,6 +259,12 @@ static void CheckCollisionElecShockVSEnemy(void) {
 
 	EnemyBasic* enemyBasic = GetEnemyBasicArray();
 	int enemyBasicLimit = GetEnemyBasicLimit();
+
+	EnemySmall* enemySmall = GetEnemySmallArray();
+	int enemySmallLimit = GetEnemySmallLimit();
+
+	EnemyM* enemyM = GetEnemyMArray();
+	int enemyMLimit = GetEnemyMLimit();
 
 	ElecShock* elecShock = GetElecShockArray();
 	int elecShockLimit = GetElecShockLimit();
@@ -290,6 +343,58 @@ static void CheckCollisionElecShockVSEnemy(void) {
 					DamageEnemyBasic(enemyBasic[i], elecShock[j].pow);
 				}
 			}
+		}
+	}
+
+
+#pragma endregion
+
+#pragma region VSEnemySmall
+	for (int i = 0; i < enemySmallLimit; i++) {
+		if (!enemySmall[i].isAlive) continue;
+
+		for (int j = 0; j < elecShockLimit; j++) {
+			if (!elecShock[j].isShoot) continue;
+
+			if (CheckCollisionCircleVSCircle(enemySmall[i].pos, enemySmall[i].hitRadius, elecShock[j].pos, elecShock[j].hitRadius)) {
+
+				//ホウデンの生成
+				if (!enemySmall[i].isIgnoreShock) {
+					SpawnElecShock(enemySmall[i].pos, elecShock[j].type);
+					enemySmall[i].isIgnoreShock = true;
+				}
+				//ダメージ判定()
+				if (elecShock[j].breakTimer.count == elecShock[j].triggerDamageFrame) {
+					DamageEnemySmall(enemySmall[i], elecShock[j].pow);
+				}
+			}
+
+		}
+	}
+
+
+#pragma endregion
+
+#pragma region VSEnemyM
+	for (int i = 0; i < enemyMLimit; i++) {
+		if (!enemyM[i].isAlive) continue;
+
+		for (int j = 0; j < elecShockLimit; j++) {
+			if (!elecShock[j].isShoot) continue;
+
+			if (CheckCollisionCircleVSCircle(enemyM[i].pos, enemyM[i].hitRadius, elecShock[j].pos, elecShock[j].hitRadius)) {
+
+				//ホウデンの生成
+				if (!enemyM[i].isIgnoreShock) {
+					SpawnElecShock(enemyM[i].pos, elecShock[j].type);
+					enemyM[i].isIgnoreShock = true;
+				}
+				//ダメージ判定()
+				if (elecShock[j].breakTimer.count == elecShock[j].triggerDamageFrame) {
+					DamageEnemyM(enemyM[i], elecShock[j].pow);
+				}
+			}
+
 		}
 	}
 

@@ -557,7 +557,7 @@ static void InitEnemySmoll(void) {
 /// enemySmollの移動処理
 /// </summary>
 /// <param name=""></param>
-static void MoveEnemySmoll(void) {
+static void MoveEnemySmall(void) {
 	for (int i = 0; i < kEnemySmallLimit; i++) {
 		if (!enemySmall[i].isAlive) continue;
 
@@ -583,7 +583,7 @@ static void MoveEnemySmoll(void) {
 /// デンゲキショックの生成を受け付けない状態のカウント
 /// </summary>
 /// <param name=""></param>
-static void CountIgnoreShockEnemySmoll(void) {
+static void CountIgnoreShockEnemySmall(void) {
 	for (int i = 0; i < kEnemySmallLimit; i++) {
 		if (!enemySmall[i].isAlive) continue;
 		if (!enemySmall[i].isIgnoreShock) continue;
@@ -601,7 +601,7 @@ static void CountIgnoreShockEnemySmoll(void) {
 /// 
 /// </summary>
 /// <param name=""></param>
-static void UpdateFlashTimerEnemySmoll(void) {
+static void UpdateFlashTimerEnemySmall(void) {
 	for (int i = 0; i < kEnemySmallLimit; i++) {
 		if (!enemySmall[i].isAlive) continue;
 		if (!enemySmall[i].isFlash) continue;
@@ -620,7 +620,7 @@ static void DeadEnemySmoll(int index) {
 	/*spawner.spawnTimer.time = spawner.kSpawnTime * nowenemyBasicIsAliveCount;*/
 }
 
-static void CheckDeadEnemySmoll(void) {
+static void CheckDeadEnemySmall(void) {
 	for (int i = 0; i < kEnemySmallLimit; i++) {
 		if (!enemySmall[i].isAlive) continue;
 
@@ -794,6 +794,7 @@ void UpdateEnemy(void) {
 	MoveEnemy1();
 	UpdateFlashTimerEnemy1();
 	CountIgnoreShockEnemy1();
+	InitEnemyBomb();
 
 	//enemy2
 	CheckDeadEnemy2();
@@ -814,10 +815,10 @@ void UpdateEnemy(void) {
 	ShootEnemySmoll();
 
 	//enemySmoll
-	MoveEnemySmoll();
-	CountIgnoreShockEnemySmoll();
-	UpdateFlashTimerEnemySmoll();
-	CheckDeadEnemySmoll();
+	MoveEnemySmall();
+	CountIgnoreShockEnemySmall();
+	UpdateFlashTimerEnemySmall();
+	CheckDeadEnemySmall();
 
 	//enemyBomb
 	MoveEnemyBomb();
@@ -959,11 +960,11 @@ EnemySmall* GetEnemySmallArray(void) {
 	return enemySmall;
 }
 
-int GetEnemySmollLimit(void) {
+int GetEnemySmallLimit(void) {
 	return kEnemySmallLimit;
 }
 
-void DamageEnemySmoll(EnemySmall& enemy, int pow) {
+void DamageEnemySmall(EnemySmall& enemy, int pow) {
 	enemy.hp -= pow;
 
 	//フラッシュさせる

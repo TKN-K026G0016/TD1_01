@@ -287,12 +287,12 @@ void DamageEnemyM(EnemyM& enemy, int pow);
 
 EnemySmall* GetEnemySmallArray(void);
 
-int GetEnemySmollLimit(void);
+int GetEnemySmallLimit(void);
 
 /// <summary>
 /// EnemySmollへのダメージ処理
 /// </summary>
 /// <param name="enemy"></param>
 /// <param name="pow"></param>
-void DamageEnemySmoll(EnemySmall&enemy, int pow);
+void DamageEnemySmall(EnemySmall&enemy, int pow);
 
