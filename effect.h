@@ -33,3 +33,9 @@ void CreateElecShockEffect(Vector2 pos);
 /// </summary>
 /// <param name="pos">生成座標</param
 void CreateElecShockChargedEffect(Vector2 pos);
+
+/// <summary>
+/// ChargeOrbエフェクト生成処理
+/// </summary>
+/// <param name="pos">生成座標</param>
+void CreateChargeOrbEffect(Vector2 pos);

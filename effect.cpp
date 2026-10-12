@@ -155,6 +155,40 @@ ElecShockChargedEffect elecShockChargedEffect[kElecShockEffectLimit];
 
 #pragma endregion
 
+#pragma region データ: ChargeOrbエフェクト
+
+//ChargeOrbエフェクト
+static constexpr int kChargeOrbEffectLimit = 8;
+
+struct ChargeOrbEffect {
+	Vector2 pos = {};
+
+	bool isShoot = false;
+
+	//<イージング用>
+	float easingT = 0.0f;
+	float easingSpeed = 0.05f;
+	float easingTFadeIn = 0.5f;
+
+	//<サイズ関係>
+	float startSizeValue = 50.0f;
+	float endSizeValue = 0.1f;
+	float sizeValue = 0.0f;
+
+
+	//<透明度関係>
+	int alphaMin = 0;
+	int alphaMax = 255;
+	int alpha = 0;
+
+	Texture texture = {};
+	unsigned int color = 0x04C1E8FF;
+};
+ChargeOrbEffect chargeOrbEffect[kChargeOrbEffectLimit];
+
+#pragma endregion
+
+
 #pragma region 関数: ジェム取得effect
 
 void CreateJemEffect() {
@@ -564,6 +598,85 @@ void CreateElecShockChargedEffect(Vector2 pos) {
 
 #pragma endregion
 
+#pragma region 関数: chargeOrbEffect
+
+static void InitChargeOrbEffect(void) {
+	for (int i = 0; i < kChargeOrbEffectLimit; i++) {
+		chargeOrbEffect[i] = {};
+
+		chargeOrbEffect[i].texture = GetTexture(TextureType::EffectCircle);
+	}
+}
+
+static void UpdateChargeOrbEffect(void) {
+
+	Vector2 targetPos = GetPlayerShootPos();
+
+	for (int i = 0; i < kChargeOrbEffectLimit; i++) {
+		if (!chargeOrbEffect[i].isShoot) continue;
+
+		chargeOrbEffect[i].pos = targetPos;
+
+		//easingTの更新
+		chargeOrbEffect[i].easingT += chargeOrbEffect[i].easingSpeed;
+		if (chargeOrbEffect[i].easingT >= 1.0f) {
+			chargeOrbEffect[i].easingT = 1.0f;
+			chargeOrbEffect[i].isShoot = false;
+		}
+
+		//サイズの更新
+		chargeOrbEffect[i].sizeValue = UpdateValueByEasing(chargeOrbEffect[i].startSizeValue, chargeOrbEffect[i].endSizeValue, chargeOrbEffect[i].easingT, EasingMode::EaseIn);
+
+#pragma region 透明度の更新
+
+		if (chargeOrbEffect[i].easingT < chargeOrbEffect[i].easingTFadeIn) {
+			float t = chargeOrbEffect[i].easingT / 0.5f;  // 0.0→0.5 を 0→1 に正規化
+			if (t > 1.0f) t = 1.0f;
+
+			chargeOrbEffect[i].alpha = UpdateValueByEasing(chargeOrbEffect[i].alphaMin, chargeOrbEffect[i].alphaMax, t, EasingMode::EaseOut);
+		}
+		else {
+			float t = (chargeOrbEffect[i].easingT - 0.5f) / 0.5f;  // 0.5→1.0 を 0→1 に正規化
+			if (t > 1.0f) t = 1.0f;
+
+			chargeOrbEffect[i].alpha = UpdateValueByEasing(chargeOrbEffect[i].alphaMax, chargeOrbEffect[i].alphaMin, t, EasingMode::EaseIn);
+		}
+
+#pragma endregion
+		
+	}
+}
+
+static void DrawChargeOrbEffect(void) {
+	for (int i = 0; i < kChargeOrbEffectLimit; i++) {
+		if (!chargeOrbEffect[i].isShoot) continue;
+
+		Vector2 size = { chargeOrbEffect[i].sizeValue, chargeOrbEffect[i].sizeValue };
+
+		Texture texture = chargeOrbEffect[i].texture;
+		texture.color = (chargeOrbEffect[i].color & 0xFFFFFF00) | chargeOrbEffect[i].alpha;
+
+		DrawTextureObj(texture, chargeOrbEffect[i].pos, size);
+	}
+}
+
+void CreateChargeOrbEffect(Vector2 pos) {
+	for (int i = 0; i < kChargeOrbEffectLimit; i++) {
+		if (chargeOrbEffect[i].isShoot) continue;
+
+		chargeOrbEffect[i].isShoot = true;
+		chargeOrbEffect[i].pos = pos;
+
+		chargeOrbEffect[i].sizeValue = chargeOrbEffect[i].startSizeValue;
+		chargeOrbEffect[i].alpha = chargeOrbEffect[i].alphaMin;
+		chargeOrbEffect[i].easingT = 0.0f;
+
+		break;
+	}
+}
+
+#pragma endregion
+
 void InitEffect() {
 	InitGemEffect();
 	
@@ -574,11 +687,15 @@ void InitEffect() {
 	InitElecShockEffect();
 	InitElecShockChargedEffect();
 
+	InitChargeOrbEffect();
+
 #ifdef _DEBUG
 
 	CreateJemEffect();
 
 	CreateGageEffect();
+
+	//CreateChargeOrbEffect(GetPlayerPos());
 
 #endif // _DEBUG
 
@@ -590,6 +707,7 @@ void UpdateEffect() {
 	UpdateSmokeEffect();
 	UpdateElecShockEffect();
 	UpdateElecShockChargedEffect();
+	UpdateChargeOrbEffect();
 }
 void DrawEffect() {
 	DrawGetEffect();
@@ -597,6 +715,7 @@ void DrawEffect() {
 	DrawSmokeEffect();
 	DrawElecShockEffect();
 	DrawElecShockChargedEffect();
+	DrawChargeOrbEffect();
 }
 
 void DrawEffectAsUI() {

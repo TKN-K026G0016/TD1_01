@@ -214,12 +214,14 @@ constexpr int kCreateSmokeNum = 4;
 //オーバーヒート時のケムリ生成スパン
 Timer createSmokeTimer = { 15, 0 };
 
-struct ChargeOrb {
-	Vector2 size = { 32, 32 };
+//struct ChargeOrb {
+//	Vector2 size = { 32, 32 };
+//
+//	Texture texture = {};
+//};
+//ChargeOrb chargeOrb;
 
-	Texture texture = {};
-};
-ChargeOrb chargeOrb;
+Timer createChargeOrbTimer = { 10, 0 };
 
 #pragma endregion
 
@@ -1021,10 +1023,14 @@ static void UpdatePlayerEffect(void) {
 /// チャージ中の玉の描画処理
 /// </summary>
 /// <param name=""></param>
-static void DrawChargeOrb(void) {
+static void CreateChargeOrbEffect(void) {
 	if (chargeElecBulletTimer.count < chargeElecBulletTimer.time) return;
 
-	DrawTextureObj(chargeOrb.texture, shootPos, chargeOrb.size);
+	createChargeOrbTimer.count++;
+	if (createChargeOrbTimer.count >= createChargeOrbTimer.time) {
+		createChargeOrbTimer.count = 0;
+		CreateChargeOrbEffect(shootPos);
+	}
 }
 
 #pragma endregion
@@ -1120,7 +1126,7 @@ void InitPlayer(void) {
 	player.texture = GetTexture(TextureType::Player);
 	player.remainEnergy = kEnergyCenter;
 
-	chargeOrb.texture = GetTexture(TextureType::ChargeOrb);
+	//chargeOrb.texture = GetTexture(TextureType::ChargeOrb);
 
 	GetMovablePos(movablePos);
 	InitLockSign();
@@ -1163,7 +1169,7 @@ void DrawPlayer(void) {
 	//本体の描画
 	DrawTextureRotateObj(player.texture, player.pos, player.size, player.rotateTheta);
 
-	DrawChargeOrb();
+	CreateChargeOrbEffect();
 
 	DrawLockOnSign();
 
