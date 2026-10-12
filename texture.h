@@ -100,6 +100,8 @@ enum class TextureType {
 	ProgressGaugeFrame,
 	ProgressGaugeMeter,
 
+	ComboNumbers,
+
 	//effect
 	EffectSquare,
 	EffectSquareMini,

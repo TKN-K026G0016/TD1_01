@@ -1,5 +1,6 @@
 #include "play_ui.h"
 #include "player.h"
+#include "elec_bullet.h"
 #include "boss_enemy.h"
 #include "stage.h"
 #include "effect.h"
@@ -149,6 +150,24 @@ struct ProgressGauge {
 	Texture meterTexture = {};
 };
 ProgressGauge progressGauge;
+
+#pragma endregion
+
+#pragma region データ: ショックコンボ
+
+constexpr int kComboNumbersLimit = 2;
+struct ShockComboNumbers {
+	Vector2 size = { 68, 128 };
+
+	Vector2 startPos = { 1200, 630 };
+	Vector2 interval = { -80.0f, 0.0f };
+
+	int animNum = 0;
+};
+ShockComboNumbers comboNumbers[kComboNumbersLimit];
+int shockCombo = 0;
+
+Texture comboNumbersTexture = {};
 
 #pragma endregion
 
@@ -439,7 +458,44 @@ static void DrawProgressGauge(void) {
 
 #pragma region 関数: 連鎖表示
 
+static void InitShockCombo(void) {
+	for (int i = 0; i < kComboNumbersLimit; i++) {
+		comboNumbers[i] = {};
+	}
+	comboNumbersTexture = GetTexture(TextureType::ComboNumbers);
+}
 
+static void UpdateShockCombo(void) {
+	shockCombo = GetShockCombo();
+
+	for (int i = 0; i < kComboNumbersLimit; i++) {
+		comboNumbers[i].animNum = GetValueAtDigit(shockCombo, i);
+	}
+}
+
+static void DrawShockCombo(void) {
+
+	int digits = 0;
+	if (shockCombo < 3) {
+		return;
+	}
+	else if (shockCombo < 10) {
+		digits = 1;
+	} else {
+		digits = 2;
+	}
+
+	//scoreNumbers
+	for (int i = 0; i < digits; i++) {
+		Vector2 pos = { comboNumbers[i].startPos.x + comboNumbers[i].interval.x * i, comboNumbers[i].startPos.y };
+
+		Texture texture = comboNumbersTexture;
+		texture.animNum = comboNumbers[i].animNum;
+
+		DrawTextureUI(texture, pos, comboNumbers[i].size);
+	}
+
+}
 
 #pragma endregion
 
@@ -448,6 +504,7 @@ void InitPlayUI(void) {
 	InitEnergyGauge();
 	InitBossHpGauge();
 	InitProgressGauge();
+	InitShockCombo();
 }
 
 void UpdatePlayUI(void){
@@ -455,6 +512,7 @@ void UpdatePlayUI(void){
 	UpdateBossHpGauge();
 	UpdatePowRate();
 	UpdateProgressGauge();
+	UpdateShockCombo();
 }
 
 void DrawPlayUI(void) {
@@ -463,6 +521,7 @@ void DrawPlayUI(void) {
 	DrawBossHpGauge();
 	DrawPowRate();
 	DrawProgressGauge();
+	DrawShockCombo();
 }
 
 #pragma region 関数: 外部参照関係

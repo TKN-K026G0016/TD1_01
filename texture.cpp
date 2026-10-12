@@ -92,6 +92,8 @@ void InitTexture(void) {
 		{ Novice::LoadTexture("./resources/texture/ui/play/progress_gauge_frame.png"), { 768, 32 }, {0, 0}, 0, 0, WHITE },
 		{ Novice::LoadTexture("./resources/texture/ui/play/progress_gauge_meter.png"), { 768, 32 }, {0, 0}, 0, 0, WHITE },
 
+		{ Novice::LoadTexture("./resources/texture/ui/play/combo_numbers.png"), { 68, 128 }, {0, 0}, 0, 0, WHITE },
+
 		//effect
 		{ Novice::LoadTexture("./resources/texture/effect/effect.square.png"), {128 , 128 }, {0, 0}, 0, 0, WHITE },
 		{ Novice::LoadTexture("./resources/texture/effect/effect.square.mini.png"), {32 , 32 }, {0, 0}, 0, 0, WHITE },

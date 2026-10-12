@@ -114,3 +114,8 @@ int GetElecShockLimit(void);
 /// ショックコンボの増加処理
 /// </summary>
 void AddShockCombo(void);
+
+/// <summary>
+/// ショックコンボを取得
+/// </summary>
+int GetShockCombo(void);

@@ -268,4 +268,8 @@ void AddShockCombo(void) {
 	comboTimer.count = 0;
 }
 
+int GetShockCombo(void) {
+	return shockCombo;
+}
+
 #pragma endregion
