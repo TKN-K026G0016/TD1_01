@@ -8,6 +8,7 @@
 enum class EnemyType {
 	Enemy1,
 	Enemy2,
+	EnemyBasic,
 
 	Count
 };
@@ -87,6 +88,32 @@ struct Enemy2 {
 	Texture texture = {};
 };
 
+struct EnemyBasic {
+	Vector2 pos = { 0, 0 };
+	Vector2 size = { 64, 64 };
+
+	//生存フラグ
+	bool isAlive = false;
+
+	int hp = 20;
+	int hpMax = 30;
+
+	float hitRadius = 20.0f;
+
+	//移動速度
+	float moveSpeed = 1.5f;
+
+	//ショックの生成無視状態
+	bool isIgnoreShock = false;
+	//ショック生成無視タイマー
+	Timer ignoreSpawnShockTimer = { 20, 0 };
+
+	//<フラッシュ関係>
+	bool isFlash = false;
+	Timer flashTimer = { 7, 0 };
+
+	Texture texture = {};
+};
 
 
 void InitEnemy(void);
@@ -121,3 +148,15 @@ int GetEnemy2Limit(void);
 /// <param name="enemy"></param>
 /// <param name="pow"></param>
 void DamageEnemy2(Enemy2& enemy, int pow);
+
+
+EnemyBasic* GetEnemyBasicArray(void);
+
+int GetEnemyBasicLimit(void);
+
+/// <summary>
+/// EnemyBasicへのダメージ処理
+/// </summary>
+/// <param name="enemy">enemyBasic</param>
+/// <param name="pow">ダメージ</param>
+void DamageEnemyBasic(EnemyBasic& enemy, int pow);

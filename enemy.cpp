@@ -13,18 +13,32 @@
 #define _USE_MATH_DEFINES
 #include <math.h>
 
+//カラー関係
 static constexpr unsigned int kNormalColor = 0xE01068FF;
 static constexpr unsigned int kFlashColor = 0x333333FF;
 
+#pragma region データ: Enemy1
 constexpr int kEnemy1Limit = 10;
 static Enemy1 enemy1[kEnemy1Limit];
 int nowEnemy1IsAliveCount = 0;
 //ジェムの生成量
 constexpr int enemy1GemLimit = 4;
 
+#pragma endregion
 
+#pragma region データ: Enemy2
 constexpr int kEnemy2Limit = 10;
 static Enemy2 enemy2[kEnemy2Limit];
+
+#pragma endregion
+
+#pragma region データ: EnemyBasic
+constexpr int kEnemyBasicLimit = 20;
+static EnemyBasic enemyBasic[kEnemyBasicLimit];
+//ジェムの生成量
+constexpr int enemyBasicGemLimit = 3;
+
+#pragma endregion
 
 struct Spawner {
 	Timer spawnTimer = { 0, 0 };
@@ -299,32 +313,144 @@ static void Attack2Enemy2Move(void) {
 
 #pragma endregion
 
+#pragma region 関数: enemyBasic
+
+static void InitEnemyBasic(void) {
+	for (int i = 0; i < kEnemyBasicLimit; i++) {
+		enemyBasic[i] = {};
+
+		enemyBasic[i].texture = GetTexture(TextureType::EnemyBasic);
+	}
+}
+
+/// <summary>
+/// enemyBasicの移動処理
+/// </summary>
+/// <param name=""></param>
+static void MoveEnemyBasic(void) {
+	for (int i = 0; i < kEnemyBasicLimit; i++) {
+		if (!enemyBasic[i].isAlive) continue;
+
+		Vector2 targetPos = GetPlayerPos();
+		float disX = targetPos.x - enemyBasic[i].pos.x;
+		float disY = targetPos.y - enemyBasic[i].pos.y;
+		float disLength = sqrtf(disX * disX + disY * disY);
+		if (disLength != 0.0f) {
+			disX /= disLength;
+			disY /= disLength;
+		}
+		Vector2 moveVec = { disX, disY };
+		
+		enemyBasic[i].pos.x += moveVec.x * enemyBasic[i].moveSpeed;
+		enemyBasic[i].pos.y += moveVec.y * enemyBasic[i].moveSpeed;
+	}
+}
+
+/// <summary>
+/// デンゲキショックの生成を受け付けない状態のカウント
+/// </summary>
+/// <param name=""></param>
+static void CountIgnoreShockEnemyBasic(void) {
+	for (int i = 0; i < kEnemyBasicLimit; i++) {
+		if (!enemyBasic[i].isAlive) continue;
+		if (!enemyBasic[i].isIgnoreShock) continue;
+
+
+		enemyBasic[i].ignoreSpawnShockTimer.count++;
+		if (enemyBasic[i].ignoreSpawnShockTimer.count >= enemyBasic[i].ignoreSpawnShockTimer.time) {
+			enemyBasic[i].ignoreSpawnShockTimer.count = 0;
+			enemyBasic[i].isIgnoreShock = false;
+		}
+	}
+}
+
+/// <summary>
+/// 
+/// </summary>
+/// <param name=""></param>
+static void UpdateFlashTimerEnemyBasic(void) {
+	for (int i = 0; i < kEnemyBasicLimit; i++) {
+		if (!enemyBasic[i].isAlive) continue;
+		if (!enemyBasic[i].isFlash) continue;
+
+		enemyBasic[i].flashTimer.count++;
+		if (enemyBasic[i].flashTimer.count >= enemyBasic[i].flashTimer.time) {
+			enemyBasic[i].flashTimer.count = 0;
+			enemyBasic[i].isFlash = false;
+		}
+	}
+}
+
+static void DeadEnemyBasic(int index) {
+	enemyBasic[index].isAlive = false;
+	enemyBasic[index].hp = enemyBasic[index].hpMax;
+	/*spawner.spawnTimer.time = spawner.kSpawnTime * nowenemyBasicIsAliveCount;*/
+}
+
+static void CheckDeadEnemyBasic(void) {
+	for (int i = 0; i < kEnemyBasicLimit; i++) {
+		if (!enemyBasic[i].isAlive) continue;
+
+		if (enemyBasic[i].hp <= 0) {
+			DeadEnemyBasic(i);
+
+			//ジェムの生成処理
+			for (int j = 0;j < enemyBasicGemLimit;j++) {
+				SpawnGem(enemyBasic[i].pos, GemType::S);
+			}
+		}
+	}
+}
+
+static void DrawEnemyBasic(void) {
+	for (int i = 0; i < kEnemyBasicLimit; i++) {
+		if (!enemyBasic[i].isAlive) continue;
+
+		Texture texture = enemyBasic[i].texture;
+		if (enemyBasic[i].isFlash) {
+			texture.color = WHITE;
+		}else{
+			texture.color = kNormalColor;
+		}
+
+		DrawTextureObj(texture, enemyBasic[i].pos, enemyBasic[i].size);
+	}
+}
+
+
+#pragma endregion
+
 void InitEnemy(void) {
 	InitEnemy1();
 	InitEnemy2();
-
-	//for (int i = 0; i < 5; i++) {
-	//	Vector2 pos = { ToFloat(GetRand(0, 2000)), ToFloat(GetRand(0, 1300)) };
-
-	//	SpawnEnemy(pos, EnemyType::Enemy1);
-	//}
+	InitEnemyBasic();
 
 	GetMovablePos(spawner.spawnRange);
 
 }
 
 void UpdateEnemy(void) {
+	//enemy1
+	CheckDeadEnemy1();
+	ShootEnemyBullet1();
 	CheckDeadEnemy1();/*
 	ShootEnemyBullet1();*/
 	MoveEnemy1();
 	UpdateFlashTimerEnemy1();
 	CountIgnoreShockEnemy1();
 
+	//enemy2
 	CheckDeadEnemy2();
 	UpdateFlashTimerEnemy2();
 	CountIgnoreShockEnemy2();
 	ShootEnemyBullet2();
-	
+
+	//enemyBasic
+	MoveEnemyBasic();
+	CountIgnoreShockEnemyBasic();
+	UpdateFlashTimerEnemyBasic();
+	CheckDeadEnemyBasic();
+
 	ReSpawnEnemy();
 	Attack2Enemy2Move();
 }
@@ -332,13 +458,14 @@ void UpdateEnemy(void) {
 void DrawEnemy(void) {
 	DrawEnemy1();
 	DrawEnemy2();
+	DrawEnemyBasic();
 }
 
 #pragma region 関数: 外部参照関係
 
 void SpawnEnemy(Vector2 pos, EnemyType type) {
 	switch (type) {
-	case EnemyType::Enemy1:
+	case EnemyType::Enemy1: {
 		for (int i = 0; i < kEnemy1Limit; i++) {
 			if (enemy1[i].isAlive) continue;
 			enemy1[i].isAlive = true;
@@ -347,6 +474,20 @@ void SpawnEnemy(Vector2 pos, EnemyType type) {
 			spawner.spawnTimer.time = spawner.kSpawnTime * nowEnemy1IsAliveCount;
 			break;
 		}
+
+		break;
+	}
+	case EnemyType::EnemyBasic: {
+		for (int i = 0; i < kEnemyBasicLimit; i++) {
+			if (enemyBasic[i].isAlive) continue;
+			enemyBasic[i].isAlive = true;
+			enemyBasic[i].pos = pos;
+			//spawner.spawnTimer.time = spawner.kSpawnTime * nowenemyBasicIsAliveCount;
+			break;
+		}
+
+		break;
+	}
 
 		break;
 	}
@@ -378,6 +519,22 @@ int GetEnemy2Limit(void) {
 }
 
 void DamageEnemy2(Enemy2& enemy, int pow) {
+	enemy.hp -= pow;
+
+	//フラッシュさせる
+	enemy.isFlash = true;
+	enemy.flashTimer.count = 0;
+}
+
+EnemyBasic* GetEnemyBasicArray(void) {
+	return enemyBasic;
+}
+
+int GetEnemyBasicLimit(void) {
+	return kEnemyBasicLimit;
+}
+
+void DamageEnemyBasic(EnemyBasic& enemy, int pow) {
 	enemy.hp -= pow;
 
 	//フラッシュさせる
