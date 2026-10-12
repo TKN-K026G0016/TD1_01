@@ -56,6 +56,15 @@ constexpr int enemySmallGemLimit = 1;
 
 #pragma endregion
 
+#pragma region データ: EnemySmallGroup
+
+//散らばる範囲(最大)
+constexpr int kScatterLengthMax = 100;
+//散らばる範囲(最小)
+constexpr int kScatterLengthMin = 0;
+
+#pragma endregion
+
 #pragma region データ: EnemyBomb
 constexpr int kEnemyBombLimit = 10;
 static EnemyBomb enemyBomb[kEnemyBombLimit];
@@ -459,7 +468,7 @@ static void InitEnemyM(void) {
 	}
 }
 
-static void ShootEnemySmoll(void) {
+static void ShootEnemySmall(void) {
 	for (int i = 0; i < kEnemyMLimit; i++) {
 		if (!enemyM[i].isAlive) continue;
 
@@ -543,7 +552,7 @@ static void DrawEnemyM(void) {
 
 #pragma endregion
 
-#pragma region 関数: enemySmoll
+#pragma region 関数: enemySmall
 
 static void InitEnemySmoll(void) {
 	for (int i = 0; i < kEnemySmallLimit; i++) {
@@ -651,6 +660,27 @@ static void DrawEnemySmoll(void) {
 	}
 }
 
+
+#pragma region 関数: 生成処理
+
+/// <summary>
+/// 生成時の出現座標作成
+/// </summary>
+/// <param name="centerPos">中心座標</param>
+/// <returns>出現座標</returns>
+static Vector2 CreateScatterPos(Vector2 centerPos) {
+	float scatterLength = ToFloat(GetRand(kScatterLengthMin, kScatterLengthMax));
+
+	float theta = ToFloat(GetRand(0, 360)) * (ToFloat(M_PI) / 180.0f);
+
+	Vector2 pos;
+	pos.x = centerPos.x + scatterLength * cosf(theta);
+	pos.y = centerPos.y + scatterLength * sinf(theta);
+
+	return pos;
+}
+
+#pragma endregion
 
 #pragma endregion
 
@@ -812,7 +842,7 @@ void UpdateEnemy(void) {
 	CheckDeadEnemyM();
 	UpdateFlashTimerEnemyM();
 	CountIgnoreShockEnemyM();
-	ShootEnemySmoll();
+	ShootEnemySmall();
 
 	//enemySmoll
 	MoveEnemySmall();
@@ -879,6 +909,23 @@ void SpawnEnemy(Vector2 pos, EnemyType type) {
 			enemySmall[i].velocity = { 0,0 };
 
 			break;
+		}
+		break;
+	}
+	case EnemyType::EnemySmallGroup: {
+		for (int createNum = 0; createNum < 3; createNum++) {
+			for (int i = 0; i < kEnemySmallLimit; i++) {
+				if (enemySmall[i].isAlive) continue;
+
+				enemySmall[i].isAlive = true;
+				enemySmall[i].pos = CreateScatterPos(pos);
+
+				// 初期化（必要なら）
+				enemySmall[i].nowSpeed = 0.0f;
+				enemySmall[i].velocity = { 0,0 };
+
+				break;
+			}
 		}
 		break;
 	}

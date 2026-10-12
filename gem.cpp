@@ -111,7 +111,7 @@ static void CountBreakTimer(void) {
 /// </summary>
 /// <param name="centerPos">中心座標</param>
 /// <returns>出現座標</returns>
-Vector2 CreateScatterPos(Vector2 centerPos) {
+static Vector2 CreateScatterPos(Vector2 centerPos) {
 	float scatterLength = ToFloat(GetRand(kScatterLengthMin, kScatterLengthMax));
 
 	float theta = ToFloat(GetRand(0, 360)) * (ToFloat(M_PI) / 180.0f);

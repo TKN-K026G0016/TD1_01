@@ -16,6 +16,8 @@ enum class EnemyType {
 	EnemyM,
 	//小雑魚
 	EnemySmall,
+	//小ザコの群体
+	EnemySmallGroup,
 	//ボム
 	EnemyBomb,
 
