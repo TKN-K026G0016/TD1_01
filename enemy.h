@@ -136,7 +136,7 @@ struct EnemyM {
 	float hitRadius = 20.0f;
 
 	//<射撃処理関係>
-	Timer shootTimer = { 75, 0 };
+	Timer shootTimer = { 30, 0 };
 
 	//ショックの生成無視状態
 	bool isIgnoreShock = false;

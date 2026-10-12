@@ -476,7 +476,7 @@ static void ShootEnemySmall(void) {
 				if (enemySmall[j].isAlive)continue;
 
 				enemySmall[j].isAlive = true;
-				enemySmall[j].velocity = { ToFloat(GetRand(0,5)),ToFloat(GetRand(0,5)) };
+				enemySmall[j].velocity = { ToFloat(GetRand(0,20)),ToFloat(GetRand(0,20)) };
 				enemySmall[j].pos = enemyM[i].pos;
 				break;
 			}
