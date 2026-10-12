@@ -134,8 +134,7 @@ static void MoveEnemy1(void) {
 			}
 			enemy1[i].pos.x += enemy1[i].velocity.x * enemy1[i].nowSpeed;
 			enemy1[i].pos.y += enemy1[i].velocity.y * enemy1[i].nowSpeed;
-		}
-		else {
+		} else {
 			enemy1[i].nowSpeed -= enemy1[i].decelerationSpeed;
 			if (enemy1[i].nowSpeed < 0) {
 				enemy1[i].nowSpeed = 0;
@@ -339,8 +338,7 @@ static void Attack2Enemy2Move(void) {
 			enemyCount++;
 			if (enemyCount == 6)break;
 		}
-	}
-	else if (bossEnemyNouStates != Attack2) {
+	} else if (bossEnemyNouStates != Attack2) {
 		for (int i = 0;i < kEnemy2Limit;i++) {
 			enemy2[i].isAlive = false;
 			enemy2[i].hp = enemy2[i].hpMax;
@@ -446,8 +444,7 @@ static void DrawEnemyBasic(void) {
 		Texture texture = enemyBasic[i].texture;
 		if (enemyBasic[i].isFlash) {
 			texture.color = WHITE;
-		}
-		else {
+		} else {
 			texture.color = kNormalColor;
 		}
 
@@ -571,20 +568,27 @@ static void MoveEnemySmall(void) {
 		if (!enemySmall[i].isAlive) continue;
 
 		Vector2 targetPos = GetPlayerPos();
-		float disX = targetPos.x - enemySmall[i].pos.x;
-		float disY = targetPos.y - enemySmall[i].pos.y;
-		float disLength = sqrtf(disX * disX + disY * disY);
-		if (disLength != 0) {
-			enemySmall[i].velocity.x = (enemySmall[i].velocity.x + disX / disLength) / 2;
-			enemySmall[i].velocity.x = (enemySmall[i].velocity.y + disY / disLength) / 2;
-			enemySmall[i].nowSpeed += enemySmall[i].accleretionSpeed;
-			if (enemySmall[i].nowSpeed > enemySmall[i].moveSpeedLimit) {
-				enemySmall[i].nowSpeed = enemySmall[i].moveSpeedLimit;
-			}
-			enemySmall[i].pos.x += enemySmall[i].velocity.x * enemySmall[i].nowSpeed;
-			enemySmall[i].pos.y += enemySmall[i].velocity.y * enemySmall[i].nowSpeed;
+		Vector2 moveVec = { targetPos.x - enemySmall[i].pos.x,   targetPos.y - enemySmall[i].pos.y };
+
+		float disLength = sqrtf(moveVec.x * moveVec.x + moveVec.y * moveVec.y);
+		if (disLength != 0.0f) {
+			moveVec.x /= disLength;
+			moveVec.y /= disLength;
 		}
 
+		//移動ベクトル(ゆっくり曲がる)
+		enemySmall[i].velocity.x = (1 - enemySmall[i].turnRate) * enemySmall[i].velocity.x + moveVec.x * enemySmall[i].turnRate;
+		enemySmall[i].velocity.y = (1 - enemySmall[i].turnRate) * enemySmall[i].velocity.y + moveVec.y * enemySmall[i].turnRate;
+
+		//加速処理
+		enemySmall[i].nowSpeed += enemySmall[i].accleretionSpeed;
+		if (enemySmall[i].nowSpeed > enemySmall[i].moveSpeedLimit) {
+			enemySmall[i].nowSpeed = enemySmall[i].moveSpeedLimit;
+		}
+
+		//座標に反映
+		enemySmall[i].pos.x += enemySmall[i].velocity.x * enemySmall[i].nowSpeed;
+		enemySmall[i].pos.y += enemySmall[i].velocity.y * enemySmall[i].nowSpeed;
 	}
 }
 
@@ -651,8 +655,7 @@ static void DrawEnemySmoll(void) {
 		Texture texture = enemySmall[i].texture;
 		if (enemySmall[i].isFlash) {
 			texture.color = WHITE;
-		}
-		else {
+		} else {
 			texture.color = kNormalColor;
 		}
 
@@ -707,16 +710,14 @@ static void MoveEnemyBomb(void) {
 			if (enemyBomb[i].pos.x <= 0) {
 				enemyBomb[i].pos.x = 0;
 				enemyBomb[i].velocity.x *= -1;
-			}
-			else if (enemyBomb[i].pos.x >= 2560) {
+			} else if (enemyBomb[i].pos.x >= 2560) {
 				enemyBomb[i].pos.x = 2560;
 				enemyBomb[i].velocity.x *= -1;
 			}
 			if (enemyBomb[i].pos.y <= 0) {
 				enemyBomb[i].pos.y = 0;
 				enemyBomb[i].velocity.y *= -1;
-			}
-			else if (enemyBomb[i].pos.y >= 1440) {
+			} else if (enemyBomb[i].pos.y >= 1440) {
 				enemyBomb[i].pos.y = 1440;
 				enemyBomb[i].velocity.y *= -1;
 			}
@@ -816,6 +817,7 @@ void InitEnemy(void) {
 
 	GetMovablePos(spawner.spawnRange);
 
+	SpawnEnemy({ 100, 100 }, EnemyType::EnemySmallGroup);
 }
 
 void UpdateEnemy(void) {
@@ -920,7 +922,7 @@ void SpawnEnemy(Vector2 pos, EnemyType type) {
 				enemySmall[i].isAlive = true;
 				enemySmall[i].pos = CreateScatterPos(pos);
 
-				// 初期化（必要なら）
+				// 初期化
 				enemySmall[i].nowSpeed = 0.0f;
 				enemySmall[i].velocity = { 0,0 };
 

@@ -170,9 +170,11 @@ struct EnemySmall {
 	//加速度
 	float accleretionSpeed = 0.05f;
 	//スピード上限
-	float moveSpeedLimit = 3.0f;
+	float moveSpeedLimit = 4.0f;
 	//減速度
 	float decelerationSpeed = 0.12f;
+	//方向転換の比率
+	float turnRate = 0.5f;
 
 	//ショックの生成無視状態
 	bool isIgnoreShock = false;
