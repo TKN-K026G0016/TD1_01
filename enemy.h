@@ -6,9 +6,17 @@
 
 //ザコ敵の種類
 enum class EnemyType {
+	//移動→射撃
 	Enemy1,
+	//ボス防御
 	Enemy2,
+	//移動のみ
 	EnemyBasic,
+	//小雑魚召喚
+	EnemyM,
+	//小雑魚
+	EnemySmoll,
+
 
 	Count
 };
@@ -53,10 +61,6 @@ struct Enemy1 {
 	float decelerationSpeed = 0.12f;
 	Vector2 inputVec = { 0, 0 };
 
-	//<回転関係>
-	float rotateTheta = 0.0f;
-	//回転速度
-	float rotateSpeed = 0.05f;
 
 	Texture texture = {};
 };
@@ -102,6 +106,69 @@ struct EnemyBasic {
 
 	//移動速度
 	float moveSpeed = 1.5f;
+
+	//ショックの生成無視状態
+	bool isIgnoreShock = false;
+	//ショック生成無視タイマー
+	Timer ignoreSpawnShockTimer = { 20, 0 };
+
+	//<フラッシュ関係>
+	bool isFlash = false;
+	Timer flashTimer = { 7, 0 };
+
+	Texture texture = {};
+};
+
+struct EnemyM {
+	Vector2 pos = { 0, 0 };
+	Vector2 size = { 64, 64 };
+
+	//生存フラグ
+	bool isAlive = false;
+
+	int hp = 60;
+	int hpMax = 30;
+
+	float hitRadius = 20.0f;
+
+	//<射撃処理関係>
+	Timer shootTimer = { 75, 0 };
+
+	//ショックの生成無視状態
+	bool isIgnoreShock = false;
+	//ショック生成無視タイマー
+	Timer ignoreSpawnShockTimer = { 20, 0 };
+
+	//<フラッシュ関係>
+	bool isFlash = false;
+	Timer flashTimer = { 7, 0 };
+
+	Texture texture = {};
+};
+
+struct EnemySmoll {
+	Vector2 pos = { 0, 0 };
+	Vector2 size = { 16, 16 };
+
+	//生存フラグ
+	bool isAlive = false;
+
+	int hp = 5;
+	int hpMax = 5;
+
+	float hitRadius = 20.0f;
+
+	//<移動関係>
+	//速度
+	Vector2 velocity = { 0.0f, 0.0f };
+	//スピード
+	float nowSpeed = 0.0f;
+	//加速度
+	float accleretionSpeed = 0.05f;
+	//スピード上限
+	float moveSpeedLimit = 3.0f;
+	//減速度
+	float decelerationSpeed = 0.12f;
 
 	//ショックの生成無視状態
 	bool isIgnoreShock = false;

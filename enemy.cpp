@@ -40,6 +40,24 @@ constexpr int enemyBasicGemLimit = 3;
 
 #pragma endregion
 
+#pragma region データ: EnemyM
+constexpr int kEnemyMLimit = 4;
+static EnemyM enemyM[kEnemyMLimit];
+//ジェムの生成量
+constexpr int enemyMGemLimit = 4;
+
+#pragma endregion
+
+#pragma region データ: EnemySmoll
+constexpr int kEnemySmollLimit = 30;
+static EnemySmoll enemySmoll[kEnemySmollLimit];
+//ジェムの生成量
+constexpr int enemySmollGemLimit = 1;
+
+#pragma endregion
+
+
+
 struct Spawner {
 	Timer spawnTimer = { 0, 0 };
 
@@ -297,8 +315,8 @@ static void Attack2Enemy2Move(void) {
 		}
 		for (int i = 0;i < kEnemy2Limit;i++) {
 			if (!enemy2[i].isAlive)continue;
-			enemy2[i].pos.x = cosf(bossEnemyRotateTheta+attack2Pos.theta[enemyCount]) * attack2Pos.dstance[enemyCount] + bossEnemyPos.x;
-			enemy2[i].pos.y = sinf(bossEnemyRotateTheta+attack2Pos.theta[enemyCount]) * attack2Pos.dstance[enemyCount] + bossEnemyPos.y;
+			enemy2[i].pos.x = cosf(bossEnemyRotateTheta + attack2Pos.theta[enemyCount]) * attack2Pos.dstance[enemyCount] + bossEnemyPos.x;
+			enemy2[i].pos.y = sinf(bossEnemyRotateTheta + attack2Pos.theta[enemyCount]) * attack2Pos.dstance[enemyCount] + bossEnemyPos.y;
 			enemyCount++;
 			if (enemyCount == 6)break;
 		}
@@ -340,7 +358,7 @@ static void MoveEnemyBasic(void) {
 			disY /= disLength;
 		}
 		Vector2 moveVec = { disX, disY };
-		
+
 		enemyBasic[i].pos.x += moveVec.x * enemyBasic[i].moveSpeed;
 		enemyBasic[i].pos.y += moveVec.y * enemyBasic[i].moveSpeed;
 	}
@@ -409,11 +427,123 @@ static void DrawEnemyBasic(void) {
 		Texture texture = enemyBasic[i].texture;
 		if (enemyBasic[i].isFlash) {
 			texture.color = WHITE;
-		}else{
+		}
+		else {
 			texture.color = kNormalColor;
 		}
 
 		DrawTextureObj(texture, enemyBasic[i].pos, enemyBasic[i].size);
+	}
+}
+
+
+#pragma endregion
+
+#pragma region 関数: enemySmoll
+
+static void InitEnemySmoll(void) {
+	for (int i = 0; i < kEnemySmollLimit; i++) {
+		enemySmoll[i] = {};
+
+		enemySmoll[i].texture = GetTexture(TextureType::EnemyBasic);
+	}
+}
+
+/// <summary>
+/// enemySmollの移動処理
+/// </summary>
+/// <param name=""></param>
+static void MoveEnemySmoll(void) {
+	for (int i = 0; i < kEnemySmollLimit; i++) {
+		if (!enemySmoll[i].isAlive) continue;
+
+		Vector2 targetPos = GetPlayerPos();
+		float disX = targetPos.x - enemySmoll[i].pos.x;
+		float disY = targetPos.y - enemySmoll[i].pos.y;
+		float disLength = sqrtf(disX * disX + disY * disY);
+		if (disLength != 0) {
+			enemySmoll[i].velocity.x = (enemySmoll[i].velocity.x + disX / disLength) / 2;
+			enemySmoll[i].velocity.x = (enemySmoll[i].velocity.y + disY / disLength) / 2;
+			enemySmoll[i].nowSpeed += enemySmoll[i].accleretionSpeed;
+			if (enemySmoll[i].nowSpeed > enemySmoll[i].moveSpeedLimit) {
+				enemySmoll[i].nowSpeed = enemySmoll[i].moveSpeedLimit;
+			}
+			enemySmoll[i].pos.x += enemySmoll[i].velocity.x * enemySmoll[i].nowSpeed;
+			enemySmoll[i].pos.y += enemySmoll[i].velocity.y * enemySmoll[i].nowSpeed;
+		}
+
+	}
+}
+
+/// <summary>
+/// デンゲキショックの生成を受け付けない状態のカウント
+/// </summary>
+/// <param name=""></param>
+static void CountIgnoreShockEnemySmoll(void) {
+	for (int i = 0; i < kEnemySmollLimit; i++) {
+		if (!enemySmoll[i].isAlive) continue;
+		if (!enemySmoll[i].isIgnoreShock) continue;
+
+
+		enemySmoll[i].ignoreSpawnShockTimer.count++;
+		if (enemySmoll[i].ignoreSpawnShockTimer.count >= enemySmoll[i].ignoreSpawnShockTimer.time) {
+			enemySmoll[i].ignoreSpawnShockTimer.count = 0;
+			enemySmoll[i].isIgnoreShock = false;
+		}
+	}
+}
+
+/// <summary>
+/// 
+/// </summary>
+/// <param name=""></param>
+static void UpdateFlashTimerEnemySmoll(void) {
+	for (int i = 0; i < kEnemySmollLimit; i++) {
+		if (!enemySmoll[i].isAlive) continue;
+		if (!enemySmoll[i].isFlash) continue;
+
+		enemySmoll[i].flashTimer.count++;
+		if (enemySmoll[i].flashTimer.count >= enemySmoll[i].flashTimer.time) {
+			enemySmoll[i].flashTimer.count = 0;
+			enemySmoll[i].isFlash = false;
+		}
+	}
+}
+
+static void DeadEnemySmoll(int index) {
+	enemySmoll[index].isAlive = false;
+	enemySmoll[index].hp = enemySmoll[index].hpMax;
+	/*spawner.spawnTimer.time = spawner.kSpawnTime * nowenemyBasicIsAliveCount;*/
+}
+
+static void CheckDeadEnemySmoll(void) {
+	for (int i = 0; i < kEnemySmollLimit; i++) {
+		if (!enemySmoll[i].isAlive) continue;
+
+		if (enemySmoll[i].hp <= 0) {
+			DeadEnemySmoll(i);
+
+			//ジェムの生成処理
+			for (int j = 0;j < enemySmollGemLimit;j++) {
+				SpawnGem(enemySmoll[i].pos, GemType::S);
+			}
+		}
+	}
+}
+
+static void DrawEnemySmoll(void) {
+	for (int i = 0; i < kEnemySmollLimit; i++) {
+		if (!enemySmoll[i].isAlive) continue;
+
+		Texture texture = enemySmoll[i].texture;
+		if (enemySmoll[i].isFlash) {
+			texture.color = WHITE;
+		}
+		else {
+			texture.color = kNormalColor;
+		}
+
+		DrawTextureObj(texture, enemySmoll[i].pos, enemySmoll[i].size);
 	}
 }
 
@@ -431,8 +561,7 @@ void InitEnemy(void) {
 
 void UpdateEnemy(void) {
 	//enemy1
-	CheckDeadEnemy1();/*
-	ShootEnemyBullet1();*/
+	CheckDeadEnemy1();
 	MoveEnemy1();
 	UpdateFlashTimerEnemy1();
 	CountIgnoreShockEnemy1();
@@ -448,6 +577,12 @@ void UpdateEnemy(void) {
 	CountIgnoreShockEnemyBasic();
 	UpdateFlashTimerEnemyBasic();
 	CheckDeadEnemyBasic();
+
+	//enemySmoll
+	MoveEnemySmoll();
+	CountIgnoreShockEnemySmoll();
+	UpdateFlashTimerEnemySmoll();
+	CheckDeadEnemySmoll();
 
 	ReSpawnEnemy();
 	Attack2Enemy2Move();
@@ -487,7 +622,7 @@ void SpawnEnemy(Vector2 pos, EnemyType type) {
 		break;
 	}
 
-		break;
+							  break;
 	}
 }
 
@@ -500,7 +635,7 @@ int GetEnemy1Limit(void) {
 	return kEnemy1Limit;
 }
 
-void DamageEnemy1(Enemy1& enemy,int pow) {
+void DamageEnemy1(Enemy1& enemy, int pow) {
 	enemy.hp -= pow;
 
 	//フラッシュさせる
