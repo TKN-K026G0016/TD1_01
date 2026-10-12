@@ -211,6 +211,7 @@ static void DrawBackGround(void) {
 
 static void InitRound(void) {
 	ResetTimeData(gameTime);
+	nowRound = Round::Round1;
 }
 
 /// <summary>

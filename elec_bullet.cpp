@@ -8,6 +8,7 @@
 
 #include <math.h>
 
+#pragma region データ: ElecBullet
 //レベルごとの性能
 struct ElecBulletSpec {
 	Vector2 size;
@@ -25,6 +26,12 @@ ElecBulletSpec elecBulletSpec[ToInt(ElecBulletType::Count)] = {
 	{ {100, 100}, 32, 3, {} },
 };
 
+constexpr static int kElecBulletLimit = 5;
+ElecBullet elecBullet[kElecBulletLimit] = {};
+
+#pragma endregion
+
+#pragma region データ: ElecShock
 //レベルごとの性能
 struct ElecShockSpec {
 	float hitRadius;
@@ -41,12 +48,22 @@ ElecShockSpec elecShockSpec[ToInt(ElecBulletType::Count)] = {
 	{ 200, 3, {} },
 };
 
-constexpr static int kElecBulletLimit = 5;
-ElecBullet elecBullet[kElecBulletLimit] = {};
-
-
-constexpr static int kElecShockLimit = 50;
+constexpr static int kElecShockLimit = 30;
 ElecShock elecShock[kElecShockLimit] = {};
+
+#pragma endregion
+
+#pragma region データ: ShockCombo関係
+
+//現在のコンボ数
+static int shockCombo = 0;
+//今回のゲームの最大コンボ数
+static int maxShockCombo = 0;
+
+Timer comboTimer = { 10, 0 };
+
+#pragma endregion
+
 
 #pragma region 関数: デンゲキ弾関係
 
