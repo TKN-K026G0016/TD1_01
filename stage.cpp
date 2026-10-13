@@ -84,7 +84,7 @@ float spawnPosOffset = 100;
 
 //Round1
 //enemy1生成タイマー
-Timer spawnEnemyBasicRound1Timer = { 300, 0 };
+Timer spawnEnemyBasicRound1Timer = { 250, 0 };
 
 //Round2
 //enemy1生成タイマー
