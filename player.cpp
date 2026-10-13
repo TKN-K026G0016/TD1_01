@@ -17,15 +17,6 @@
 #include <math.h>
 
 
-//自動ロックオンスイッチ
-static constexpr bool kAutoLockOnSwitch = true;
-//加速度移動スイッチ
-static constexpr bool kAcceleratingSwitch = false;
-//真ん中に維持するゲーム性にするスイッチ
-static constexpr bool kModeKeepCenterSwitch = true;
-//デンゲキ弾射撃スイッチ
-static constexpr bool kShootElecBulletSwitch = true;
-
 //ギリ避けスイッチ
 constexpr bool kDodgeCloseSwitch = true;
 
@@ -246,18 +237,6 @@ static void CheckInput(void) {
 
 #pragma endregion
 
-#pragma region ロック
-
-	if (!kAutoLockOnSwitch) {
-		if (CheckInputAction(InputAction::Lock)) {
-			player.isLock = true;
-		} else {
-			player.isLock = false;
-		}
-	}
-
-#pragma endregion
-
 }
 
 #pragma region 関数: 基本動作
@@ -267,102 +246,19 @@ static void MovePlayer(void) {
 		return;
 	}
 
-	//加速度移動
-	if (kAcceleratingSwitch) {
-
-		//右入力
-		if (player.inputVec.x >= 1.0f) {
-			player.velocity.x += player.accleretionSpeed;
-
-			//反対側に勢いがあれば、減速度も加える
-			if (player.velocity.x < 0.0f) {
-				player.velocity.x += player.decelerationSpeed;
-			}
-		}
-		//左入力
-		else if (player.inputVec.x <= -1.0f) {
-			player.velocity.x -= player.accleretionSpeed;
-
-			//反対側に勢いがあれば、減速度も加える
-			if (player.velocity.x > 0.0f) {
-				player.velocity.x -= player.decelerationSpeed;
-			}
-		}
-		//入力なし(=減速)
-		else {
-			if (player.velocity.x > 0.0f) {
-				player.velocity.x -= player.decelerationSpeed;
-				if (player.velocity.x < 0.0f) {
-					player.velocity.x = 0.0f;
-				}
-			} else if (player.velocity.x < 0.0f) {
-				player.velocity.x += player.decelerationSpeed;
-				if (player.velocity.x > 0.0f) {
-					player.velocity.x = 0.0f;
-				}
-			}
-		}
-
-		//上入力
-		if (player.inputVec.y >= 1.0f) {
-			player.velocity.y += player.accleretionSpeed;
-
-			//反対側に勢いがあれば、減速度も加える
-			if (player.velocity.y < 0.0f) {
-				player.velocity.y += player.decelerationSpeed;
-			}
-		}
-		//下入力
-		else if (player.inputVec.y <= -1.0f) {
-			player.velocity.y -= player.accleretionSpeed;
-
-			//反対側に勢いがあれば、減速度も加える
-			if (player.velocity.y > 0.0f) {
-				player.velocity.y -= player.decelerationSpeed;
-			}
-		}
-		//入力なし(=減速)
-		else {
-			if (player.velocity.y > 0.0f) {
-				player.velocity.y -= player.decelerationSpeed;
-				if (player.velocity.y < 0.0f) {
-					player.velocity.y = 0.0f;
-				}
-			} else if (player.velocity.y < 0.0f) {
-				player.velocity.y += player.decelerationSpeed;
-				if (player.velocity.y > 0.0f) {
-					player.velocity.y = 0.0f;
-				}
-			}
-		}
-
-		//速度調整
-		float speed = sqrtf(player.velocity.x * player.velocity.x + player.velocity.y * player.velocity.y);
-		if (speed > player.moveSpeedLimit) {
-			float scale = player.moveSpeedLimit / speed;
-			player.velocity.x *= scale;
-			player.velocity.y *= scale;
-		}
-
-		//位置更新
-		player.pos.x += player.velocity.x;
-		player.pos.y += player.velocity.y;
+	Vector2 moveVec = player.inputVec;
+	float moveVecLength = sqrtf(moveVec.x * moveVec.x + moveVec.y * moveVec.y);
+	if (moveVecLength != 0) {
+		moveVec.x /= moveVecLength;
+		moveVec.y /= moveVecLength;
 	}
-	//通常移動
-	else {
-		Vector2 moveVec = player.inputVec;
-		float moveVecLength = sqrtf(moveVec.x * moveVec.x + moveVec.y * moveVec.y);
-		if (moveVecLength != 0) {
-			moveVec.x /= moveVecLength;
-			moveVec.y /= moveVecLength;
-		}
 
-		//異常発生時は移動速度を変更
-		float moveSpeed = (player.nowState == PlayerState::Normal) ? player.moveSpeed[0] : player.moveSpeed[1];
+	//異常発生時は移動速度を変更
+	float moveSpeed = (player.nowState == PlayerState::Normal) ? player.moveSpeed[0] : player.moveSpeed[1];
 
-		player.pos.x += moveSpeed * moveVec.x;
-		player.pos.y += moveSpeed * moveVec.y;
-	}
+	player.pos.x += moveSpeed * moveVec.x;
+	player.pos.y += moveSpeed * moveVec.y;
+
 }
 
 static void ClampPlayerPos(void) {
@@ -392,323 +288,175 @@ static void ClampPlayerPos(void) {
 static void RotatePlayer(void) {
 	if (player.isLock) return;
 
-	//手動ロックオン
-	if (!kAutoLockOnSwitch) {
-		//入力なしならスキップ
-		if (player.inputVec.x == 0.0f && player.inputVec.y == 0.0f) return;
+	float closestDis = 99999.0f;
+	nowTargetType = LockTargetType::None;
+	targetIndex = -1;
 
-		//入力方向の角度
-		float inputTheta = atan2f(player.inputVec.y, player.inputVec.x);
-		//現在の方向との差を求める
-		float diff = inputTheta - player.rotateTheta;
+	Enemy1* enemy1 = GetEnemy1Array();
+	int enemy1Limit = GetEnemy1Limit();
 
-		//差を-π~πに正規化
-		while (diff > ToFloat(M_PI)) {
-			diff -= ToFloat(M_PI) * 2;
+	Enemy2* enemy2 = GetEnemy2Array();
+	int enemy2Limit = GetEnemy2Limit();
+
+	EnemyBasic* enemyBasic = GetEnemyBasicArray();
+	int enemyBasicLimit = GetEnemyBasicLimit();
+
+	EnemySmall* enemySmall = GetEnemySmallArray();
+	int enemySmallLimit = GetEnemySmallLimit();
+
+	EnemyM* enemyM = GetEnemyMArray();
+	int enemyMLimit = GetEnemyMLimit();
+
+	// enemy1探索
+	for (int i = 0; i < enemy1Limit; i++) {
+		if (!enemy1[i].isAlive) continue;
+
+		float dx = enemy1[i].pos.x - player.pos.x;
+		float dy = enemy1[i].pos.y - player.pos.y;
+		float dis = sqrtf(dx * dx + dy * dy);
+
+		if (dis < closestDis) {
+			closestDis = dis;
+			targetIndex = i;
+			nowTargetType = LockTargetType::Enemy1;
 		}
-		while (diff < -ToFloat(M_PI)) {
-			diff += ToFloat(M_PI) * 2;
-		}
-
-		player.rotateTheta += diff * player.rotateSpeed;
 	}
-	//オートロックオン
-	else {
 
-		float closestDis = 99999.0f;
-		nowTargetType = LockTargetType::None;
-		targetIndex = -1;
+	for (int i = 0; i < enemy2Limit; i++) {
+		if (!enemy2[i].isAlive) continue;
 
-		Enemy1* enemy1 = GetEnemy1Array();
-		int enemy1Limit = GetEnemy1Limit();
+		float dx = enemy2[i].pos.x - player.pos.x;
+		float dy = enemy2[i].pos.y - player.pos.y;
+		float dis = sqrtf(dx * dx + dy * dy);
 
-		Enemy2* enemy2 = GetEnemy2Array();
-		int enemy2Limit = GetEnemy2Limit();
-
-		EnemyBasic* enemyBasic = GetEnemyBasicArray();
-		int enemyBasicLimit = GetEnemyBasicLimit();
-
-		EnemySmall* enemySmall = GetEnemySmallArray();
-		int enemySmallLimit = GetEnemySmallLimit();
-
-		EnemyM* enemyM = GetEnemyMArray();
-		int enemyMLimit = GetEnemyMLimit();
-
-		// enemy1探索
-		for (int i = 0; i < enemy1Limit; i++) {
-			if (!enemy1[i].isAlive) continue;
-
-			float dx = enemy1[i].pos.x - player.pos.x;
-			float dy = enemy1[i].pos.y - player.pos.y;
-			float dis = sqrtf(dx * dx + dy * dy);
-
-			if (dis < closestDis) {
-				closestDis = dis;
-				targetIndex = i;
-				nowTargetType = LockTargetType::Enemy1;
-			}
+		if (dis < closestDis) {
+			closestDis = dis;
+			targetIndex = i;
+			nowTargetType = LockTargetType::Enemy2;
 		}
+	}
 
-		for (int i = 0; i < enemy2Limit; i++) {
-			if (!enemy2[i].isAlive) continue;
+	for (int i = 0; i < enemyBasicLimit; i++) {
+		if (!enemyBasic[i].isAlive) continue;
 
-			float dx = enemy2[i].pos.x - player.pos.x;
-			float dy = enemy2[i].pos.y - player.pos.y;
-			float dis = sqrtf(dx * dx + dy * dy);
+		float dx = enemyBasic[i].pos.x - player.pos.x;
+		float dy = enemyBasic[i].pos.y - player.pos.y;
+		float dis = sqrtf(dx * dx + dy * dy);
 
-			if (dis < closestDis) {
-				closestDis = dis;
-				targetIndex = i;
-				nowTargetType = LockTargetType::Enemy2;
-			}
+		if (dis < closestDis) {
+			closestDis = dis;
+			targetIndex = i;
+			nowTargetType = LockTargetType::EnemyBasic;
 		}
+	}
 
-		for (int i = 0; i < enemyBasicLimit; i++) {
-			if (!enemyBasic[i].isAlive) continue;
+	for (int i = 0; i < enemySmallLimit; i++) {
+		if (!enemySmall[i].isAlive) continue;
 
-			float dx = enemyBasic[i].pos.x - player.pos.x;
-			float dy = enemyBasic[i].pos.y - player.pos.y;
-			float dis = sqrtf(dx * dx + dy * dy);
+		float dx = enemySmall[i].pos.x - player.pos.x;
+		float dy = enemySmall[i].pos.y - player.pos.y;
+		float dis = sqrtf(dx * dx + dy * dy);
 
-			if (dis < closestDis) {
-				closestDis = dis;
-				targetIndex = i;
-				nowTargetType = LockTargetType::EnemyBasic;
-			}
+		if (dis < closestDis) {
+			closestDis = dis;
+			targetIndex = i;
+			nowTargetType = LockTargetType::EnemySmall;
 		}
+	}
 
-		for (int i = 0; i < enemySmallLimit; i++) {
-			if (!enemySmall[i].isAlive) continue;
+	for (int i = 0; i < enemyMLimit; i++) {
+		if (!enemyM[i].isAlive) continue;
 
-			float dx = enemySmall[i].pos.x - player.pos.x;
-			float dy = enemySmall[i].pos.y - player.pos.y;
-			float dis = sqrtf(dx * dx + dy * dy);
+		float dx = enemyM[i].pos.x - player.pos.x;
+		float dy = enemyM[i].pos.y - player.pos.y;
+		float dis = sqrtf(dx * dx + dy * dy);
 
-			if (dis < closestDis) {
-				closestDis = dis;
-				targetIndex = i;
-				nowTargetType = LockTargetType::EnemySmall;
-			}
+		if (dis < closestDis) {
+			closestDis = dis;
+			targetIndex = i;
+			nowTargetType = LockTargetType::EnemyM;
 		}
+	}
 
-		for (int i = 0; i < enemyMLimit; i++) {
-			if (!enemyM[i].isAlive) continue;
+	// boss探索
+	BossEnemy* boss = GetBossEnemy();
+	if (boss->isAlive) {
+		float dx = boss->pos.x - player.pos.x;
+		float dy = boss->pos.y - player.pos.y;
+		float dis = sqrtf(dx * dx + dy * dy);
 
-			float dx = enemyM[i].pos.x - player.pos.x;
-			float dy = enemyM[i].pos.y - player.pos.y;
-			float dis = sqrtf(dx * dx + dy * dy);
-
-			if (dis < closestDis) {
-				closestDis = dis;
-				targetIndex = i;
-				nowTargetType = LockTargetType::EnemyM;
-			}
+		if (dis < closestDis) {
+			closestDis = dis;
+			targetIndex = 0;
+			nowTargetType = LockTargetType::Boss;
 		}
+	}
 
-		// boss探索
-		BossEnemy* boss = GetBossEnemy();
-		if (boss->isAlive) {
-			float dx = boss->pos.x - player.pos.x;
-			float dy = boss->pos.y - player.pos.y;
-			float dis = sqrtf(dx * dx + dy * dy);
+	// ターゲットが死んだらロック解除
+	if (nowTargetType == LockTargetType::None) return;
 
-			if (dis < closestDis) {
-				closestDis = dis;
-				targetIndex = 0;
-				nowTargetType = LockTargetType::Boss;
-			}
-		}
+	Vector2 targetPos = {};
 
-		// ターゲットが死んだらロック解除
-		if (nowTargetType == LockTargetType::None) return;
-
-		Vector2 targetPos = {};
-
-		//ボス
-		if (nowTargetType == LockTargetType::Boss) {
-			if (!boss->isAlive) {
-				nowTargetType = LockTargetType::None;
-				return;
-			}
-			targetPos = boss->pos;
-		} else if (nowTargetType == LockTargetType::Enemy1) {
-			if (!enemy1[targetIndex].isAlive) {
-				nowTargetType = LockTargetType::None;
-				return;
-			}
-			targetPos = enemy1[targetIndex].pos;
-		} else if (nowTargetType == LockTargetType::Enemy2) {
-			if (!enemy2[targetIndex].isAlive) {
-				nowTargetType = LockTargetType::None;
-				return;
-			}
-			targetPos = enemy2[targetIndex].pos;
+	//ボス
+	if (nowTargetType == LockTargetType::Boss) {
+		if (!boss->isAlive) {
+			nowTargetType = LockTargetType::None;
+			return;
 		}
-		else if (nowTargetType == LockTargetType::EnemyBasic) {
-			if (!enemyBasic[targetIndex].isAlive) {
-				nowTargetType = LockTargetType::None;
-				return;
-			}
-			targetPos = enemyBasic[targetIndex].pos;
+		targetPos = boss->pos;
+	} else if (nowTargetType == LockTargetType::Enemy1) {
+		if (!enemy1[targetIndex].isAlive) {
+			nowTargetType = LockTargetType::None;
+			return;
 		}
-		else if (nowTargetType == LockTargetType::EnemySmall) {
-			if (!enemySmall[targetIndex].isAlive) {
-				nowTargetType = LockTargetType::None;
-				return;
-			}
-			targetPos = enemySmall[targetIndex].pos;
+		targetPos = enemy1[targetIndex].pos;
+	} else if (nowTargetType == LockTargetType::Enemy2) {
+		if (!enemy2[targetIndex].isAlive) {
+			nowTargetType = LockTargetType::None;
+			return;
 		}
-		else if (nowTargetType == LockTargetType::EnemyM) {
-			if (!enemyM[targetIndex].isAlive) {
-				nowTargetType = LockTargetType::None;
-				return;
-			}
-			targetPos = enemyM[targetIndex].pos;
+		targetPos = enemy2[targetIndex].pos;
+	} else if (nowTargetType == LockTargetType::EnemyBasic) {
+		if (!enemyBasic[targetIndex].isAlive) {
+			nowTargetType = LockTargetType::None;
+			return;
 		}
+		targetPos = enemyBasic[targetIndex].pos;
+	} else if (nowTargetType == LockTargetType::EnemySmall) {
+		if (!enemySmall[targetIndex].isAlive) {
+			nowTargetType = LockTargetType::None;
+			return;
+		}
+		targetPos = enemySmall[targetIndex].pos;
+	} else if (nowTargetType == LockTargetType::EnemyM) {
+		if (!enemyM[targetIndex].isAlive) {
+			nowTargetType = LockTargetType::None;
+			return;
+		}
+		targetPos = enemyM[targetIndex].pos;
+	}
 
 #pragma region 回転処理
-		float dx = targetPos.x - player.pos.x;
-		float dy = targetPos.y - player.pos.y;
+	float dx = targetPos.x - player.pos.x;
+	float dy = targetPos.y - player.pos.y;
 
-		float targetTheta = atan2f(dy, dx);
-		float diff = targetTheta - player.rotateTheta;
+	float targetTheta = atan2f(dy, dx);
+	float diff = targetTheta - player.rotateTheta;
 
-		//差を-π~πに正規化
-		while (diff > ToFloat(M_PI)) {
-			diff -= ToFloat(M_PI) * 2;
-		}
-		while (diff < -ToFloat(M_PI)) {
-			diff += ToFloat(M_PI) * 2;
-		}
+	//差を-π~πに正規化
+	while (diff > ToFloat(M_PI)) {
+		diff -= ToFloat(M_PI) * 2;
+	}
+	while (diff < -ToFloat(M_PI)) {
+		diff += ToFloat(M_PI) * 2;
+	}
 
-		player.rotateTheta += diff * player.lockOnRotateSpeed;
+	player.rotateTheta += diff * player.lockOnRotateSpeed;
 
 #pragma endregion
 
-	}
 
-}
 
-/// <summary>
-/// ロックオン時の回転処理
-/// </summary>
-/// <param name=""></param>
-static void RotatePlayerByLockOn(void) {
-	if (!kAutoLockOnSwitch) {
-		if (!player.isLock) return;
-
-		Enemy1* enemy1 = GetEnemy1Array();
-		Enemy2* enemy2 = GetEnemy2Array();
-		BossEnemy* boss = GetBossEnemy();
-
-		// ターゲットが死んだらロック解除
-		if (nowTargetType == LockTargetType::None) return;
-
-		Vector2 targetPos = {};
-
-		//ボス
-		if (nowTargetType == LockTargetType::Boss) {
-			if (!boss->isAlive) {
-				nowTargetType = LockTargetType::None;
-				return;
-			}
-			targetPos = boss->pos;
-		} else if (nowTargetType == LockTargetType::Enemy1) {
-			if (!enemy1[targetIndex].isAlive) {
-				nowTargetType = LockTargetType::None;
-				return;
-			}
-			targetPos = enemy1[targetIndex].pos;
-		} else if (nowTargetType == LockTargetType::Enemy2) {
-			if (!enemy2[targetIndex].isAlive) {
-				nowTargetType = LockTargetType::None;
-				return;
-			}
-			targetPos = enemy2[targetIndex].pos;
-		}
-
-		// 回転処理
-		float dx = targetPos.x - player.pos.x;
-		float dy = targetPos.y - player.pos.y;
-
-		float targetTheta = atan2f(dy, dx);
-		float diff = targetTheta - player.rotateTheta;
-
-		//差を-π~πに正規化
-		while (diff > ToFloat(M_PI)) {
-			diff -= ToFloat(M_PI) * 2;
-		}
-		while (diff < -ToFloat(M_PI)) {
-			diff += ToFloat(M_PI) * 2;
-		}
-
-		player.rotateTheta += diff * player.lockOnRotateSpeed;
-	}
-}
-
-/// <summary>
-/// ターゲットの決定処理
-/// </summary>
-/// <param name=""></param>
-static void LockOn(void) {
-	if (!kAutoLockOnSwitch) {
-
-		if (!CheckInputAction(InputAction::TriggerLock)) return;
-		if (!player.isAlive) return;
-
-		float closestDis = 99999.0f;
-		nowTargetType = LockTargetType::None;
-		targetIndex = -1;
-
-		Enemy1* enemy1 = GetEnemy1Array();
-		int enemy1Limit = GetEnemy1Limit();
-
-		// enemy1探索
-		for (int i = 0; i < enemy1Limit; i++) {
-			if (!enemy1[i].isAlive) continue;
-
-			float dx = enemy1[i].pos.x - player.pos.x;
-			float dy = enemy1[i].pos.y - player.pos.y;
-			float dis = sqrtf(dx * dx + dy * dy);
-
-			if (dis < closestDis) {
-				closestDis = dis;
-				targetIndex = i;
-				nowTargetType = LockTargetType::Enemy1;
-			}
-		}
-
-		Enemy2* enemy2 = GetEnemy2Array();
-		int enemy2Limit = GetEnemy2Limit();
-
-		for (int i = 0; i < enemy2Limit; i++) {
-			if (!enemy2[i].isAlive) continue;
-
-			float dx = enemy2[i].pos.x - player.pos.x;
-			float dy = enemy2[i].pos.y - player.pos.y;
-			float dis = sqrtf(dx * dx + dy * dy);
-
-			if (dis < closestDis) {
-				closestDis = dis;
-				targetIndex = i;
-				nowTargetType = LockTargetType::Enemy2;
-			}
-		}
-
-		// boss探索
-		BossEnemy* boss = GetBossEnemy();
-		if (boss->isAlive) {
-			float dx = boss->pos.x - player.pos.x;
-			float dy = boss->pos.y - player.pos.y;
-			float dis = sqrtf(dx * dx + dy * dy);
-
-			if (dis < closestDis) {
-				closestDis = dis;
-				targetIndex = 0;
-				nowTargetType = LockTargetType::Boss;
-			}
-		}
-	}
 }
 
 
@@ -781,40 +529,6 @@ static void UpdateShootPos(void) {
 	shootPos.y = player.pos.y + kShootDisLength * sinf(player.rotateTheta);
 }
 
-/// <summary>
-/// レーザーの射撃処理
-/// </summary>
-static void ShootLaser(void) {
-	if (!player.isAlive) return;
-
-	if (kShootElecBulletSwitch) return;
-
-	if (!kModeKeepCenterSwitch) {
-		player.shootTimer.count++;
-		if (player.shootTimer.count >= player.shootTimer.time) {
-			player.shootTimer.count = 0;
-
-			//射撃位置設定
-			shootPos.x = player.pos.x + kShootDisLength * cosf(player.rotateTheta);
-			shootPos.y = player.pos.y + kShootDisLength * sinf(player.rotateTheta);
-
-			ShootPlayerLaser(shootPos, player.rotateTheta, kShootDisLength);
-		}
-	}
-	else {
-		//異常発生時は発射しない
-		if (player.nowState != PlayerState::Normal) return;
-
-		player.shootTimer.count++;
-		if (player.shootTimer.count >= player.shootTimer.time) {
-			player.shootTimer.count = 0;
-
-
-
-			ShootPlayerLaser(shootPos, player.rotateTheta, kShootDisLength);
-		}
-	}
-}
 
 /// <summary>
 /// デンゲキ弾発射処理
@@ -822,8 +536,6 @@ static void ShootLaser(void) {
 /// <param name=""></param>
 static void ShootElecBullet(void) {
 	if (!player.isAlive) return;
-
-	if (!kShootElecBulletSwitch) return;
 
 	//異常発生時は発射しない
 	if (player.nowState != PlayerState::Normal) return;
@@ -867,78 +579,19 @@ static void ShootElecBullet(void) {
 }
 
 /// <summary>
-/// レベルアップ処理
-/// </summary>
-static void LevelUp(void) {
-	if (!player.isAlive) return;
-
-	if (!kModeKeepCenterSwitch) {
-		int level = ToInt(player.laserLevel);
-
-		//レベル2以上はレベルアップなし
-		if (level >= ToInt(PlayerLaserLevel::Level2)) return;
-
-		float levelUpLine = player.levelUpLine[level + 1];
-		if (player.remainEnergy >= levelUpLine) {
-			player.laserLevel = static_cast<PlayerLaserLevel>(level + 1);
-		}
-	}
-}
-
-/// <summary>
 /// エネルギーの消費処理
 /// </summary>
 static void ConsumptionEnergy(void) {
 	if (!player.isAlive) return;
 
-	if (!kModeKeepCenterSwitch) {
-		int level = ToInt(player.laserLevel);
+	if (player.nowState != PlayerState::Normal) return;
 
-		//レベル0は消費なし
-		if (level == 0) return;
+	player.remainEnergy -= kConsumptionEnergy;
 
-		player.remainEnergy -= kConsumptionEnergys[level];
-
-		if (player.remainEnergy <= 0.0f) {
-			player.laserLevel = PlayerLaserLevel::Level0;
-			player.remainEnergy = 0.0f;
-		}
+	if (player.remainEnergy <= 0.0f) {
+		player.remainEnergy = 0.0f;
 	}
-	//中心に保つゲーム性
-	else {
-		if (player.nowState != PlayerState::Normal) return;
 
-		player.remainEnergy -= kConsumptionEnergy;
-
-		if (player.remainEnergy <= 0.0f) {
-			player.remainEnergy = 0.0f;
-		}
-	}
-}
-
-/// <summary>
-/// Lv2継続ボーナス関係の処理
-/// </summary>
-/// <param name=""></param>
-static void UpdateSustainLv2Bonus(void) {
-	if (!player.isAlive) return;
-
-	if (!kModeKeepCenterSwitch) {
-		//Lv2状態時のみ実行
-		if (player.laserLevel == PlayerLaserLevel::Level2) {
-			sustainLv2Count++;
-
-			//初期値 + (maxまでの数値 * (1.0f - 指数関数(0に近づく)))
-			laserPowRate = kLaserPowRateMin +
-				(kLaserPowRateMax - kLaserPowRateMin) * (1.0f - expf(-kLaserPowRateIncreaseSpeed * sustainLv2Count));
-
-		}
-		//それ以外の状態時、攻撃力の倍率を戻す
-		else {
-			sustainLv2Count = 0;
-			laserPowRate = kLaserPowRateMin;
-		}
-	}
 }
 
 /// <summary>
@@ -948,33 +601,15 @@ static void UpdateSustainLv2Bonus(void) {
 static void CheckFailedMaintenance(void) {
 	if (!player.isAlive) return;
 
-	if (kModeKeepCenterSwitch) {
-		if (player.nowState != PlayerState::Normal) return;
+	if (player.nowState != PlayerState::Normal) return;
 
-		//デンリョク不足
-		if (player.remainEnergy <= kEnergyMin) {
-			player.nowState = PlayerState::DeadEnergy;
-			player.remainEnergy = 0.0f;
-			chargeElecBulletTimer.count = 0;
-		}
-		//過ジュウデン
-		else if (player.remainEnergy >= kEnergyMax) {
-			player.nowState = PlayerState::OverHeat;
-			player.remainEnergy = kEnergyMax;
-			chargeElecBulletTimer.count = 0;
-
-#pragma region 煙生成
-			for (int i = 0; i < kCreateSmokeNum; i++) {
-				float posX = player.pos.x + ToFloat(GetRand(-kCreateSmokeRange, kCreateSmokeRange));
-				float posY = player.pos.y + ToFloat(GetRand(-kCreateSmokeRange, kCreateSmokeRange));
-
-				CreateSmokeEffect({ posX, posY }, TypeDrawEffect::Obj);
-			}
-
-#pragma endregion
-
-		}
+	//デンリョク不足
+	if (player.remainEnergy <= kEnergyMin) {
+		player.nowState = PlayerState::DeadEnergy;
+		player.remainEnergy = 0.0f;
+		chargeElecBulletTimer.count = 0;
 	}
+
 }
 
 /// <summary>
@@ -984,37 +619,11 @@ static void CheckFailedMaintenance(void) {
 static void RecoveryPlayerState(void) {
 	if (!player.isAlive) return;
 
-	if (kModeKeepCenterSwitch) {
-
-		if (player.nowState == PlayerState::DeadEnergy) {
-			player.remainEnergy += kRecoveryEnergyDuringEmpty;
-			if (player.remainEnergy >= kEnergyCenter) {
-				player.nowState = PlayerState::Normal;
-			}
+	if (player.nowState == PlayerState::DeadEnergy) {
+		player.remainEnergy += kRecoveryEnergyDuringEmpty;
+		if (player.remainEnergy >= kEnergyCenter) {
+			player.nowState = PlayerState::Normal;
 		}
-		else if (player.nowState == PlayerState::OverHeat) {
-			player.remainEnergy -= kRecoveryEnergyDuringEmpty;
-			if (player.remainEnergy <= kEnergyCenter) {
-				player.nowState = PlayerState::Normal;
-			}
-
-#pragma region ケムリの生成
-
-			createSmokeTimer.count++;
-			if (createSmokeTimer.count >= createSmokeTimer.time) {
-				createSmokeTimer.count = 0;
-
-				float posX = player.pos.x + ToFloat(GetRand(-kCreateSmokeRange, kCreateSmokeRange));
-				float posY = player.pos.y + ToFloat(GetRand(-kCreateSmokeRange, kCreateSmokeRange));
-
-				CreateSmokeEffect({ posX, posY }, TypeDrawEffect::Obj);
-			}
-
-#pragma endregion
-
-		}
-
-
 	}
 }
 
@@ -1036,8 +645,7 @@ static void UpdatePlayerEffect(void) {
 				//反転
 				colorManager.isGoToBlack = false;
 			}
-		}
-		else {
+		} else {
 			colorManager.easingT -= colorManager.changeSpeed;
 			if (colorManager.easingT < 0.0f) {
 				colorManager.easingT = 0.0f;
@@ -1055,13 +663,6 @@ static void UpdatePlayerEffect(void) {
 
 		break;
 	}
-
-	case PlayerState::OverHeat: {
-
-
-		break;
-	}
-
 	case PlayerState::Normal: {
 		player.texture.color = WHITE;
 		colorManager.isGoToBlack = true;
@@ -1202,21 +803,16 @@ void UpdatePlayer(void) {
 	MovePlayer();
 	ClampPlayerPos();
 
-	LockOn();
 	RotatePlayer();
-	RotatePlayerByLockOn();
 	UpdateLockOnSign();
 
 	UpdateShootPos();
-	ShootLaser();
 	ShootElecBullet();
 
 	CheckFailedMaintenance();
 	RecoveryPlayerState();
 
 	ConsumptionEnergy();
-	LevelUp();
-	UpdateSustainLv2Bonus();
 
 	UpdatePlayerEffect();
 	CreateChargeOrbEffect();
@@ -1282,7 +878,7 @@ void RecoveryEnergy(float recoveryValue) {
 
 Vector2 GetPlayerShootPos(void) {
 	return shootPos;
-}	
+}
 
 float GetPlayerRotateTheta(void) {
 	return player.rotateTheta;
