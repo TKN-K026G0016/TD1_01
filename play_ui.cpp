@@ -43,6 +43,9 @@ struct EnergyGaugeFrame {
 	//オーバーヒート中の煙エフェクト生成スパン
 	Timer createSmokeOverHeatTimer = { 7, 0 };
 
+	//ゲージエフェクトの生成スパン
+	Timer createGaugeEffectTimer = { 3, 0 };
+
 	Texture texture = {};
 };
 EnergyGaugeFrame energyGaugeFrame;
@@ -266,6 +269,17 @@ static void UpdateEnergyGauge(void) {
 		energyGaugeDelayMeter.gaugeRate = nowRate;
 		energyGaugeDelayMeter.easingT = 0.0f;
 	}
+
+#pragma endregion
+
+#pragma region GaugeEffectの生成
+
+	//energyGaugeFrame.createGaugeEffectTimer.count++;
+	//if (energyGaugeFrame.createGaugeEffectTimer.count >= energyGaugeFrame.createGaugeEffectTimer.time) {
+	//	energyGaugeFrame.createGaugeEffectTimer.count = 0;
+
+	//	CreateGageEffect(GetEnergyGaugeEndPos());
+	//}
 
 #pragma endregion
 
