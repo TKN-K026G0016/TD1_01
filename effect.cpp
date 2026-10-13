@@ -94,7 +94,7 @@ struct SmokeEffect {
 	int diffAlpha = 30;
 
 	Texture texture = {};
-	unsigned int color = 0x444444FF;
+	unsigned int color = 0x555555FF;
 };
 SmokeEffect smokeEffect[kSmokeEffectLimit];
 
@@ -214,7 +214,7 @@ struct ChargeChipEffect {
 	float revolutionTheta = 0.0f;
 	float revolutionSpeed = ToFloat(M_PI) / 12.0f;
 
-	float startTargetVecLength = 40.0f;
+	float startTargetVecLength = 60.0f;
 	float endTargetVecLength = 1.0f;
 	float targetVecLength = 0.0f;
 

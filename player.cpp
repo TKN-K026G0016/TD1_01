@@ -1237,7 +1237,7 @@ void DrawPlayer(void) {
 	DrawLockOnSign();
 
 #ifdef _DEBUG
-	DrawHitEllipse(player.pos, player.dodgeCloseRadius, BLUE, false);
+	//DrawHitEllipse(player.pos, player.dodgeCloseRadius, BLUE, false);
 
 #endif // _DEBUG
 
