@@ -19,6 +19,8 @@
 
 //ギリ避けスイッチ
 constexpr bool kDodgeCloseSwitch = true;
+//ジェムをロックオンの対象にするフラグ
+constexpr bool kGemLockOnSwitch = true;
 
 #pragma region データ: player本体
 struct Player {
@@ -112,6 +114,8 @@ enum class LockTargetType {
 	EnemyBasic = 2,
 	EnemySmall = 3,
 	EnemyM = 4,
+
+	Gem,
 };
 LockTargetType nowTargetType = LockTargetType::None;
 //ターゲットの番号
@@ -307,6 +311,9 @@ static void RotatePlayer(void) {
 	EnemyM* enemyM = GetEnemyMArray();
 	int enemyMLimit = GetEnemyMLimit();
 
+	Gem* gem = GetGemArray();
+	int gemLimit = GetGemLimit();
+
 	// enemy1探索
 	for (int i = 0; i < enemy1Limit; i++) {
 		if (!enemy1[i].isAlive) continue;
@@ -378,6 +385,23 @@ static void RotatePlayer(void) {
 		}
 	}
 
+	//ジェム
+	if (kGemLockOnSwitch) {
+		for (int i = 0; i < gemLimit; i++) {
+			if (!gem[i].isAlive) continue;
+
+			float dx = gem[i].pos.x - player.pos.x;
+			float dy = gem[i].pos.y - player.pos.y;
+			float dis = sqrtf(dx * dx + dy * dy);
+
+			if (dis < closestDis) {
+				closestDis = dis;
+				targetIndex = i;
+				nowTargetType = LockTargetType::Gem;
+			}
+		}
+	}
+
 	// boss探索
 	BossEnemy* boss = GetBossEnemy();
 	if (boss->isAlive) {
@@ -435,6 +459,13 @@ static void RotatePlayer(void) {
 		}
 		targetPos = enemyM[targetIndex].pos;
 	}
+	else if (nowTargetType == LockTargetType::Gem) {
+		if (!gem[targetIndex].isAlive) {
+			nowTargetType = LockTargetType::None;
+			return;
+		}
+		targetPos = gem[targetIndex].pos;
+	}
 
 #pragma region 回転処理
 	float dx = targetPos.x - player.pos.x;
@@ -474,7 +505,7 @@ static void InitLockSign(void) {
 /// </summary>
 /// <param name=""></param>
 static void UpdateLockOnSign(void) {
-	if (!player.isLock || nowTargetType == LockTargetType::None) return;
+	if (nowTargetType == LockTargetType::None) return;
 
 	//ボスの場合、
 	if (nowTargetType == LockTargetType::Boss) {
@@ -507,12 +538,16 @@ static void UpdateLockOnSign(void) {
 		EnemyM* enemyM = GetEnemyMArray();
 		lockOnSign.pos = enemyM[targetIndex].pos;
 	}
-
+	//enemyM
+	else if (nowTargetType == LockTargetType::Gem) {
+		Gem* gem = GetGemArray();
+		lockOnSign.pos = gem[targetIndex].pos;
+	}
 
 }
 
 static void DrawLockOnSign(void) {
-	if (!player.isLock || nowTargetType == LockTargetType::None) return;
+	if (nowTargetType == LockTargetType::None) return;
 
 	DrawTextureObj(lockOnSign.texture, lockOnSign.pos, lockOnSign.size);
 }
