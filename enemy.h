@@ -300,3 +300,13 @@ int GetEnemySmallLimit(void);
 /// <param name="pow"></param>
 void DamageEnemySmall(EnemySmall&enemy, int pow);
 
+EnemyBomb* GetEnemyBombArray(void);
+
+int GetEnemyBombLimit(void);
+
+/// <summary>
+/// EnemyBombへのダメージ処理
+/// </summary>
+/// <param name="enemy"></param>
+/// <param name="pow"></param>
+void DamageEnemyBomb(EnemyBomb& enemy, int pow);

@@ -117,6 +117,9 @@ static void CheckCollisionElecBulletVSEnemy(void) {
 	EnemyM* enemyM = GetEnemyMArray();
 	int enemyMLimit = GetEnemyMLimit();
 
+	EnemyBomb* enemyBomb = GetEnemyBombArray();
+	int enemyBombLimit = GetEnemyBombLimit();
+
 	ElecBullet* elecBullet = GetElecBulletArray();
 	int elecBulletLimit = GetElecBulletLimit();
 
@@ -218,6 +221,26 @@ static void CheckCollisionElecBulletVSEnemy(void) {
 
 #pragma endregion
 
+#pragma region VSenemyBomb
+	for (int i = 0; i < enemyBombLimit; i++) {
+		if (!enemyBomb[i].isAlive) continue;
+
+		for (int j = 0; j < elecBulletLimit; j++) {
+			if (!elecBullet[j].isShoot) continue;
+
+			if (CheckCollisionCircleVSCircle(enemyBomb[i].pos, enemyBomb[i].hitRadius, elecBullet[j].pos, elecBullet[j].hitRadius)) {
+				BreakElecBullet(j);
+				//ホウデンの生成
+				SpawnElecShock(enemyBomb[i].pos, elecBullet[j].type);
+
+				DamageEnemyBomb(enemyBomb[i], elecBullet[j].pow);
+			}
+		}
+	}
+
+
+#pragma endregion
+
 }
 
 /// <summary>
@@ -265,6 +288,9 @@ static void CheckCollisionElecShockVSEnemy(void) {
 
 	EnemyM* enemyM = GetEnemyMArray();
 	int enemyMLimit = GetEnemyMLimit();
+
+	EnemyBomb* enemyBomb = GetEnemyBombArray();
+	int enemyBombLimit = GetEnemyBombLimit();
 
 	ElecShock* elecShock = GetElecShockArray();
 	int elecShockLimit = GetElecShockLimit();
@@ -406,6 +432,36 @@ static void CheckCollisionElecShockVSEnemy(void) {
 				//ダメージ判定()
 				if (elecShock[j].breakTimer.count == elecShock[j].triggerDamageFrame) {
 					DamageEnemyM(enemyM[i], elecShock[j].pow);
+
+
+					//コンボ
+					AddShockCombo();
+				}
+			}
+
+		}
+	}
+
+
+#pragma endregion
+
+#pragma region VSEnemyM
+	for (int i = 0; i < enemyBombLimit; i++) {
+		if (!enemyBomb[i].isAlive) continue;
+
+		for (int j = 0; j < elecShockLimit; j++) {
+			if (!elecShock[j].isShoot) continue;
+
+			if (CheckCollisionCircleVSCircle(enemyBomb[i].pos, enemyBomb[i].hitRadius, elecShock[j].pos, elecShock[j].hitRadius)) {
+
+				//ホウデンの生成
+				if (!enemyBomb[i].isIgnoreShock) {
+					SpawnElecShock(enemyBomb[i].pos, elecShock[j].type);
+					enemyBomb[i].isIgnoreShock = true;
+				}
+				//ダメージ判定()
+				if (elecShock[j].breakTimer.count == elecShock[j].triggerDamageFrame) {
+					DamageEnemyBomb(enemyBomb[i], elecShock[j].pow);
 
 
 					//コンボ

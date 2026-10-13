@@ -1053,4 +1053,20 @@ void DamageEnemySmall(EnemySmall& enemy, int pow) {
 	enemy.flashTimer.count = 0;
 }
 
+EnemyBomb* GetEnemyBombArray(void) {
+	return enemyBomb;
+}
+
+int GetEnemyBombLimit(void) {
+	return kEnemyBombLimit;
+}
+
+void DamageEnemyBomb(EnemyBomb& enemy, int pow) {
+	enemy.hp -= pow;
+
+	//フラッシュさせる
+	enemy.isFlash = true;
+	enemy.flashTimer.count = 0;
+}
+
 #pragma endregion
