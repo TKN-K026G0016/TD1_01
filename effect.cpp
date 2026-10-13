@@ -297,31 +297,26 @@ void DrawGetEffect() {
 
 #pragma region 関数: ゲージeffect
 void CreateGageEffect() {
-	if (GageTimer.count > 0) {
-		GageTimer.count--;
-	}
 
-	if (isGage == true) {
-		if (GageTimer.count >= 0) {
-			for (int i = 0; i < KGageEffectNumber; i++)
-			{
-				if (gageEffect[i].appear) {
-					gageEffect[i].appear = false;
-					GageTimer.count = 20;
-					gageEffect[i].pos = GetEnergyGaugeEndPos();
-					gageEffect[i].color = 0xffffffff;
-					float randomSpeedX = ToFloat(GetRand(0, 25));
-					float randomSpeedY = ToFloat(GetRand(-10, 10));
-					gageEffect[i].acceleration.x = randomSpeedX;
-					gageEffect[i].acceleration.y = randomSpeedY;
+	if (GageTimer.count >= 0) {
+		for (int i = 0; i < KGageEffectNumber; i++)
+		{
+			if (gageEffect[i].appear) {
+				gageEffect[i].appear = false;
+				GageTimer.count = 20;
+				gageEffect[i].pos = GetEnergyGaugeEndPos();
+				gageEffect[i].color = 0xffffffff;
+				float randomSpeedX = ToFloat(GetRand(0, 25));
+				float randomSpeedY = ToFloat(GetRand(-10, 10));
+				gageEffect[i].acceleration.x = randomSpeedX;
+				gageEffect[i].acceleration.y = randomSpeedY;
 
-
-
-				}
+				break;
 			}
 		}
 	}
 }
+
 
 static void InitGageEffect(void) {
 	for (int i = 0; i < KJemEffectNumber; i++) {
@@ -341,7 +336,7 @@ VOID UodateGageEffect() {
 		}
 		else {
 			gageEffect[i].color = 0xffffffff;
-			gageEffect[i].appear = false;
+			gageEffect[i].appear = true;
 		}
 	}
 }
