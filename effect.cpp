@@ -41,7 +41,7 @@ const int KGageEffectNumber = 20;
 struct GageEffect {
 	Vector2 pos = { };
 	Vector2 acceleration = { };
-	Vector2 size = { 32,32 };
+	Vector2 size = { 8,8 };
 	bool appear = { };
 	unsigned int color = { };
 	Texture texture = {};
