@@ -114,6 +114,7 @@ enum class LockTargetType {
 	EnemyBasic = 2,
 	EnemySmall = 3,
 	EnemyM = 4,
+	EnemyBomb = 5,
 
 	Gem,
 };
@@ -311,6 +312,9 @@ static void RotatePlayer(void) {
 	EnemyM* enemyM = GetEnemyMArray();
 	int enemyMLimit = GetEnemyMLimit();
 
+	EnemyBomb* enemyBomb = GetEnemyBombArray();
+	int enemyBombLimit = GetEnemyBombLimit();
+
 	Gem* gem = GetGemArray();
 	int gemLimit = GetGemLimit();
 
@@ -382,6 +386,20 @@ static void RotatePlayer(void) {
 			closestDis = dis;
 			targetIndex = i;
 			nowTargetType = LockTargetType::EnemyM;
+		}
+	}
+
+	for (int i = 0; i < enemyBombLimit; i++) {
+		if (!enemyBomb[i].isAlive) continue;
+
+		float dx = enemyBomb[i].pos.x - player.pos.x;
+		float dy = enemyBomb[i].pos.y - player.pos.y;
+		float dis = sqrtf(dx * dx + dy * dy);
+
+		if (dis < closestDis) {
+			closestDis = dis;
+			targetIndex = i;
+			nowTargetType = LockTargetType::EnemyBomb;
 		}
 	}
 
@@ -458,6 +476,12 @@ static void RotatePlayer(void) {
 			return;
 		}
 		targetPos = enemyM[targetIndex].pos;
+	} else if (nowTargetType == LockTargetType::EnemyBomb) {
+		if (!enemyBomb[targetIndex].isAlive) {
+			nowTargetType = LockTargetType::None;
+			return;
+		}
+		targetPos = enemyBomb[targetIndex].pos;
 	}
 	else if (nowTargetType == LockTargetType::Gem) {
 		if (!gem[targetIndex].isAlive) {
