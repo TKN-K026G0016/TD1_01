@@ -43,6 +43,9 @@ struct EnergyGaugeFrame {
 	//オーバーヒート中の煙エフェクト生成スパン
 	Timer createSmokeOverHeatTimer = { 7, 0 };
 
+	//ゲージエフェクトの生成スパン
+	Timer createGaugeEffectTimer = { 3, 0 };
+
 	Texture texture = {};
 };
 EnergyGaugeFrame energyGaugeFrame;
@@ -155,7 +158,7 @@ ProgressGauge progressGauge;
 
 #pragma region データ: ショックコンボ
 
-constexpr int kComboNumbersLimit = 2;
+constexpr int kComboNumbersLimit = 3;
 struct ShockComboNumbers {
 	Vector2 size = { 68, 128 };
 
@@ -266,6 +269,17 @@ static void UpdateEnergyGauge(void) {
 		energyGaugeDelayMeter.gaugeRate = nowRate;
 		energyGaugeDelayMeter.easingT = 0.0f;
 	}
+
+#pragma endregion
+
+#pragma region GaugeEffectの生成
+
+	//energyGaugeFrame.createGaugeEffectTimer.count++;
+	//if (energyGaugeFrame.createGaugeEffectTimer.count >= energyGaugeFrame.createGaugeEffectTimer.time) {
+	//	energyGaugeFrame.createGaugeEffectTimer.count = 0;
+
+	//	CreateGageEffect(GetEnergyGaugeEndPos());
+	//}
 
 #pragma endregion
 
@@ -526,8 +540,10 @@ static void DrawShockCombo(void) {
 	else if (shockCombo.combo < 10) {
 		digits = 1;
 	} 
-	else {
+	else if(shockCombo.combo < 100){
 		digits = 2;
+	} else {
+		digits = 3;
 	}
 
 	//scoreNumbers

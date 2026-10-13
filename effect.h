@@ -13,8 +13,13 @@ void DrawEffect();
 void DrawEffectAsUI();
 
 void CreateJemEffect();
-void CreateGageEffect();
 
+
+/// <summary>
+/// ゲージエフェクトの出現処理
+/// </summary>
+/// <param name="pos">生成座標</param>
+void CreateGageEffect(Vector2 pos);
 
 /// <summary>
 /// 煙エフェクトの生成処理
