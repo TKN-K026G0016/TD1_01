@@ -12,7 +12,6 @@ enum class PlayerLaserLevel {
 enum class PlayerState {
 	Normal,
 	DeadEnergy,
-	OverHeat,
 
 	Count
 };

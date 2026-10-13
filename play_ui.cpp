@@ -286,7 +286,7 @@ static void UpdateEnergyGauge(void) {
 #pragma region 点滅処理
 
 	//警告表示のラインを下回るor故障状態時
-	if (remainEnergy <= energyGaugeFrame.warnDeadEnergy || remainEnergy >= energyGaugeFrame.warnOverHeat || GetPlayerNowState() != PlayerState::Normal) {
+	if (remainEnergy <= energyGaugeFrame.warnDeadEnergy || GetPlayerNowState() != PlayerState::Normal) {
 		UpdateAnimation(energyGaugeFrame.texture);
 		UpdateAnimation(miniEnergyGauge.frameTexture);
 	}
@@ -302,24 +302,24 @@ static void UpdateEnergyGauge(void) {
 
 #pragma region ケムリ生成処理
 
-	if (remainEnergy >= energyGaugeFrame.warnOverHeat) {
-		energyGaugeFrame.createSmokeWarningTimer.count++;
-	}
-	else if (GetPlayerNowState() == PlayerState::OverHeat) {
-		energyGaugeFrame.createSmokeOverHeatTimer.count++;
-	}
+	//if (remainEnergy >= energyGaugeFrame.warnOverHeat) {
+	//	energyGaugeFrame.createSmokeWarningTimer.count++;
+	//}
+	//else if (GetPlayerNowState() == PlayerState::OverHeat) {
+	//	energyGaugeFrame.createSmokeOverHeatTimer.count++;
+	//}
 
-	if (energyGaugeFrame.createSmokeWarningTimer.count >= energyGaugeFrame.createSmokeWarningTimer.time
-		|| energyGaugeFrame.createSmokeOverHeatTimer.count >= energyGaugeFrame.createSmokeOverHeatTimer.time) {
-		energyGaugeFrame.createSmokeWarningTimer.count = 0;
-		energyGaugeFrame.createSmokeOverHeatTimer.count = 0;
+	//if (energyGaugeFrame.createSmokeWarningTimer.count >= energyGaugeFrame.createSmokeWarningTimer.time
+	//	|| energyGaugeFrame.createSmokeOverHeatTimer.count >= energyGaugeFrame.createSmokeOverHeatTimer.time) {
+	//	energyGaugeFrame.createSmokeWarningTimer.count = 0;
+	//	energyGaugeFrame.createSmokeOverHeatTimer.count = 0;
 
-		//生成座標を設定
-		float posX = energyGaugeFrame.pos.x + ToFloat(GetRand(-energyGaugeFrame.spawnSmokeRange.x, energyGaugeFrame.spawnSmokeRange.x));
-		float posY = energyGaugeFrame.pos.y + ToFloat(GetRand(0, energyGaugeFrame.spawnSmokeRange.y));
+	//	//生成座標を設定
+	//	float posX = energyGaugeFrame.pos.x + ToFloat(GetRand(-energyGaugeFrame.spawnSmokeRange.x, energyGaugeFrame.spawnSmokeRange.x));
+	//	float posY = energyGaugeFrame.pos.y + ToFloat(GetRand(0, energyGaugeFrame.spawnSmokeRange.y));
 
-		CreateSmokeEffect({ posX, posY }, TypeDrawEffect::UI);
-	}
+	//	CreateSmokeEffect({ posX, posY }, TypeDrawEffect::UI);
+	//}
 
 #pragma endregion
 

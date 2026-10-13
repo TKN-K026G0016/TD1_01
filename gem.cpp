@@ -73,9 +73,8 @@ static void CheckHitVSPlayer(void) {
 			CreateJemEffect();
 			BreakGem(i);
 
-			if (GetPlayerNowState() != PlayerState::OverHeat) {
-				RecoveryEnergy(gem[i].recoveryEnergy);
-			}
+
+			RecoveryEnergy(gem[i].recoveryEnergy);
 		}
 	}
 
@@ -144,8 +143,7 @@ void DrawGem(void) {
 
 		if (!gem[i].isIgnoreElecShock) {
 			DrawTextureObj(gem[i].texture, gem[i].pos, gem[i].size);
-		}
-		else {
+		} else {
 			DrawTextureObj(gem[i].lightTexture, gem[i].pos, gem[i].size);
 		}
 
