@@ -431,6 +431,33 @@ static void SpawnEnemyByRound(void) {
 
 	case Round::RoundBoss: {
 
+#pragma region EnemyBasic
+
+		spawnEnemyBasicRound2Timer.count++;
+		if (spawnEnemyBasicRound2Timer.count >= spawnEnemyBasicRound2Timer.time) {
+			spawnEnemyBasicRound2Timer.count = 0;
+
+			//ランダムな位置を生成
+			Vector2 createPos = CreatePosOutCameraZone();
+
+			SpawnEnemy(createPos, EnemyType::EnemyBasic);
+		}
+
+#pragma endregion
+
+#pragma region EnemySmall
+
+		spawnEnemySmallRound4Timer.count++;
+		if (spawnEnemySmallRound4Timer.count >= spawnEnemySmallRound4Timer.time) {
+			spawnEnemySmallRound4Timer.count = 0;
+
+			//ランダムな位置を生成
+			Vector2 createPos = CreatePosOutCameraZone();
+
+			SpawnEnemy(createPos, EnemyType::EnemySmallGroup);
+		}
+
+#pragma endregion
 
 		break;
 	}

@@ -14,7 +14,7 @@ constexpr int kGemLimit = 100;
 Gem gem[kGemLimit];
 
 //散らばる範囲(最大)
-constexpr int kScatterLengthMax = 100;
+constexpr int kScatterLengthMax = 130;
 //散らばる範囲(最小)
 constexpr int kScatterLengthMin = 0;
 

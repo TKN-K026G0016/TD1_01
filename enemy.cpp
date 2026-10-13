@@ -36,7 +36,7 @@ static Enemy2 enemy2[kEnemy2Limit];
 constexpr int kEnemyBasicLimit = 20;
 static EnemyBasic enemyBasic[kEnemyBasicLimit];
 //ジェムの生成量
-constexpr int enemyBasicGemLimit = 3;
+constexpr int enemyBasicGemLimit = 2;
 
 #pragma endregion
 
@@ -430,6 +430,8 @@ static void CheckDeadEnemyBasic(void) {
 			DeadEnemyBasic(i);
 
 			//ジェムの生成処理
+			SpawnGem(enemyBasic[i].pos, GemType::M);
+
 			for (int j = 0;j < enemyBasicGemLimit;j++) {
 				SpawnGem(enemyBasic[i].pos, GemType::S);
 			}

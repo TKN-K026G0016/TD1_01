@@ -24,7 +24,7 @@ ElecBulletSpec elecBulletSpec[ToInt(ElecBulletType::Count)] = {
 	//Normal弾
 	{ {32, 32}, 20, 1, {}},
 	//Charge弾
-	{ {100, 100}, 32, 3, {} },
+	{ {100, 100}, 32, 4, {} },
 };
 
 constexpr static int kElecBulletLimit = 5;
