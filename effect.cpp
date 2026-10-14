@@ -267,9 +267,9 @@ struct TriangleEffect {
 	float rotateSpeed = ToFloat(M_PI) / 20.0f;
 
 	float easingT = 0.0f;
-	float easingSpeed = 0.01f;
+	float easingSpeed = 0.4f;
 	//透明化が始まるタイミング
-	float startFadeEasingT = 0.3f;
+	float startFadeEasingT = 0.0f;
 
 	//不透明度
 	int alpha = kAlphaMax;
@@ -326,12 +326,28 @@ TriangleEffect2 triangleEffect2[kTriangleEffectNumber];
 
 #pragma region データ: circleEffect
 
-const int kCircleEffectNumber = 20;
+const int kCircleEffectNumber = 80;
 struct CircleEffect {
 	Vector2 pos = { };
-	Vector2 size = { 256,256 };
-	bool appear = { };
-	unsigned int color = { };
+	//Vector2 size = { 256,256 };
+
+	bool appear = false;
+
+	//イージング関係
+	float easingT = 0.0f;
+	float easingSpeed = 0.1f;
+	//透明化が始まるタイミング
+	float startFadeEasingT = 0.1f;
+
+	//サイズ関係
+	float sizeValue = 0.0f;
+	float startSizeValue = 0.0f;
+	float endSizeValue = 0.0f;
+
+	//透明度関係
+	int alpha = kAlphaMax;
+
+	unsigned int color = WHITE;
 	Texture texture = {};
 };
 CircleEffect circleEffect[kCircleEffectNumber];
@@ -1141,20 +1157,25 @@ void DrawTriangleEffect2() {
 
 #pragma region 関数: circleeffect
 
-void CreateCircleEffect(Vector2 pos) {
+void CreateCircleEffect(Vector2 pos, float endSizeValue, unsigned int color) {
 	for (int i = 0; i < kCircleEffectNumber; i++) {
 		if (circleEffect[i].appear) continue;
-		circleEffect[i].pos = pos;
-		circleEffect[i].color = 0xffffffff;
-		circleEffect[i].size.x = 0;
-		circleEffect[i].size.y = 0;
-		break;
 
+		circleEffect[i].appear = true;
+
+		circleEffect[i].pos = pos;
+		circleEffect[i].endSizeValue = endSizeValue;
+		circleEffect[i].color = color;
+
+		circleEffect[i].easingT = 0.0f;
+
+		break;
 	}
 }
 
 static void InitCircleEffect(void) {
 	for (int i = 0; i < kCircleEffectNumber; i++) {
+		circleEffect[i] = {};
 		circleEffect[i].texture = GetTexture(TextureType::EffectCircle);
 	}
 }
@@ -1163,31 +1184,57 @@ void UpdateCircleEffect() {
 	for (int i = 0; i < kCircleEffectNumber; i++) {
 		if (!circleEffect[i].appear) continue;
 
-		circleEffect[i].size.x += 10;
-		circleEffect[i].size.y += 10;
-		if (circleEffect[i].size.x >= 256) {
-			circleEffect[i].size.x = 256;
-			circleEffect[i].size.y = 256;
+		//イージング
+		circleEffect[i].easingT += circleEffect[i].easingSpeed;
+		if (circleEffect[i].easingT >= 1.0f) {
+			circleEffect[i].appear = false;
+			circleEffect[i].easingT = 1.0f;
 		}
 
-		//透明化(消滅)
-		if (circleEffect[i].size.x == 256) {
-			if (circleEffect[i].color >= 0xffffff05) {
-				circleEffect[i].color -= 0x00000015;
-				circleEffect[i].texture.color = circleEffect[i].color;
-			} else {
-				circleEffect[i].color = 0xffffffff;
-				circleEffect[i].appear = false;
-			}
+		//拡大処理
+		circleEffect[i].sizeValue = UpdateValueByEasing(circleEffect[i].startSizeValue, circleEffect[i].endSizeValue, circleEffect[i].easingT, EasingMode::Linear);
+
+		//フェード処理
+		if (circleEffect[i].easingT >= circleEffect[i].startFadeEasingT) {
+			float t = (circleEffect[i].easingT - 0.5f) / 0.5f;  // 0.5→1.0 を 0→1 に正規化
+			if (t > 1.0f) t = 1.0f;
+
+			circleEffect[i].alpha = UpdateValueByEasing(kAlphaMax, kAlphaMin, t, EasingMode::EaseOut);
 		}
+
+#pragma region 前データ
+		//	circleEffect[i].size.x += 10;
+		//	circleEffect[i].size.y += 10;
+		//	if (circleEffect[i].size.x >= 256) {
+		//		circleEffect[i].size.x = 256;
+		//		circleEffect[i].size.y = 256;
+		//	}
+
+		//	//透明化(消滅)
+		//	if (circleEffect[i].size.x == 256) {
+		//		if (circleEffect[i].color >= 0xffffff05) {
+		//			circleEffect[i].color -= 0x00000015;
+		//			circleEffect[i].texture.color = circleEffect[i].color;
+		//		} else {
+		//			circleEffect[i].color = 0xffffffff;
+		//			circleEffect[i].appear = false;
+		//		}
+		//	}
+#pragma endregion
 	}
 }
 
 void DrawCircleEffect() {
 	for (int i = 0; i < kCircleEffectNumber; i++) {
-		if (circleEffect[i].appear == true) {
-			DrawTextureUI(circleEffect[i].texture, circleEffect[i].pos, circleEffect[i].size);
-		}
+		if (!circleEffect[i].appear) continue;
+
+		Vector2 size = { circleEffect[i].sizeValue, circleEffect[i].sizeValue };
+		
+		Texture texture = circleEffect[i].texture;
+		texture.color = (circleEffect[i].color & 0xFFFFFF00) | circleEffect[i].alpha;
+
+		DrawTextureObj(texture, circleEffect[i].pos, size);
+
 	}
 }
 
@@ -1196,6 +1243,8 @@ void DrawCircleEffect() {
 #pragma region 関数: ElecShockEffect
 
 void CreateElecShockEffect(Vector2 pos) {
+	CreateCircleEffect(pos, 256, kPlayerColor);
+
 	//2回三角を生成
 	for (int i = 0; i < 2; i++) {
 		CreateTriangleEffect2(pos, 20, 20.0f, kPlayerColor);

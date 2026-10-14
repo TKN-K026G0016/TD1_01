@@ -75,5 +75,7 @@ void CreateTriangleEffect2(Vector2 pos, float sizeValue, float moveSpeed, unsign
 /// <summary>
 /// 拡大する円のエフェクト生成処理
 /// </summary>
-/// <param name="pos"></param>
-void CreateCircleEffect(Vector2 pos);
+/// <param name="pos">生成座標</param>
+/// <param name="endSizeValue">最終的なサイズ</param>
+/// <param name="color">色</param>
+void CreateCircleEffect(Vector2 pos, float endSizeValue, unsigned int color);
