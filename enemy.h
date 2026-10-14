@@ -152,7 +152,7 @@ struct EnemyM {
 
 struct EnemySmall {
 	Vector2 pos = { 0, 0 };
-	Vector2 size = { 16, 16 };
+	Vector2 size = { 32, 32 };
 
 	//生存フラグ
 	bool isAlive = false;

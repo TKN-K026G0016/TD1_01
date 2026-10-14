@@ -414,14 +414,6 @@ void DrawBossEnemy(void) {
 	if (bossEnemy.isAlive == true) {
 		DrawTextureRotateObj(bossEnemy.texture, bossEnemy.pos, bossEnemy.size, bossEnemy.rotateTheta);
 	}
-	for (int i = 0;i < 6;i++) {
-		if (bossBomb[i].isAlive == true) {
-			DrawTextureObj(bossBomb[i].texture, bossBomb[i].pos, bossBomb[i].size);
-			if (bossBomb[i].burst.count >= bossBomb[i].burst.time - 60) {
-				DrawTextureObj(bossBomb[i].burstTexture, bossBomb[i].pos, bossBomb[i].bustSize);
-			}
-		}
-	}
 }
 
 #pragma region 関数: 外部参照関係
