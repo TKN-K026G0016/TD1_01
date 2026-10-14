@@ -22,7 +22,7 @@ constexpr int kAlphaMax = 255;
 constexpr int kAlphaMin = 0;
 
 unsigned int kPlayerColor = 0x04C1E8FF;
-unsigned int kPlayerChargedColor = 0x04C1E8FF;
+unsigned int kPlayerChargedColor = 0x0483E8FF;
 unsigned int kEnemyColor = 0xE01068FF;
 
 #pragma endregion
@@ -111,18 +111,18 @@ SmokeEffect smokeEffect[kSmokeEffectLimit];
 struct ElecShockEffect {
 	int createTriangleLimit = 3;
 	float triangleSizeValue = 20.0f;
-	float triangleMoveSpeed = 20.0f;
+	float triangleMoveSpeed = 30.0f;
 
-	float circleSize = 120.0f;
+	float circleSize = 300.0f;
 };
 ElecShockEffect elecShockEffect;
 
 struct ElecShockChargedEffect {
 	int createTriangleLimit = 6;
 	float triangleSizeValue = 30.0f;
-	float triangleMoveSpeed = 35.0f;
+	float triangleMoveSpeed = 50.0f;
 
-	float circleSize = 400.0f;
+	float circleSize = 550.0f;
 };
 ElecShockChargedEffect elecShockChargedEffect;
 
@@ -208,7 +208,7 @@ struct ChargeOrbEffect {
 	int alpha = 0;
 
 	Texture texture = {};
-	unsigned int color = 0x04C1E8FF;
+	unsigned int color = kPlayerChargedColor;
 };
 ChargeOrbEffect chargeOrbEffect[kChargeOrbEffectLimit];
 
@@ -1266,11 +1266,11 @@ void DrawCircleEffect() {
 
 void CreateElecShockEffect(Vector2 pos) {
 	//円を生成
-	CreateCircleEffect(pos, elecShockChargedEffect.circleSize, kPlayerColor);
+	CreateCircleEffect(pos, elecShockEffect.circleSize, kPlayerColor);
 
 	//三角を生成
-	for (int i = 0; i < elecShockChargedEffect.createTriangleLimit; i++) {
-		CreateTriangleEffect2(pos, elecShockChargedEffect.triangleSizeValue, elecShockChargedEffect.triangleMoveSpeed, kPlayerColor);
+	for (int i = 0; i < elecShockEffect.createTriangleLimit; i++) {
+		CreateTriangleEffect2(pos, elecShockEffect.triangleSizeValue, elecShockEffect.triangleMoveSpeed, kPlayerColor);
 	}
 
 }
