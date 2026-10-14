@@ -134,7 +134,8 @@ static void MoveEnemy1(void) {
 			}
 			enemy1[i].pos.x += enemy1[i].velocity.x * enemy1[i].nowSpeed;
 			enemy1[i].pos.y += enemy1[i].velocity.y * enemy1[i].nowSpeed;
-		} else {
+		}
+		else {
 			enemy1[i].nowSpeed -= enemy1[i].decelerationSpeed;
 			if (enemy1[i].nowSpeed < 0) {
 				enemy1[i].nowSpeed = 0;
@@ -338,7 +339,8 @@ static void Attack2Enemy2Move(void) {
 			enemyCount++;
 			if (enemyCount == 6)break;
 		}
-	} else if (bossEnemyNouStates != Attack2) {
+	}
+	else if (bossEnemyNouStates != Attack2) {
 		for (int i = 0;i < kEnemy2Limit;i++) {
 			enemy2[i].isAlive = false;
 			enemy2[i].hp = enemy2[i].hpMax;
@@ -446,7 +448,8 @@ static void DrawEnemyBasic(void) {
 		Texture texture = enemyBasic[i].texture;
 		if (enemyBasic[i].isFlash) {
 			texture.color = WHITE;
-		} else {
+		}
+		else {
 			texture.color = kNormalColor;
 		}
 
@@ -657,7 +660,8 @@ static void DrawEnemySmoll(void) {
 		Texture texture = enemySmall[i].texture;
 		if (enemySmall[i].isFlash) {
 			texture.color = WHITE;
-		} else {
+		}
+		else {
 			texture.color = kNormalColor;
 		}
 
@@ -695,7 +699,8 @@ static void InitEnemyBomb(void) {
 	for (int i = 0;i < kEnemy2Limit;i++) {
 		enemyBomb[i] = {};
 
-		enemyBomb[i].texture = GetTexture(TextureType::Enemy2);
+		enemyBomb[i].texture = GetTexture(TextureType::BossBomb);
+		enemyBomb[i].burstTexture = GetTexture(TextureType::BossBomBurstRange);
 	}
 }
 
@@ -712,14 +717,16 @@ static void MoveEnemyBomb(void) {
 			if (enemyBomb[i].pos.x <= 0) {
 				enemyBomb[i].pos.x = 0;
 				enemyBomb[i].velocity.x *= -1;
-			} else if (enemyBomb[i].pos.x >= 2560) {
+			}
+			else if (enemyBomb[i].pos.x >= 2560) {
 				enemyBomb[i].pos.x = 2560;
 				enemyBomb[i].velocity.x *= -1;
 			}
 			if (enemyBomb[i].pos.y <= 0) {
 				enemyBomb[i].pos.y = 0;
 				enemyBomb[i].velocity.y *= -1;
-			} else if (enemyBomb[i].pos.y >= 1440) {
+			}
+			else if (enemyBomb[i].pos.y >= 1440) {
 				enemyBomb[i].pos.y = 1440;
 				enemyBomb[i].velocity.y *= -1;
 			}
@@ -801,7 +808,9 @@ static void DrawEnemyBomb(void) {
 		if (enemyBomb[i].isFlash) {
 			texture.color = kFlashColor;
 		}
-
+		if (enemyBomb[i].burst.count >= enemyBomb[i].burst.time - 60) {
+			DrawTextureObj(enemyBomb[i].burstTexture, enemyBomb[i].pos, enemyBomb[i].bustSize);
+		}
 		DrawTextureObj(texture, enemyBomb[i].pos, enemyBomb[i].size);
 	}
 }
@@ -816,6 +825,7 @@ void InitEnemy(void) {
 	InitEnemyBasic();
 	InitEnemyM();
 	InitEnemySmoll();
+	InitEnemyBomb();
 
 	GetMovablePos(spawner.spawnRange);
 
@@ -828,7 +838,6 @@ void UpdateEnemy(void) {
 	MoveEnemy1();
 	UpdateFlashTimerEnemy1();
 	CountIgnoreShockEnemy1();
-	InitEnemyBomb();
 
 	//enemy2
 	CheckDeadEnemy2();
