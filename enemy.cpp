@@ -17,18 +17,18 @@
 static constexpr unsigned int kNormalColor = 0xE01068FF;
 static constexpr unsigned int kFlashColor = 0x333333FF;
 
-#pragma region データ: Enemy1
-constexpr int kEnemy1Limit = 10;
-static Enemy1 enemy1[kEnemy1Limit];
-int nowEnemy1IsAliveCount = 0;
+#pragma region データ: EnemySniper
+constexpr int kEnemysniperLimit = 10;
+static EnemySniper enemySniper[kEnemysniperLimit];
+int nowEnemySniperIsAliveCount = 0;
 //ジェムの生成量
-constexpr int enemy1GemLimit = 4;
+constexpr int enemySniperGemLimit = 4;
 
 #pragma endregion
 
-#pragma region データ: Enemy2
-constexpr int kEnemy2Limit = 10;
-static Enemy2 enemy2[kEnemy2Limit];
+#pragma region データ: EnemyGuardian
+constexpr int kEnemyGuardianLimit = 10;
+static EnemyGuardian enemyGuardian[kEnemyGuardianLimit];
 
 #pragma endregion
 
@@ -88,59 +88,59 @@ Spawner spawner;
 
 
 
-#pragma region 関数: enemy1
+#pragma region 関数: enemySniper
 
-static void InitEnemy1(void) {
-	for (int i = 0; i < kEnemy1Limit; i++) {
-		enemy1[i] = {};
+static void InitEnemySniper(void) {
+	for (int i = 0; i < kEnemysniperLimit; i++) {
+		enemySniper[i] = {};
 
-		enemy1[i].texture = GetTexture(TextureType::Enemy1);
+		enemySniper[i].texture = GetTexture(TextureType::Enemy1);
 	}
 }
 
-static void ShootEnemyBullet1(void) {
-	for (int i = 0; i < kEnemy1Limit; i++) {
-		if (!enemy1[i].isAlive) continue;
+static void ShootEnemyBulletSniper(void) {
+	for (int i = 0; i < kEnemysniperLimit; i++) {
+		if (!enemySniper[i].isAlive) continue;
 
-		enemy1[i].shootTimer.count++;
-		if (enemy1[i].shootTimer.count >= enemy1[i].shootTimer.time) {
-			enemy1[i].shootTimer.count = 0;
+		enemySniper[i].shootTimer.count++;
+		if (enemySniper[i].shootTimer.count >= enemySniper[i].shootTimer.time) {
+			enemySniper[i].shootTimer.count = 0;
 
 			Vector2 playerPos = GetPlayerPos();
 
-			float disX = playerPos.x - enemy1[i].pos.x;
-			float disY = playerPos.y - enemy1[i].pos.y;
+			float disX = playerPos.x - enemySniper[i].pos.x;
+			float disY = playerPos.y - enemySniper[i].pos.y;
 			float shootTheta = atan2f(disY, disX);
-			ShootEnemyBullet(enemy1[i].pos, shootTheta);
+			ShootEnemyBullet(enemySniper[i].pos, shootTheta);
 
 		}
 
 	}
 }
 
-static void MoveEnemy1(void) {
+static void MoveEnemySniper(void) {
 	Vector2 playerPos = GetPlayerPos();
-	for (int i = 0;i < kEnemy1Limit;i++) {
-		if (!enemy1[i].isAlive)continue;
+	for (int i = 0;i < kEnemysniperLimit;i++) {
+		if (!enemySniper[i].isAlive)continue;
 
-		float diffX = playerPos.x - enemy1[i].pos.x;
-		float diffY = playerPos.y - enemy1[i].pos.y;
+		float diffX = playerPos.x - enemySniper[i].pos.x;
+		float diffY = playerPos.y - enemySniper[i].pos.y;
 		float distance = sqrtf(diffX * diffX + diffY * diffY);
-		if (distance > enemy1[i].viewRange) {
-			enemy1[i].velocity = { diffX / distance,diffY / distance };
-			enemy1[i].nowSpeed += enemy1[i].accleretionSpeed;
-			if (enemy1[i].nowSpeed > enemy1[i].moveSpeedLimit) {
-				enemy1[i].nowSpeed = enemy1[i].moveSpeedLimit;
+		if (distance > enemySniper[i].viewRange) {
+			enemySniper[i].velocity = { diffX / distance,diffY / distance };
+			enemySniper[i].nowSpeed += enemySniper[i].accleretionSpeed;
+			if (enemySniper[i].nowSpeed > enemySniper[i].moveSpeedLimit) {
+				enemySniper[i].nowSpeed = enemySniper[i].moveSpeedLimit;
 			}
-			enemy1[i].pos.x += enemy1[i].velocity.x * enemy1[i].nowSpeed;
-			enemy1[i].pos.y += enemy1[i].velocity.y * enemy1[i].nowSpeed;
+			enemySniper[i].pos.x += enemySniper[i].velocity.x * enemySniper[i].nowSpeed;
+			enemySniper[i].pos.y += enemySniper[i].velocity.y * enemySniper[i].nowSpeed;
 		}
 		else {
-			enemy1[i].nowSpeed -= enemy1[i].decelerationSpeed;
-			if (enemy1[i].nowSpeed < 0) {
-				enemy1[i].nowSpeed = 0;
+			enemySniper[i].nowSpeed -= enemySniper[i].decelerationSpeed;
+			if (enemySniper[i].nowSpeed < 0) {
+				enemySniper[i].nowSpeed = 0;
 			}
-			ShootEnemyBullet1();
+			ShootEnemyBulletSniper();
 		}
 	}
 }
@@ -149,66 +149,66 @@ static void MoveEnemy1(void) {
 /// デンゲキショックの生成を受け付けない状態のカウント
 /// </summary>
 /// <param name=""></param>
-static void CountIgnoreShockEnemy1(void) {
-	for (int i = 0; i < kEnemy1Limit; i++) {
-		if (!enemy1[i].isAlive) continue;
-		if (!enemy1[i].isIgnoreShock) continue;
+static void CountIgnoreShockEnemySniper(void) {
+	for (int i = 0; i < kEnemysniperLimit; i++) {
+		if (!enemySniper[i].isAlive) continue;
+		if (!enemySniper[i].isIgnoreShock) continue;
 
 
-		enemy1[i].ignoreSpawnShockTimer.count++;
-		if (enemy1[i].ignoreSpawnShockTimer.count >= enemy1[i].ignoreSpawnShockTimer.time) {
-			enemy1[i].ignoreSpawnShockTimer.count = 0;
-			enemy1[i].isIgnoreShock = false;
+		enemySniper[i].ignoreSpawnShockTimer.count++;
+		if (enemySniper[i].ignoreSpawnShockTimer.count >= enemySniper[i].ignoreSpawnShockTimer.time) {
+			enemySniper[i].ignoreSpawnShockTimer.count = 0;
+			enemySniper[i].isIgnoreShock = false;
 		}
 	}
 }
 
-static void UpdateFlashTimerEnemy1(void) {
-	for (int i = 0; i < kEnemy1Limit; i++) {
-		if (!enemy1[i].isAlive) continue;
-		if (!enemy1[i].isFlash) continue;
+static void UpdateFlashTimerEnemySniper(void) {
+	for (int i = 0; i < kEnemysniperLimit; i++) {
+		if (!enemySniper[i].isAlive) continue;
+		if (!enemySniper[i].isFlash) continue;
 
-		enemy1[i].flashTimer.count++;
-		if (enemy1[i].flashTimer.count >= enemy1[i].flashTimer.time) {
-			enemy1[i].flashTimer.count = 0;
-			enemy1[i].isFlash = false;
+		enemySniper[i].flashTimer.count++;
+		if (enemySniper[i].flashTimer.count >= enemySniper[i].flashTimer.time) {
+			enemySniper[i].flashTimer.count = 0;
+			enemySniper[i].isFlash = false;
 		}
 
 	}
 }
 
-static void DeadEnemy1(int index) {
-	enemy1[index].isAlive = false;
-	enemy1[index].hp = enemy1[index].hpMax;
-	nowEnemy1IsAliveCount--;
-	spawner.spawnTimer.time = spawner.kSpawnTime * nowEnemy1IsAliveCount;
+static void DeadEnemySniper(int index) {
+	enemySniper[index].isAlive = false;
+	enemySniper[index].hp = enemySniper[index].hpMax;
+	nowEnemySniperIsAliveCount--;
+	spawner.spawnTimer.time = spawner.kSpawnTime * nowEnemySniperIsAliveCount;
 }
 
-static void CheckDeadEnemy1(void) {
-	for (int i = 0; i < kEnemy1Limit; i++) {
-		if (!enemy1[i].isAlive) continue;
+static void CheckDeadEnemySniper(void) {
+	for (int i = 0; i < kEnemysniperLimit; i++) {
+		if (!enemySniper[i].isAlive) continue;
 
-		if (enemy1[i].hp <= 0) {
-			DeadEnemy1(i);
+		if (enemySniper[i].hp <= 0) {
+			DeadEnemySniper(i);
 
 			//ジェムの生成処理
-			for (int j = 0;j < enemy1GemLimit;j++) {
-				SpawnGem(enemy1[i].pos, GemType::S);
+			for (int j = 0;j < enemySniperGemLimit;j++) {
+				SpawnGem(enemySniper[i].pos, GemType::S);
 			}
 		}
 	}
 }
 
-static void DrawEnemy1(void) {
-	for (int i = 0; i < kEnemy1Limit; i++) {
-		if (!enemy1[i].isAlive) continue;
+static void DrawEnemySniper(void) {
+	for (int i = 0; i < kEnemysniperLimit; i++) {
+		if (!enemySniper[i].isAlive) continue;
 
-		Texture texture = enemy1[i].texture;
-		if (enemy1[i].isFlash) {
+		Texture texture = enemySniper[i].texture;
+		if (enemySniper[i].isFlash) {
 			texture.color = kFlashColor;
 		}
 
-		DrawTextureObj(texture, enemy1[i].pos, enemy1[i].size);
+		DrawTextureObj(texture, enemySniper[i].pos, enemySniper[i].size);
 	}
 }
 
@@ -224,30 +224,30 @@ void ReSpawnEnemy(void) {
 }
 #pragma endregion
 
-#pragma region 関数: enemy2
+#pragma region 関数: enemyGuardian
 
-static void InitEnemy2(void) {
-	for (int i = 0;i < kEnemy2Limit;i++) {
-		enemy2[i] = {};
+static void InitEnemyGuardian(void) {
+	for (int i = 0;i < kEnemyGuardianLimit;i++) {
+		enemyGuardian[i] = {};
 
-		enemy2[i].texture = GetTexture(TextureType::Enemy2);
+		enemyGuardian[i].texture = GetTexture(TextureType::EnemyGuardian);
 	}
 }
 
-static void ShootEnemyBullet2(void) {
-	for (int i = 0; i < kEnemy2Limit; i++) {
-		if (!enemy2[i].isAlive) continue;
+static void ShootEnemyBulletguardian(void) {
+	for (int i = 0; i < kEnemyGuardianLimit; i++) {
+		if (!enemyGuardian[i].isAlive) continue;
 
-		enemy2[i].shootTimer.count++;
-		if (enemy2[i].shootTimer.count >= enemy2[i].shootTimer.time) {
-			enemy2[i].shootTimer.count = 0;
+		enemyGuardian[i].shootTimer.count++;
+		if (enemyGuardian[i].shootTimer.count >= enemyGuardian[i].shootTimer.time) {
+			enemyGuardian[i].shootTimer.count = 0;
 
 			Vector2 playerPos = GetPlayerPos();
 
-			float disX = playerPos.x - enemy2[i].pos.x;
-			float disY = playerPos.y - enemy2[i].pos.y;
+			float disX = playerPos.x - enemyGuardian[i].pos.x;
+			float disY = playerPos.y - enemyGuardian[i].pos.y;
 			float shootTheta = atan2f(disY, disX);
-			ShootEnemyBullet(enemy2[i].pos, shootTheta);
+			ShootEnemyBullet(enemyGuardian[i].pos, shootTheta);
 
 		}
 
@@ -258,65 +258,65 @@ static void ShootEnemyBullet2(void) {
 /// デンゲキショックの生成を受け付けない状態のカウント
 /// </summary>
 /// <param name=""></param>
-static void CountIgnoreShockEnemy2(void) {
-	for (int i = 0; i < kEnemy2Limit; i++) {
-		if (!enemy2[i].isAlive) continue;
-		if (!enemy2[i].isIgnoreShock) continue;
+static void CountIgnoreShockEnemyGuardian(void) {
+	for (int i = 0; i < kEnemyGuardianLimit; i++) {
+		if (!enemyGuardian[i].isAlive) continue;
+		if (!enemyGuardian[i].isIgnoreShock) continue;
 
 
-		enemy2[i].ignoreSpawnShockTimer.count++;
-		if (enemy2[i].ignoreSpawnShockTimer.count >= enemy2[i].ignoreSpawnShockTimer.time) {
-			enemy2[i].ignoreSpawnShockTimer.count = 0;
-			enemy2[i].isIgnoreShock = false;
+		enemyGuardian[i].ignoreSpawnShockTimer.count++;
+		if (enemyGuardian[i].ignoreSpawnShockTimer.count >= enemyGuardian[i].ignoreSpawnShockTimer.time) {
+			enemyGuardian[i].ignoreSpawnShockTimer.count = 0;
+			enemyGuardian[i].isIgnoreShock = false;
 		}
 	}
 }
 
-static void UpdateFlashTimerEnemy2(void) {
-	for (int i = 0; i < kEnemy2Limit; i++) {
-		if (!enemy2[i].isAlive) continue;
-		if (!enemy2[i].isFlash) continue;
+static void UpdateFlashTimerEnemyGuardian(void) {
+	for (int i = 0; i < kEnemyGuardianLimit; i++) {
+		if (!enemyGuardian[i].isAlive) continue;
+		if (!enemyGuardian[i].isFlash) continue;
 
-		enemy2[i].flashTimer.count++;
-		if (enemy2[i].flashTimer.count >= enemy2[i].flashTimer.time) {
-			enemy2[i].flashTimer.count = 0;
-			enemy2[i].isFlash = false;
+		enemyGuardian[i].flashTimer.count++;
+		if (enemyGuardian[i].flashTimer.count >= enemyGuardian[i].flashTimer.time) {
+			enemyGuardian[i].flashTimer.count = 0;
+			enemyGuardian[i].isFlash = false;
 		}
 	}
 }
 
-static void DeadEnemy2(int index) {
-	enemy2[index].isAlive = false;
-	enemy2[index].hp = enemy2[index].hpMax;
+static void DeadEnemyguardian(int index) {
+	enemyGuardian[index].isAlive = false;
+	enemyGuardian[index].hp = enemyGuardian[index].hpMax;
 }
 
-static void CheckDeadEnemy2(void) {
-	for (int i = 0; i < kEnemy2Limit; i++) {
-		if (!enemy2[i].isAlive) continue;
+static void CheckDeadEnemyGuardian(void) {
+	for (int i = 0; i < kEnemyGuardianLimit; i++) {
+		if (!enemyGuardian[i].isAlive) continue;
 
-		if (enemy2[i].hp <= 0) {
-			DeadEnemy2(i);
+		if (enemyGuardian[i].hp <= 0) {
+			DeadEnemyguardian(i);
 
 			//ジェムの生成処理
-			SpawnGem(enemy2[i].pos, GemType::M);
+			SpawnGem(enemyGuardian[i].pos, GemType::M);
 		}
 	}
 }
 
-static void DrawEnemy2(void) {
-	for (int i = 0; i < kEnemy2Limit; i++) {
-		if (!enemy2[i].isAlive) continue;
+static void DrawEnemyGuardian(void) {
+	for (int i = 0; i < kEnemyGuardianLimit; i++) {
+		if (!enemyGuardian[i].isAlive) continue;
 
-		Texture texture = enemy2[i].texture;
-		if (enemy2[i].isFlash) {
+		Texture texture = enemyGuardian[i].texture;
+		if (enemyGuardian[i].isFlash) {
 			texture.color = kFlashColor;
 		}
 
-		DrawTextureObj(texture, enemy2[i].pos, enemy2[i].size);
+		DrawTextureObj(texture, enemyGuardian[i].pos, enemyGuardian[i].size);
 	}
 }
 
-static void Attack2Enemy2Move(void) {
+static void Attack2EnemyGuardianMove(void) {
 	Attack2Enemy2Pos attack2Pos;
 	int bossEnemyNouStates = GetBossEnemyNowStates();
 	Timer attack2Timer = GetAttack2Timer();
@@ -325,25 +325,25 @@ static void Attack2Enemy2Move(void) {
 	int enemyCount = 0;
 	if (bossEnemyNouStates == Attack2) {
 		if (attack2Timer.count == 0) {
-			for (int i = 0;i < kEnemy2Limit;i++) {
-				if (enemy2[i].isAlive)continue;
-				enemy2[i].isAlive = true;
+			for (int i = 0;i < kEnemyGuardianLimit;i++) {
+				if (enemyGuardian[i].isAlive)continue;
+				enemyGuardian[i].isAlive = true;
 				enemyCount++;
 				if (enemyCount == 6)break;
 			}
 		}
-		for (int i = 0;i < kEnemy2Limit;i++) {
-			if (!enemy2[i].isAlive)continue;
-			enemy2[i].pos.x = cosf(bossEnemyRotateTheta + attack2Pos.theta[enemyCount]) * attack2Pos.dstance[enemyCount] + bossEnemyPos.x;
-			enemy2[i].pos.y = sinf(bossEnemyRotateTheta + attack2Pos.theta[enemyCount]) * attack2Pos.dstance[enemyCount] + bossEnemyPos.y;
+		for (int i = 0;i < kEnemyGuardianLimit;i++) {
+			if (!enemyGuardian[i].isAlive)continue;
+			enemyGuardian[i].pos.x = cosf(bossEnemyRotateTheta + attack2Pos.theta[enemyCount]) * attack2Pos.dstance[enemyCount] + bossEnemyPos.x;
+			enemyGuardian[i].pos.y = sinf(bossEnemyRotateTheta + attack2Pos.theta[enemyCount]) * attack2Pos.dstance[enemyCount] + bossEnemyPos.y;
 			enemyCount++;
 			if (enemyCount == 6)break;
 		}
 	}
 	else if (bossEnemyNouStates != Attack2) {
-		for (int i = 0;i < kEnemy2Limit;i++) {
-			enemy2[i].isAlive = false;
-			enemy2[i].hp = enemy2[i].hpMax;
+		for (int i = 0;i < kEnemyGuardianLimit;i++) {
+			enemyGuardian[i].isAlive = false;
+			enemyGuardian[i].hp = enemyGuardian[i].hpMax;
 		}
 	}
 }
@@ -466,7 +466,7 @@ static void InitEnemyM(void) {
 	for (int i = 0;i < kEnemyMLimit;i++) {
 		enemyM[i] = {};
 
-		enemyM[i].texture = GetTexture(TextureType::Enemy2);
+		enemyM[i].texture = GetTexture(TextureType::EnemyGuardian);
 	}
 }
 
@@ -475,7 +475,7 @@ static void ShootEnemySmall(void) {
 		if (!enemyM[i].isAlive) continue;
 
 		enemyM[i].shootTimer.count++;
-		if (enemyM[i].shootTimer.count >= enemy2[i].shootTimer.time) {
+		if (enemyM[i].shootTimer.count >= enemyGuardian[i].shootTimer.time) {
 			enemyM[i].shootTimer.count = 0;
 			for (int j = 0;j < kEnemySmallLimit;j++) {
 				if (enemySmall[j].isAlive)continue;
@@ -696,7 +696,7 @@ static Vector2 CreateScatterPos(Vector2 centerPos) {
 #pragma region 関数: enemyBomb
 
 static void InitEnemyBomb(void) {
-	for (int i = 0;i < kEnemy2Limit;i++) {
+	for (int i = 0;i < kEnemyGuardianLimit;i++) {
 		enemyBomb[i] = {};
 
 		enemyBomb[i].texture = GetTexture(TextureType::BossBomb);
@@ -820,8 +820,8 @@ static void DrawEnemyBomb(void) {
 
 
 void InitEnemy(void) {
-	InitEnemy1();
-	InitEnemy2();
+	InitEnemySniper();
+	InitEnemyGuardian();
 	InitEnemyBasic();
 	InitEnemyM();
 	InitEnemySmoll();
@@ -833,17 +833,17 @@ void InitEnemy(void) {
 }
 
 void UpdateEnemy(void) {
-	//enemy1
-	CheckDeadEnemy1();
-	MoveEnemy1();
-	UpdateFlashTimerEnemy1();
-	CountIgnoreShockEnemy1();
+	//enemySniper
+	CheckDeadEnemySniper();
+	MoveEnemySniper();
+	UpdateFlashTimerEnemySniper();
+	CountIgnoreShockEnemySniper();
 
-	//enemy2
-	CheckDeadEnemy2();
-	UpdateFlashTimerEnemy2();
-	CountIgnoreShockEnemy2();
-	ShootEnemyBullet2();
+	//enemyGuardian
+	CheckDeadEnemyGuardian();
+	UpdateFlashTimerEnemyGuardian();
+	CountIgnoreShockEnemyGuardian();
+	ShootEnemyBulletguardian();
 
 	//enemyBasic
 	MoveEnemyBasic();
@@ -871,12 +871,12 @@ void UpdateEnemy(void) {
 	CheckDeadEnemyBomb();
 
 	ReSpawnEnemy();
-	Attack2Enemy2Move();
+	Attack2EnemyGuardianMove();
 }
 
 void DrawEnemy(void) {
-	DrawEnemy1();
-	DrawEnemy2();
+	DrawEnemySniper();
+	DrawEnemyGuardian();
 	DrawEnemyBasic();
 	DrawEnemyM();
 	DrawEnemySmoll();
@@ -887,13 +887,13 @@ void DrawEnemy(void) {
 
 void SpawnEnemy(Vector2 pos, EnemyType type) {
 	switch (type) {
-	case EnemyType::Enemy1: {
-		for (int i = 0; i < kEnemy1Limit; i++) {
-			if (enemy1[i].isAlive) continue;
-			enemy1[i].isAlive = true;
-			enemy1[i].pos = pos;
-			nowEnemy1IsAliveCount++;
-			spawner.spawnTimer.time = spawner.kSpawnTime * nowEnemy1IsAliveCount;
+	case EnemyType::EnemySniper: {
+		for (int i = 0; i < kEnemysniperLimit; i++) {
+			if (enemySniper[i].isAlive) continue;
+			enemySniper[i].isAlive = true;
+			enemySniper[i].pos = pos;
+			nowEnemySniperIsAliveCount++;
+			spawner.spawnTimer.time = spawner.kSpawnTime * nowEnemySniperIsAliveCount;
 			break;
 		}
 
@@ -982,15 +982,15 @@ void SpawnEnemy(Vector2 pos, EnemyType type) {
 }
 
 
-Enemy1* GetEnemy1Array(void) {
-	return enemy1;
+EnemySniper* GetEnemSniperArray(void) {
+	return enemySniper;
 }
 
-int GetEnemy1Limit(void) {
-	return kEnemy1Limit;
+int GetEnemySniperLimit(void) {
+	return kEnemysniperLimit;
 }
 
-void DamageEnemy1(Enemy1& enemy, int pow) {
+void DamageEnemySniper(EnemySniper& enemy, int pow) {
 	enemy.hp -= pow;
 
 	//フラッシュさせる
@@ -998,15 +998,15 @@ void DamageEnemy1(Enemy1& enemy, int pow) {
 	enemy.flashTimer.count = 0;
 }
 
-Enemy2* GetEnemy2Array(void) {
-	return enemy2;
+EnemyGuardian* GetEnemyGuardianArray(void) {
+	return enemyGuardian;
 }
 
-int GetEnemy2Limit(void) {
-	return kEnemy2Limit;
+int GetEnemyGuardianLimit(void) {
+	return kEnemyGuardianLimit;
 }
 
-void DamageEnemy2(Enemy2& enemy, int pow) {
+void DamageEnemyGuardian(EnemyGuardian& enemy, int pow) {
 	enemy.hp -= pow;
 
 	//フラッシュさせる

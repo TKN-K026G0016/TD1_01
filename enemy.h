@@ -7,9 +7,9 @@
 //ザコ敵の種類
 enum class EnemyType {
 	//移動→射撃
-	Enemy1,
+	EnemySniper,
 	//ボス防御
-	Enemy2,
+	EnemyGuardian,
 	//移動のみ
 	EnemyBasic,
 	//小雑魚召喚
@@ -25,7 +25,7 @@ enum class EnemyType {
 	Count
 };
 
-struct Enemy1 {
+struct EnemySniper {
 	Vector2 pos = { 0, 0 };
 	Vector2 size = { 64, 64 };
 
@@ -69,7 +69,7 @@ struct Enemy1 {
 	Texture texture = {};
 };
 
-struct Enemy2 {
+struct EnemyGuardian {
 	Vector2 pos = { 0, 0 };
 	Vector2 size = { 64, 64 };
 
@@ -244,27 +244,27 @@ void DrawEnemy(void);
 /// <param name="type"生成する種類></param>
 void SpawnEnemy(Vector2 pos, EnemyType type);
 
-Enemy1* GetEnemy1Array(void);
+EnemySniper* GetEnemSniperArray(void);
 
-int GetEnemy1Limit(void);
+int GetEnemySniperLimit(void);
 
 /// <summary>
 /// Enemy1へのダメージ処理
 /// </summary>
 /// <param name="enemy"></param>
 /// <param name="pow"></param>
-void DamageEnemy1(Enemy1& enemy, int pow);
+void DamageEnemySniper(EnemySniper& enemy, int pow);
 
-Enemy2* GetEnemy2Array(void);
+EnemyGuardian* GetEnemyGuardianArray(void);
 
-int GetEnemy2Limit(void);
+int GetEnemyGuardianLimit(void);
 
 /// <summary>
 /// Enemy2へのダメージ処理
 /// </summary>
 /// <param name="enemy"></param>
 /// <param name="pow"></param>
-void DamageEnemy2(Enemy2& enemy, int pow);
+void DamageEnemyGuardian(EnemyGuardian& enemy, int pow);
 
 
 EnemyBasic* GetEnemyBasicArray(void);

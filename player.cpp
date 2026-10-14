@@ -297,11 +297,11 @@ static void RotatePlayer(void) {
 	nowTargetType = LockTargetType::None;
 	targetIndex = -1;
 
-	Enemy1* enemy1 = GetEnemy1Array();
-	int enemy1Limit = GetEnemy1Limit();
+	EnemySniper* enemy1 = GetEnemSniperArray();
+	int enemy1Limit = GetEnemySniperLimit();
 
-	Enemy2* enemy2 = GetEnemy2Array();
-	int enemy2Limit = GetEnemy2Limit();
+	EnemyGuardian* enemy2 = GetEnemyGuardianArray();
+	int enemy2Limit = GetEnemyGuardianLimit();
 
 	EnemyBasic* enemyBasic = GetEnemyBasicArray();
 	int enemyBasicLimit = GetEnemyBasicLimit();
@@ -539,12 +539,12 @@ static void UpdateLockOnSign(void) {
 	}
 	//enemy1
 	else if (nowTargetType == LockTargetType::Enemy1) {
-		Enemy1* enemy1 = GetEnemy1Array();
+		EnemySniper* enemy1 = GetEnemSniperArray();
 		lockOnSign.pos = enemy1[targetIndex].pos;
 	}
 	//enemy2
 	else if (nowTargetType == LockTargetType::Enemy2) {
-		Enemy2* enemy2 = GetEnemy2Array();
+		EnemyGuardian* enemy2 = GetEnemyGuardianArray();
 		lockOnSign.pos = enemy2[targetIndex].pos;
 	}
 	//enemyBasic

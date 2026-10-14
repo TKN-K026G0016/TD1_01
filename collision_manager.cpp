@@ -16,11 +16,11 @@
 /// playerLaserとenemyの判定
 /// </summary>
 static void CheckCollisionLaserVSEnemy(void) {
-	Enemy1* enemy1 = GetEnemy1Array();
-	int enemy1Limit = GetEnemy1Limit();
+	EnemySniper* enemy1 = GetEnemSniperArray();
+	int enemy1Limit = GetEnemySniperLimit();
 
-	Enemy2* enemy2 = GetEnemy2Array();
-	int enemy2Limit = GetEnemy2Limit();
+	EnemyGuardian* enemy2 = GetEnemyGuardianArray();
+	int enemy2Limit = GetEnemyGuardianLimit();
 
 	PlayerLaser* laser = GetPlayerLaserArray();
 	int laserLimit = GetPlayerLaserLimit();
@@ -102,11 +102,11 @@ void CheckCollisionLaserVSBossEnemy(void) {
 /// </summary>
 /// <param name=""></param>
 static void CheckCollisionElecBulletVSEnemy(void) {
-	Enemy1* enemy1 = GetEnemy1Array();
-	int enemy1Limit = GetEnemy1Limit();
+	EnemySniper* enemy1 = GetEnemSniperArray();
+	int enemy1Limit = GetEnemySniperLimit();
 
-	Enemy2* enemy2 = GetEnemy2Array();
-	int enemy2Limit = GetEnemy2Limit();
+	EnemyGuardian* enemy2 = GetEnemyGuardianArray();
+	int enemy2Limit = GetEnemyGuardianLimit();
 
 	EnemyBasic* enemyBasic = GetEnemyBasicArray();
 	int enemyBasicLimit = GetEnemyBasicLimit();
@@ -135,7 +135,7 @@ static void CheckCollisionElecBulletVSEnemy(void) {
 				//ホウデンの生成
 				SpawnElecShock(enemy1[i].pos, elecBullet[j].type);
 
-				DamageEnemy1(enemy1[i], elecBullet[j].pow);
+				DamageEnemySniper(enemy1[i], elecBullet[j].pow);
 			}
 		}
 	}
@@ -154,7 +154,7 @@ static void CheckCollisionElecBulletVSEnemy(void) {
 				BreakElecBullet(j);
 				SpawnElecShock(enemy2[i].pos, elecBullet[j].type);
 
-				DamageEnemy2(enemy2[i], elecBullet[j].pow);
+				DamageEnemyGuardian(enemy2[i], elecBullet[j].pow);
 			}
 		}
 	}
@@ -274,11 +274,11 @@ void CheckCollisionElecBulletVSBossEnemy(void) {
 /// </summary>
 /// <param name=""></param>
 static void CheckCollisionElecShockVSEnemy(void) {
-	Enemy1* enemy1 = GetEnemy1Array();
-	int enemy1Limit = GetEnemy1Limit();
+	EnemySniper* enemy1 = GetEnemSniperArray();
+	int enemy1Limit = GetEnemySniperLimit();
 
-	Enemy2* enemy2 = GetEnemy2Array();
-	int enemy2Limit = GetEnemy2Limit();
+	EnemyGuardian* enemy2 = GetEnemyGuardianArray();
+	int enemy2Limit = GetEnemyGuardianLimit();
 
 	EnemyBasic* enemyBasic = GetEnemyBasicArray();
 	int enemyBasicLimit = GetEnemyBasicLimit();
@@ -311,7 +311,7 @@ static void CheckCollisionElecShockVSEnemy(void) {
 				}
 				//ダメージ判定()
 				if (elecShock[j].breakTimer.count == elecShock[j].triggerDamageFrame) {
-					DamageEnemy1(enemy1[i], elecShock[j].pow);
+					DamageEnemySniper(enemy1[i], elecShock[j].pow);
 
 					//コンボ
 					AddShockCombo();
@@ -342,7 +342,7 @@ static void CheckCollisionElecShockVSEnemy(void) {
 				}
 				//ダメージ判定()
 				if (elecShock[j].breakTimer.count == elecShock[j].triggerDamageFrame) {
-					DamageEnemy2(enemy2[i], elecShock[j].pow);
+					DamageEnemyGuardian(enemy2[i], elecShock[j].pow);
 
 
 					//コンボ
