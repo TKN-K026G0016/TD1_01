@@ -33,8 +33,8 @@ struct GemSpec {
 
 GemSpec spec[ToInt(GemType::Count)] = {
 	//type //size //hitRadius // //回復量
-	{GemType::S, {20,20}, 10.0f, 8.0f, {}},
-	{GemType::M, {30,30}, 20.0f, 15.0f, {}},
+	{GemType::S, {20,20}, 20.0f, 8.0f, {}},
+	{GemType::M, {30,30}, 30.0f, 15.0f, {}},
 	{GemType::L, {40,40}, 15.0f, 40.0f, {}},
 };
 
@@ -148,7 +148,7 @@ void DrawGem(void) {
 		}
 
 #ifdef _DEBUG
-		DrawHitEllipse(gem[i].pos, gem[i].hitRadius, BLUE, false);
+		//DrawHitEllipse(gem[i].pos, gem[i].hitRadius, BLUE, false);
 #endif // _DEBUG
 
 	}

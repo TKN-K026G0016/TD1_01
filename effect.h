@@ -49,3 +49,37 @@ void CreateChargeOrbEffect(Vector2 pos);
 /// ChargeChipエフェクト生成処理
 /// </summary>
 void CreateChargeChipEffect();
+
+/// <summary>
+/// 爆発エフェクトの生成処理
+/// </summary>
+/// <param name="pos">生成座標</param>
+void CreateExplodeEffect(Vector2 pos);
+
+/// <summary>
+///三角形のエフェクト生成処理　
+/// </summary>
+/// <param name="pos">生成座標</param>
+/// <param name="color">表示する色</param>
+void CreateTriangleEffect(Vector2 pos, unsigned int color);
+
+/// <summary>
+/// 三角形のエフェクト(等速)生成処理
+/// </summary>
+/// <param name="pos">生成座標</param>
+/// <param name="sizeValue">サイズ</param>
+/// <param name="moveSpeed">移動速度</param>
+/// <param name="color">色</param>
+void CreateTriangleEffect2(Vector2 pos, float sizeValue, float moveSpeed, unsigned int color);
+
+/// <summary>
+/// 拡大する円のエフェクト生成処理
+/// </summary>
+/// <param name="pos">生成座標</param>
+/// <param name="endSizeValue">最終的なサイズ</param>
+/// <param name="color">色</param>
+void CreateCircleEffect(Vector2 pos, float endSizeValue, unsigned int color);
+
+void CreatePlayerDamageEffect(Vector2 pos);
+
+void CreateEnemyDamageEffect(Vector2 pos);

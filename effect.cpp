@@ -16,6 +16,14 @@
 #pragma region データ: 共通
 
 Texture whiteBoxTexture = {};
+Texture triangleTexture = {};
+
+constexpr int kAlphaMax = 255;
+constexpr int kAlphaMin = 0;
+
+unsigned int kPlayerColor = 0x04C1E8FF;
+unsigned int kPlayerChargedColor = 0x0483E8FF;
+unsigned int kEnemyColor = 0xE01068FF;
 
 #pragma endregion
 
@@ -100,56 +108,77 @@ SmokeEffect smokeEffect[kSmokeEffectLimit];
 
 #pragma region データ: Shockエフェクト
 
-constexpr int kElecShockEffectLimit = 30;
 struct ElecShockEffect {
-	Vector2 pos = {};
+	int createTriangleLimit = 3;
+	float triangleSizeValue = 20.0f;
+	float triangleMoveSpeed = 30.0f;
 
-	bool isShoot = false;
-
-	//サイズ関係
-	float firstSizeValue = 10.0f;
-	float endSizeValue = 300.0f;
-	float sizeValue = firstSizeValue;
-
-	//不透明度
-	int alphaMax = 255;
-	int alphaMin = 0;
-	int alpha = alphaMax;
-
-	float keepAlphaT = 0.4f;
-
-	//サイズなどの変更速度
-	float easingT = 0.0f;
-	float changeSpeed = 0.08f;
-
-	Texture texture = {};
+	float circleSize = 300.0f;
 };
-ElecShockEffect elecShockEffect[kElecShockEffectLimit];
+ElecShockEffect elecShockEffect;
 
 struct ElecShockChargedEffect {
-	Vector2 pos = {};
+	int createTriangleLimit = 6;
+	float triangleSizeValue = 30.0f;
+	float triangleMoveSpeed = 50.0f;
 
-	bool isShoot = false;
-
-	//サイズ関係
-	float firstSizeValue = 10.0f;
-	float endSizeValue = 500.0f;
-	float sizeValue = firstSizeValue;
-
-	//不透明度
-	int alphaMax = 255;
-	int alphaMin = 0;
-	int alpha = alphaMax;
-
-	float keepAlphaT = 0.4f;
-
-	//サイズなどの変更速度
-	float easingT = 0.0f;
-	float changeSpeed = 0.08f;
-
-	Texture texture = {};
+	float circleSize = 550.0f;
 };
-ElecShockChargedEffect elecShockChargedEffect[kElecShockEffectLimit];
+ElecShockChargedEffect elecShockChargedEffect;
+
+#pragma region 廃棄予定
+//constexpr int kElecShockEffectLimit = 30;
+//struct ElecShockEffect {
+//	Vector2 pos = {};
+//
+//	bool isShoot = false;
+//
+//	//サイズ関係
+//	float firstSizeValue = 10.0f;
+//	float endSizeValue = 300.0f;
+//	float sizeValue = firstSizeValue;
+//
+//	//不透明度
+//	int alphaMax = 255;
+//	int alphaMin = 0;
+//	int alpha = alphaMax;
+//
+//	float keepAlphaT = 0.4f;
+//
+//	//サイズなどの変更速度
+//	float easingT = 0.0f;
+//	float changeSpeed = 0.08f;
+//
+//	Texture texture = {};
+//};
+//ElecShockEffect elecShockEffect[kElecShockEffectLimit];
+//
+//struct ElecShockChargedEffect {
+//	Vector2 pos = {};
+//
+//	bool isShoot = false;
+//
+//	//サイズ関係
+//	float firstSizeValue = 10.0f;
+//	float endSizeValue = 500.0f;
+//	float sizeValue = firstSizeValue;
+//
+//	//不透明度
+//	int alphaMax = 255;
+//	int alphaMin = 0;
+//	int alpha = alphaMax;
+//
+//	float keepAlphaT = 0.4f;
+//
+//	//サイズなどの変更速度
+//	float easingT = 0.0f;
+//	float changeSpeed = 0.08f;
+//
+//	Texture texture = {};
+//};
+//ElecShockChargedEffect elecShockChargedEffect[kElecShockEffectLimit];
+
+#pragma endregion
 
 #pragma endregion
 
@@ -179,7 +208,7 @@ struct ChargeOrbEffect {
 	int alpha = 0;
 
 	Texture texture = {};
-	unsigned int color = 0x04C1E8FF;
+	unsigned int color = kPlayerChargedColor;
 };
 ChargeOrbEffect chargeOrbEffect[kChargeOrbEffectLimit];
 
@@ -225,6 +254,148 @@ struct ChargeChipEffect {
 	unsigned int color = 0x04C1E8FF;
 };
 ChargeChipEffect chargeChipEffect[kChargeChipEffecLimit];
+
+#pragma endregion
+
+#pragma region データ: 爆発エフェクト
+
+constexpr int kExplodeEffectLimit = 30;
+struct ExplodeEffect {
+	Vector2 pos = {};
+	Vector2 size = { 128, 128 };
+
+	bool isShoot = false;
+
+	Texture texture = {};
+};
+ExplodeEffect explodeEffect[kExplodeEffectLimit];
+
+#pragma endregion
+
+#pragma region データ: triangleEffect
+
+const int kTriangleEffectNumber = 80;
+struct TriangleEffect {
+	Vector2 pos = { };
+	Vector2 size = { 26,22 };
+
+	//表示フラグ
+	bool appear = false;
+
+	//加速度
+	Vector2 acceleration = { };
+	//回転量
+	float rotateTheta = 0.0f;
+	float rotateSpeed = ToFloat(M_PI) / 20.0f;
+
+	float easingT = 0.0f;
+	float easingSpeed = 0.4f;
+	//透明化が始まるタイミング
+	float startFadeEasingT = 0.0f;
+
+	//不透明度
+	int alpha = kAlphaMax;
+
+	//色
+	unsigned int color = { };
+
+	//Texture texture = {};
+
+};
+TriangleEffect triangleEffect[kTriangleEffectNumber];
+
+
+#pragma endregion
+
+#pragma region データ: triangleEffect2
+
+//等速直線運動
+struct TriangleEffect2 {
+	Vector2 pos = { };
+
+	//表示フラグ
+	bool appear = false;
+
+	float sizeValue = 0.0f;
+
+	//<移動関係>
+	float moveTheta = 0.0f;
+	float moveSpeed = 0.0f;
+
+	//<回転関係>
+	float rotateTheta = 0.0f;
+	float rotateSpeed = ToFloat(M_PI) / 12.0f;
+
+	//<easing関係>
+	float easingT = 0.0f;
+	float easingSpeed = 0.09f;
+	//透明化が始まるタイミング
+	float startFadeEasingT = 0.1f;
+
+	//不透明度
+	int alpha = kAlphaMax;
+
+	//色
+	unsigned int color = { };
+
+	//Texture texture = {};
+
+};
+TriangleEffect2 triangleEffect2[kTriangleEffectNumber];
+
+
+#pragma endregion
+
+#pragma region データ: circleEffect
+
+const int kCircleEffectNumber = 80;
+struct CircleEffect {
+	Vector2 pos = { };
+	//Vector2 size = { 256,256 };
+
+	bool appear = false;
+
+	//イージング関係
+	float easingT = 0.0f;
+	float easingSpeed = 0.1f;
+	//透明化が始まるタイミング
+	float startFadeEasingT = 0.1f;
+
+	//サイズ関係
+	float sizeValue = 0.0f;
+	float startSizeValue = 0.0f;
+	float endSizeValue = 0.0f;
+
+	//透明度関係
+	int alpha = kAlphaMax;
+
+	unsigned int color = WHITE;
+	Texture texture = {};
+};
+CircleEffect circleEffect[kCircleEffectNumber];
+
+
+#pragma endregion
+
+#pragma region データ; PlayerDamageEffect
+struct PlayerDamageEffect {
+	int createTriangleLimit = 4;
+	float triangleSizeValue = 20.0f;
+	float triangleMoveSpeed = 20.0f;
+};
+PlayerDamageEffect playerDamageEffect;
+
+#pragma endregion
+
+#pragma region データ: EnemyDamageEffect
+
+struct EnemyDamageEffect {
+	int createTriangleLimit = 2;
+	float triangleSizeValue = 20.0f;
+	float triangleMoveSpeed = 20.0f;
+
+};
+EnemyDamageEffect enemyDamageEffect;
 
 #pragma endregion
 
@@ -486,145 +657,145 @@ void CreateSmokeEffect(Vector2 pos, TypeDrawEffect drawType) {
 
 #pragma region 関数: elecShockEffect
 
-static void InitElecShockEffect(void) {
-	for (int i = 0; i < kElecShockEffectLimit; i++) {
-		elecShockEffect[i] = {};
+//static void InitElecShockEffect(void) {
+//	for (int i = 0; i < kElecShockEffectLimit; i++) {
+//		elecShockEffect[i] = {};
+//
+//		elecShockEffect[i].texture = GetTexture(TextureType::ElecShock);
+//	}
+//}
+//
+//static void UpdateElecShockEffect(void) {
+//	for (int i = 0; i < kElecShockEffectLimit; i++) {
+//		if (!elecShockEffect[i].isShoot) continue;
+//
+//		//媒介変数の更新
+//		elecShockEffect[i].easingT += elecShockEffect[i].changeSpeed;
+//		if (elecShockEffect[i].easingT > 1.0f) {
+//			elecShockEffect[i].easingT = 1.0f;
+//		}
+//
+//		//サイズ変更処理
+//		elecShockEffect[i].sizeValue = UpdateValueByEasing(elecShockEffect[i].firstSizeValue, elecShockEffect[i].endSizeValue, elecShockEffect[i].easingT, EasingMode::EaseInOut);
+//		//フェード処理
+//#pragma region 0.6まではキープ
+//		if (elecShockEffect[i].easingT < elecShockEffect[i].keepAlphaT) {
+//			elecShockEffect[i].alpha = elecShockEffect[i].alphaMax;
+//		} else {
+//			float t = (elecShockEffect[i].easingT - 0.6f) / 0.4f;  // 0.6→1.0 を 0→1 に正規化
+//			if (t > 1.0f) t = 1.0f;
+//
+//			elecShockEffect[i].alpha = UpdateValueByEasing(elecShockEffect[i].alphaMax, elecShockEffect[i].alphaMin, t, EasingMode::EaseOut);
+//		}
+//
+//#pragma endregion
+//
+//		//消滅処理
+//		if (elecShockEffect[i].easingT >= 1.0f) {
+//			elecShockEffect[i].isShoot = false;
+//		}
+//	}
+//}
+//
+//static void DrawElecShockEffect(void) {
+//	for (int i = 0; i < kElecShockEffectLimit; i++) {
+//		if (!elecShockEffect[i].isShoot) continue;
+//
+//		//size
+//		Vector2 size = { elecShockEffect[i].sizeValue, elecShockEffect[i].sizeValue };
+//
+//		//color
+//		Texture texture = elecShockEffect[i].texture;
+//		texture.color = (texture.color & 0xFFFFFF00) | elecShockEffect[i].alpha;
+//
+//		DrawTextureObj(texture, elecShockEffect[i].pos, size);
+//	}
+//}
 
-		elecShockEffect[i].texture = GetTexture(TextureType::ElecShock);
-	}
-}
+//void CreateElecShockEffect(Vector2 pos) {
+//	for (int i = 0; i < kElecShockEffectLimit; i++) {
+//		if (elecShockEffect[i].isShoot) continue;
+//
+//		elecShockEffect[i].isShoot = true;
+//		elecShockEffect[i].pos = pos;
+//
+//		elecShockEffect[i].sizeValue = elecShockEffect[i].firstSizeValue;
+//		elecShockEffect[i].alpha = elecShockEffect[i].alphaMax;
+//		elecShockEffect[i].easingT = 0.0f;
+//
+//		break;
+//	}
+//}
 
-static void UpdateElecShockEffect(void) {
-	for (int i = 0; i < kElecShockEffectLimit; i++) {
-		if (!elecShockEffect[i].isShoot) continue;
-
-		//媒介変数の更新
-		elecShockEffect[i].easingT += elecShockEffect[i].changeSpeed;
-		if (elecShockEffect[i].easingT > 1.0f) {
-			elecShockEffect[i].easingT = 1.0f;
-		}
-
-		//サイズ変更処理
-		elecShockEffect[i].sizeValue = UpdateValueByEasing(elecShockEffect[i].firstSizeValue, elecShockEffect[i].endSizeValue, elecShockEffect[i].easingT, EasingMode::EaseInOut);
-		//フェード処理
-#pragma region 0.6まではキープ
-		if (elecShockEffect[i].easingT < elecShockEffect[i].keepAlphaT) {
-			elecShockEffect[i].alpha = elecShockEffect[i].alphaMax;
-		} else {
-			float t = (elecShockEffect[i].easingT - 0.6f) / 0.4f;  // 0.6→1.0 を 0→1 に正規化
-			if (t > 1.0f) t = 1.0f;
-
-			elecShockEffect[i].alpha = UpdateValueByEasing(elecShockEffect[i].alphaMax, elecShockEffect[i].alphaMin, t, EasingMode::EaseOut);
-		}
-
-#pragma endregion
-
-		//消滅処理
-		if (elecShockEffect[i].easingT >= 1.0f) {
-			elecShockEffect[i].isShoot = false;
-		}
-	}
-}
-
-static void DrawElecShockEffect(void) {
-	for (int i = 0; i < kElecShockEffectLimit; i++) {
-		if (!elecShockEffect[i].isShoot) continue;
-
-		//size
-		Vector2 size = { elecShockEffect[i].sizeValue, elecShockEffect[i].sizeValue };
-
-		//color
-		Texture texture = elecShockEffect[i].texture;
-		texture.color = (texture.color & 0xFFFFFF00) | elecShockEffect[i].alpha;
-
-		DrawTextureObj(texture, elecShockEffect[i].pos, size);
-	}
-}
-
-void CreateElecShockEffect(Vector2 pos) {
-	for (int i = 0; i < kElecShockEffectLimit; i++) {
-		if (elecShockEffect[i].isShoot) continue;
-
-		elecShockEffect[i].isShoot = true;
-		elecShockEffect[i].pos = pos;
-
-		elecShockEffect[i].sizeValue = elecShockEffect[i].firstSizeValue;
-		elecShockEffect[i].alpha = elecShockEffect[i].alphaMax;
-		elecShockEffect[i].easingT = 0.0f;
-
-		break;
-	}
-}
-
-static void InitElecShockChargedEffect(void) {
-	for (int i = 0; i < kElecShockEffectLimit; i++) {
-		elecShockChargedEffect[i] = {};
-
-		elecShockChargedEffect[i].texture = GetTexture(TextureType::ElecShockCharged);
-	}
-}
-
-static void UpdateElecShockChargedEffect(void) {
-	for (int i = 0; i < kElecShockEffectLimit; i++) {
-		if (!elecShockChargedEffect[i].isShoot) continue;
-
-		//媒介変数の更新
-		elecShockChargedEffect[i].easingT += elecShockChargedEffect[i].changeSpeed;
-		if (elecShockChargedEffect[i].easingT > 1.0f) {
-			elecShockChargedEffect[i].easingT = 1.0f;
-		}
-
-		//サイズ変更処理
-		elecShockChargedEffect[i].sizeValue = UpdateValueByEasing(elecShockChargedEffect[i].firstSizeValue, elecShockChargedEffect[i].endSizeValue, elecShockChargedEffect[i].easingT, EasingMode::EaseInOut);
-		//フェード処理
-#pragma region 0.6まではキープ
-		if (elecShockChargedEffect[i].easingT < elecShockChargedEffect[i].keepAlphaT) {
-			elecShockChargedEffect[i].alpha = elecShockChargedEffect[i].alphaMax;
-		} else {
-			float t = (elecShockChargedEffect[i].easingT - 0.6f) / 0.4f;  // 0.6→1.0 を 0→1 に正規化
-			if (t > 1.0f) t = 1.0f;
-
-			elecShockChargedEffect[i].alpha = UpdateValueByEasing(elecShockChargedEffect[i].alphaMax, elecShockChargedEffect[i].alphaMin, t, EasingMode::EaseOut);
-		}
-
-#pragma endregion
-
-		//消滅処理
-		if (elecShockChargedEffect[i].easingT >= 1.0f) {
-			elecShockChargedEffect[i].isShoot = false;
-		}
-	}
-}
-
-static void DrawElecShockChargedEffect(void) {
-	for (int i = 0; i < kElecShockEffectLimit; i++) {
-		if (!elecShockChargedEffect[i].isShoot) continue;
-
-		//size
-		Vector2 size = { elecShockChargedEffect[i].sizeValue, elecShockChargedEffect[i].sizeValue };
-
-		//color
-		Texture texture = elecShockChargedEffect[i].texture;
-		texture.color = (texture.color & 0xFFFFFF00) | elecShockChargedEffect[i].alpha;
-
-		DrawTextureObj(texture, elecShockChargedEffect[i].pos, size);
-	}
-}
-
-void CreateElecShockChargedEffect(Vector2 pos) {
-	for (int i = 0; i < kElecShockEffectLimit; i++) {
-		if (elecShockChargedEffect[i].isShoot) continue;
-
-		elecShockChargedEffect[i].isShoot = true;
-		elecShockChargedEffect[i].pos = pos;
-
-		elecShockChargedEffect[i].sizeValue = elecShockChargedEffect[i].firstSizeValue;
-		elecShockChargedEffect[i].alpha = elecShockChargedEffect[i].alphaMax;
-		elecShockChargedEffect[i].easingT = 0.0f;
-
-		break;
-	}
-}
+//static void InitElecShockChargedEffect(void) {
+//	for (int i = 0; i < kElecShockEffectLimit; i++) {
+//		elecShockChargedEffect[i] = {};
+//
+//		elecShockChargedEffect[i].texture = GetTexture(TextureType::ElecShockCharged);
+//	}
+//}
+//
+//static void UpdateElecShockChargedEffect(void) {
+//	for (int i = 0; i < kElecShockEffectLimit; i++) {
+//		if (!elecShockChargedEffect[i].isShoot) continue;
+//
+//		//媒介変数の更新
+//		elecShockChargedEffect[i].easingT += elecShockChargedEffect[i].changeSpeed;
+//		if (elecShockChargedEffect[i].easingT > 1.0f) {
+//			elecShockChargedEffect[i].easingT = 1.0f;
+//		}
+//
+//		//サイズ変更処理
+//		elecShockChargedEffect[i].sizeValue = UpdateValueByEasing(elecShockChargedEffect[i].firstSizeValue, elecShockChargedEffect[i].endSizeValue, elecShockChargedEffect[i].easingT, EasingMode::EaseInOut);
+//		//フェード処理
+//#pragma region 0.6まではキープ
+//		if (elecShockChargedEffect[i].easingT < elecShockChargedEffect[i].keepAlphaT) {
+//			elecShockChargedEffect[i].alpha = elecShockChargedEffect[i].alphaMax;
+//		} else {
+//			float t = (elecShockChargedEffect[i].easingT - 0.6f) / 0.4f;  // 0.6→1.0 を 0→1 に正規化
+//			if (t > 1.0f) t = 1.0f;
+//
+//			elecShockChargedEffect[i].alpha = UpdateValueByEasing(elecShockChargedEffect[i].alphaMax, elecShockChargedEffect[i].alphaMin, t, EasingMode::EaseOut);
+//		}
+//
+//#pragma endregion
+//
+//		//消滅処理
+//		if (elecShockChargedEffect[i].easingT >= 1.0f) {
+//			elecShockChargedEffect[i].isShoot = false;
+//		}
+//	}
+//}
+//
+//static void DrawElecShockChargedEffect(void) {
+//	for (int i = 0; i < kElecShockEffectLimit; i++) {
+//		if (!elecShockChargedEffect[i].isShoot) continue;
+//
+//		//size
+//		Vector2 size = { elecShockChargedEffect[i].sizeValue, elecShockChargedEffect[i].sizeValue };
+//
+//		//color
+//		Texture texture = elecShockChargedEffect[i].texture;
+//		texture.color = (texture.color & 0xFFFFFF00) | elecShockChargedEffect[i].alpha;
+//
+//		DrawTextureObj(texture, elecShockChargedEffect[i].pos, size);
+//	}
+//}
+//
+//void CreateElecShockChargedEffect(Vector2 pos) {
+//	for (int i = 0; i < kElecShockEffectLimit; i++) {
+//		if (elecShockChargedEffect[i].isShoot) continue;
+//
+//		elecShockChargedEffect[i].isShoot = true;
+//		elecShockChargedEffect[i].pos = pos;
+//
+//		elecShockChargedEffect[i].sizeValue = elecShockChargedEffect[i].firstSizeValue;
+//		elecShockChargedEffect[i].alpha = elecShockChargedEffect[i].alphaMax;
+//		elecShockChargedEffect[i].easingT = 0.0f;
+//
+//		break;
+//	}
+//}
 
 #pragma endregion
 
@@ -800,19 +971,386 @@ void CreateChargeChipEffect() {
 
 #pragma endregion
 
+#pragma region 関数: ExplodeEffect
+
+static void InitExplodeEffect(void) {
+	for (int i = 0; i < kExplodeEffectLimit; i++) {
+		explodeEffect[i] = {};
+		explodeEffect[i].texture = GetTexture(TextureType::ExplodeEffect);
+	}
+}
+
+static void UpdateExplodeEffect(void) {
+	for (int i = 0; i < kExplodeEffectLimit; i++) {
+		if (!explodeEffect[i].isShoot) continue;
+
+		explodeEffect[i].texture.animChangeTimer.count++;
+		if (explodeEffect[i].texture.animChangeTimer.count >= explodeEffect[i].texture.animChangeTimer.time) {
+			explodeEffect[i].texture.animChangeTimer.count = 0;
+
+			if (explodeEffect[i].texture.animNum < explodeEffect[i].texture.animLimit) {
+				explodeEffect[i].texture.animNum++;
+			} else {
+				explodeEffect[i].texture.animNum = 0;
+				explodeEffect[i].isShoot = false;
+			}
+		}
+	}
+}
+
+static void DrawExplodeEffect(void) {
+	for (int i = 0; i < kExplodeEffectLimit; i++) {
+		if (!explodeEffect[i].isShoot) continue;
+
+		DrawTextureObj(explodeEffect[i].texture, explodeEffect[i].pos, explodeEffect[i].size);
+	}
+}
+
+void CreateExplodeEffect(Vector2 pos) {
+	for (int i = 0; i < kExplodeEffectLimit; i++) {
+		if (explodeEffect[i].isShoot) continue;
+
+		explodeEffect[i].isShoot = true;
+		explodeEffect[i].pos = pos;
+
+		break;
+	}
+}
+
+#pragma endregion
+
+#pragma region 関数: TriangleEffect
+
+void CreateTriangleEffect(Vector2 pos, unsigned int color) {
+	for (int i = 0; i < kTriangleEffectNumber; i++) {
+		if (triangleEffect[i].appear) continue;
+
+		triangleEffect[i].appear = true;
+
+		triangleEffect[i].pos = pos;
+		triangleEffect[i].color = color;
+
+		float randomSpeedX = ToFloat(GetRand(-10, 10));
+		float randomSpeedY = ToFloat(GetRand(-10, 10));
+		triangleEffect[i].rotateTheta = ToFloat(GetRand(1, 4) * (M_PI) / 4);
+		triangleEffect[i].acceleration.x = randomSpeedX;
+		triangleEffect[i].acceleration.y = randomSpeedY;
+
+		//triangleEffect[i].rotateTheta = 0.0f;
+		triangleEffect[i].easingT = 0.0f;
+		triangleEffect[i].alpha = kAlphaMax;
+
+		break;
+
+	}
+}
+
+static void InitTriangleEffect(void) {
+	for (int i = 0; i < kTriangleEffectNumber; i++) {
+		triangleEffect[i] = {};
+	}
+}
+
+void UpdateTriangleEffect() {
+	for (int i = 0; i < kTriangleEffectNumber; i++) {
+		if (!triangleEffect[i].appear) continue;
+
+		//移動処理
+		triangleEffect[i].pos.x += triangleEffect[i].acceleration.x;
+		triangleEffect[i].pos.y += triangleEffect[i].acceleration.y;
+
+		//回転処理
+		triangleEffect[i].rotateTheta += triangleEffect[i].rotateSpeed;
+
+		//イージングを増価させる処理
+		triangleEffect[i].easingT += triangleEffect[i].easingSpeed;
+		if (triangleEffect[i].easingT >= 1.0f) {
+			triangleEffect[i].easingT = 1.0f;
+			triangleEffect[i].appear = false;
+		}
+
+#pragma region 透明化処理
+
+		if (triangleEffect[i].easingT >= triangleEffect[i].startFadeEasingT) {
+			float t = (triangleEffect[i].easingT - triangleEffect[i].startFadeEasingT) / (1.0f - triangleEffect[i].startFadeEasingT);
+			if (t > 1.0f) t = 1.0f;
+
+			triangleEffect[i].alpha = UpdateValueByEasing(kAlphaMax, kAlphaMin, t, EasingMode::EaseIn);
+		}
+
+#pragma endregion
+
+#pragma region 元データ
+		////透明化(消滅)
+		//if (triangleEffect[i].color >= 0xffffff05) {
+		//	triangleEffect[i].color -= 0x00000015;
+		//	triangleEffect[i].texture.color = triangleEffect[i].color;
+		//}
+		//else {
+		//	triangleEffect[i].color = 0xffffffff;
+		//	triangleEffect[i].appear = false;
+		//}
+
+#pragma endregion
+	}
+}
+
+void DrawTriangleEffect() {
+	for (int i = 0; i < kTriangleEffectNumber; i++) {
+		if (!triangleEffect[i].appear) continue;
+
+		Texture texture = triangleTexture;
+		texture.color = (triangleEffect[i].color & 0xFFFFFF00) | triangleEffect[i].alpha;
+
+		DrawTextureRotateObj(texture, triangleEffect[i].pos, triangleEffect[i].size, triangleEffect[i].rotateTheta);
+
+	}
+}
+#pragma endregion
+
+#pragma region 関数: TriangleEffect2
+
+void CreateTriangleEffect2(Vector2 pos, float sizeValue, float moveSpeed, unsigned int color) {
+	for (int i = 0; i < kTriangleEffectNumber; i++) {
+		if (triangleEffect2[i].appear) continue;
+
+		triangleEffect2[i].appear = true;
+
+		triangleEffect2[i].pos = pos;
+		triangleEffect2[i].color = color;
+		triangleEffect2[i].sizeValue = sizeValue;
+		triangleEffect2[i].moveSpeed = moveSpeed;
+
+		//ランダムな方向に飛んでいく
+		triangleEffect2[i].moveTheta = ToFloat(GetRand(0, 360)) * (ToFloat(M_PI) / 180.0f);
+
+		triangleEffect2[i].rotateTheta = ToFloat(GetRand(1, 4) * (M_PI) / 4);
+
+		triangleEffect2[i].easingT = 0.0f;
+		triangleEffect2[i].alpha = kAlphaMax;
+
+		break;
+
+	}
+}
+
+static void InitTriangleEffect2(void) {
+	for (int i = 0; i < kTriangleEffectNumber; i++) {
+		triangleEffect2[i] = {};
+	}
+}
+
+void UpdateTriangleEffect2() {
+	for (int i = 0; i < kTriangleEffectNumber; i++) {
+		if (!triangleEffect2[i].appear) continue;
+
+		//移動処理
+		triangleEffect2[i].pos.x += cosf(triangleEffect2[i].moveTheta) * triangleEffect2[i].moveSpeed;
+		triangleEffect2[i].pos.y += sinf(triangleEffect2[i].moveTheta) * triangleEffect2[i].moveSpeed;
+
+		//回転処理
+		triangleEffect2[i].rotateTheta += triangleEffect2[i].rotateSpeed;
+
+		//イージングを増価させる処理
+		triangleEffect2[i].easingT += triangleEffect2[i].easingSpeed;
+		if (triangleEffect2[i].easingT >= 1.0f) {
+			triangleEffect2[i].easingT = 1.0f;
+			triangleEffect2[i].appear = false;
+		}
+
+#pragma region 透明化処理
+
+		if (triangleEffect2[i].easingT >= triangleEffect2[i].startFadeEasingT) {
+			float t = (triangleEffect2[i].easingT - triangleEffect2[i].startFadeEasingT) / (1.0f - triangleEffect2[i].startFadeEasingT);
+			if (t > 1.0f) t = 1.0f;
+
+			triangleEffect2[i].alpha = UpdateValueByEasing(kAlphaMax, kAlphaMin, t, EasingMode::EaseOut);
+		}
+
+#pragma endregion
+
+#pragma region 元データ
+		////透明化(消滅)
+		//if (triangleEffect2[i].color >= 0xffffff05) {
+		//	triangleEffect2[i].color -= 0x00000015;
+		//	triangleEffect2[i].texture.color = triangleEffect2[i].color;
+		//}
+		//else {
+		//	triangleEffect2[i].color = 0xffffffff;
+		//	triangleEffect2[i].appear = false;
+		//}
+
+#pragma endregion
+	}
+}
+
+void DrawTriangleEffect2() {
+	for (int i = 0; i < kTriangleEffectNumber; i++) {
+		if (!triangleEffect2[i].appear) continue;
+
+		Vector2 size = { triangleEffect2[i].sizeValue, triangleEffect2[i].sizeValue };
+
+		Texture texture = triangleTexture;
+		texture.color = (triangleEffect2[i].color & 0xFFFFFF00) | triangleEffect2[i].alpha;
+
+		DrawTextureRotateObj(texture, triangleEffect2[i].pos, size, triangleEffect2[i].rotateTheta);
+
+	}
+}
+#pragma endregion
+
+#pragma region 関数: circleeffect
+
+void CreateCircleEffect(Vector2 pos, float endSizeValue, unsigned int color) {
+	for (int i = 0; i < kCircleEffectNumber; i++) {
+		if (circleEffect[i].appear) continue;
+
+		circleEffect[i].appear = true;
+
+		circleEffect[i].pos = pos;
+		circleEffect[i].endSizeValue = endSizeValue;
+		circleEffect[i].color = color;
+
+		circleEffect[i].easingT = 0.0f;
+
+		break;
+	}
+}
+
+static void InitCircleEffect(void) {
+	for (int i = 0; i < kCircleEffectNumber; i++) {
+		circleEffect[i] = {};
+		circleEffect[i].texture = GetTexture(TextureType::EffectCircle);
+	}
+}
+
+void UpdateCircleEffect() {
+	for (int i = 0; i < kCircleEffectNumber; i++) {
+		if (!circleEffect[i].appear) continue;
+
+		//イージング
+		circleEffect[i].easingT += circleEffect[i].easingSpeed;
+		if (circleEffect[i].easingT >= 1.0f) {
+			circleEffect[i].appear = false;
+			circleEffect[i].easingT = 1.0f;
+		}
+
+		//拡大処理
+		circleEffect[i].sizeValue = UpdateValueByEasing(circleEffect[i].startSizeValue, circleEffect[i].endSizeValue, circleEffect[i].easingT, EasingMode::EaseOut);
+
+		//フェード処理
+		if (circleEffect[i].easingT >= circleEffect[i].startFadeEasingT) {
+			float t = (circleEffect[i].easingT - circleEffect[i].startFadeEasingT) / (1.0f - circleEffect[i].startFadeEasingT);
+			if (t > 1.0f) t = 1.0f;
+
+			circleEffect[i].alpha = UpdateValueByEasing(kAlphaMax, kAlphaMin, t, EasingMode::EaseOut);
+		}
+
+#pragma region 前データ
+		//	circleEffect[i].size.x += 10;
+		//	circleEffect[i].size.y += 10;
+		//	if (circleEffect[i].size.x >= 256) {
+		//		circleEffect[i].size.x = 256;
+		//		circleEffect[i].size.y = 256;
+		//	}
+
+		//	//透明化(消滅)
+		//	if (circleEffect[i].size.x == 256) {
+		//		if (circleEffect[i].color >= 0xffffff05) {
+		//			circleEffect[i].color -= 0x00000015;
+		//			circleEffect[i].texture.color = circleEffect[i].color;
+		//		} else {
+		//			circleEffect[i].color = 0xffffffff;
+		//			circleEffect[i].appear = false;
+		//		}
+		//	}
+#pragma endregion
+	}
+}
+
+void DrawCircleEffect() {
+	for (int i = 0; i < kCircleEffectNumber; i++) {
+		if (!circleEffect[i].appear) continue;
+
+		Vector2 size = { circleEffect[i].sizeValue, circleEffect[i].sizeValue };
+		
+		Texture texture = circleEffect[i].texture;
+		texture.color = (circleEffect[i].color & 0xFFFFFF00) | circleEffect[i].alpha;
+
+		DrawTextureObj(texture, circleEffect[i].pos, size);
+
+	}
+}
+
+#pragma endregion
+
+#pragma region 関数: ElecShockEffect
+
+void CreateElecShockEffect(Vector2 pos) {
+	//円を生成
+	CreateCircleEffect(pos, elecShockEffect.circleSize, kPlayerColor);
+
+	//三角を生成
+	for (int i = 0; i < elecShockEffect.createTriangleLimit; i++) {
+		CreateTriangleEffect2(pos, elecShockEffect.triangleSizeValue, elecShockEffect.triangleMoveSpeed, kPlayerColor);
+	}
+
+}
+
+void CreateElecShockChargedEffect(Vector2 pos) {
+	//円を生成
+	CreateCircleEffect(pos, elecShockChargedEffect.circleSize, kPlayerChargedColor);
+
+	//三角を生成
+	for (int i = 0; i < elecShockChargedEffect.createTriangleLimit; i++) {
+		CreateTriangleEffect2(pos, elecShockChargedEffect.triangleSizeValue, elecShockChargedEffect.triangleMoveSpeed, kPlayerChargedColor);
+	}
+
+}
+
+
+#pragma endregion
+
+#pragma region 関数: PlayerDamageEffect
+
+void CreatePlayerDamageEffect(Vector2 pos) {
+	for (int i = 0; i < playerDamageEffect.createTriangleLimit; i++) {
+		CreateTriangleEffect2(pos, playerDamageEffect.triangleSizeValue, playerDamageEffect.triangleMoveSpeed, kPlayerColor);
+	}
+}
+
+#pragma endregion
+
+#pragma region 関数: EnemyDamageEffect
+
+void CreateEnemyDamageEffect(Vector2 pos) {
+	for (int i = 0; i < enemyDamageEffect.createTriangleLimit; i++) {
+		CreateTriangleEffect2(pos, enemyDamageEffect.triangleSizeValue, enemyDamageEffect.triangleMoveSpeed, kEnemyColor);
+	}
+}
+
+#pragma endregion
+
 void InitEffect() {
+	triangleTexture = GetTexture(TextureType::EffectTriangle);
+
 	InitGemEffect();
 
 	InitGageEffect();
 
 	InitSmokeEffect();
 
-	InitElecShockEffect();
-	InitElecShockChargedEffect();
+	//InitElecShockEffect();
+	//InitElecShockChargedEffect();
 
 	InitChargeOrbEffect();
 	InitChargeChipEffect();
 
+	InitExplodeEffect();
+
+	InitTriangleEffect();
+	InitTriangleEffect2();
+	InitCircleEffect();
 #ifdef _DEBUG
 
 	CreateJemEffect();
@@ -829,19 +1367,27 @@ void UpdateEffect() {
 	UpdateGemEffect();
 	UodateGageEffect();
 	UpdateSmokeEffect();
-	UpdateElecShockEffect();
-	UpdateElecShockChargedEffect();
+	//UpdateElecShockEffect();
+	//UpdateElecShockChargedEffect();
 	UpdateChargeOrbEffect();
 	UpdateChargeChipEffect();
+	UpdateExplodeEffect();
+	UpdateTriangleEffect();
+	UpdateTriangleEffect2();
+	UpdateCircleEffect();
 }
 void DrawEffect() {
 	DrawGetEffect();
 
 	DrawSmokeEffect();
-	DrawElecShockEffect();
-	DrawElecShockChargedEffect();
+	//DrawElecShockEffect();
+	//DrawElecShockChargedEffect();
 	DrawChargeOrbEffect();
 	DrawChargeChipEffect();
+	DrawExplodeEffect();
+	DrawTriangleEffect();
+	DrawTriangleEffect2();
+	DrawCircleEffect();
 }
 
 void DrawEffectAsUI() {

@@ -125,7 +125,7 @@ LockTargetType nowTargetType = LockTargetType::None;
 int targetIndex = -1;
 
 //敵を除外する範囲
-static constexpr float kCancelLockOnEnemyRange = 320;
+static constexpr float kCancelLockOnEnemyRange = 400;
 
 struct LockOnSign {
 	Vector2 pos = {};
@@ -957,6 +957,8 @@ void PlayerDamage(Vector2 hitPos) {
 
 	//体力減らす
 	player.hp--;
+
+	CreatePlayerDamageEffect(player.pos);
 
 #pragma region ノックバック方向設定
 

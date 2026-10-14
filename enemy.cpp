@@ -4,6 +4,7 @@
 #include "enemy_bullet.h"
 #include "gem.h"
 #include "boss_enemy.h"
+#include "effect.h"
 
 #include "vector2.h"
 #include "timer.h"
@@ -15,7 +16,7 @@
 
 //カラー関係
 static constexpr unsigned int kNormalColor = 0xE01068FF;
-static constexpr unsigned int kFlashColor = 0x333333FF;
+static constexpr unsigned int kFlashColor = WHITE;
 
 #pragma region データ: EnemySniper
 constexpr int kEnemysniperLimit = 10;
@@ -94,7 +95,7 @@ static void InitEnemySniper(void) {
 	for (int i = 0; i < kEnemysniperLimit; i++) {
 		enemySniper[i] = {};
 
-		enemySniper[i].texture = GetTexture(TextureType::Enemy1);
+		enemySniper[i].texture = GetTexture(TextureType::EnemySniper);
 	}
 }
 
@@ -180,7 +181,11 @@ static void UpdateFlashTimerEnemySniper(void) {
 static void DeadEnemySniper(int index) {
 	enemySniper[index].isAlive = false;
 	enemySniper[index].hp = enemySniper[index].hpMax;
+
+	CreateExplodeEffect(enemySniper[index].pos);
+
 	nowEnemySniperIsAliveCount--;
+
 	spawner.spawnTimer.time = spawner.kSpawnTime * nowEnemySniperIsAliveCount;
 }
 
@@ -206,6 +211,8 @@ static void DrawEnemySniper(void) {
 		Texture texture = enemySniper[i].texture;
 		if (enemySniper[i].isFlash) {
 			texture.color = kFlashColor;
+		} else {
+			texture.color = kNormalColor;
 		}
 
 		DrawTextureObj(texture, enemySniper[i].pos, enemySniper[i].size);
@@ -288,6 +295,8 @@ static void UpdateFlashTimerEnemyGuardian(void) {
 static void DeadEnemyguardian(int index) {
 	enemyGuardian[index].isAlive = false;
 	enemyGuardian[index].hp = enemyGuardian[index].hpMax;
+
+	CreateExplodeEffect(enemyGuardian[index].pos);
 }
 
 static void CheckDeadEnemyGuardian(void) {
@@ -310,6 +319,8 @@ static void DrawEnemyGuardian(void) {
 		Texture texture = enemyGuardian[i].texture;
 		if (enemyGuardian[i].isFlash) {
 			texture.color = kFlashColor;
+		} else {
+			texture.color = kNormalColor;
 		}
 
 		DrawTextureObj(texture, enemyGuardian[i].pos, enemyGuardian[i].size);
@@ -426,6 +437,9 @@ static void UpdateFlashTimerEnemyBasic(void) {
 static void DeadEnemyBasic(int index) {
 	enemyBasic[index].isAlive = false;
 	enemyBasic[index].hp = enemyBasic[index].hpMax;
+
+	CreateExplodeEffect(enemyBasic[index].pos);
+
 	/*spawner.spawnTimer.time = spawner.kSpawnTime * nowenemyBasicIsAliveCount;*/
 }
 
@@ -529,6 +543,8 @@ static void UpdateFlashTimerEnemyM(void) {
 static void DeadEnemyM(int index) {
 	enemyM[index].isAlive = false;
 	enemyM[index].hp = enemyM[index].hpMax;
+
+	CreateExplodeEffect(enemyM[index].pos);
 }
 
 static void CheckDeadEnemyM(void) {
@@ -552,6 +568,9 @@ static void DrawEnemyM(void) {
 		if (enemyM[i].isFlash) {
 			texture.color = kFlashColor;
 		}
+		else {
+			texture.color = kNormalColor;
+		}
 
 		DrawTextureObj(texture, enemyM[i].pos, enemyM[i].size);
 	}
@@ -561,7 +580,7 @@ static void DrawEnemyM(void) {
 
 #pragma region 関数: enemySmall
 
-static void InitEnemySmoll(void) {
+static void InitEnemySmall(void) {
 	for (int i = 0; i < kEnemySmallLimit; i++) {
 		enemySmall[i] = {};
 
@@ -637,9 +656,12 @@ static void UpdateFlashTimerEnemySmall(void) {
 	}
 }
 
-static void DeadEnemySmoll(int index) {
+static void DeadEnemySmall(int index) {
 	enemySmall[index].isAlive = false;
 	enemySmall[index].hp = enemySmall[index].hpMax;
+
+	CreateExplodeEffect(enemySmall[index].pos);
+
 	/*spawner.spawnTimer.time = spawner.kSpawnTime * nowenemyBasicIsAliveCount;*/
 }
 
@@ -648,7 +670,7 @@ static void CheckDeadEnemySmall(void) {
 		if (!enemySmall[i].isAlive) continue;
 
 		if (enemySmall[i].hp <= 0) {
-			DeadEnemySmoll(i);
+			DeadEnemySmall(i);
 
 			//ジェムの生成処理
 			for (int j = 0;j < enemySmallGemLimit;j++) {
@@ -658,13 +680,13 @@ static void CheckDeadEnemySmall(void) {
 	}
 }
 
-static void DrawEnemySmoll(void) {
+static void DrawEnemySmall(void) {
 	for (int i = 0; i < kEnemySmallLimit; i++) {
 		if (!enemySmall[i].isAlive) continue;
 
 		Texture texture = enemySmall[i].texture;
 		if (enemySmall[i].isFlash) {
-			texture.color = WHITE;
+			texture.color = kFlashColor;
 		}
 		else {
 			texture.color = kNormalColor;
@@ -742,6 +764,8 @@ static void MoveEnemyBomb(void) {
 static void DeadEnemyBomb(int index) {
 	enemyBomb[index].isAlive = false;
 	enemyBomb[index].hp = enemyBomb[index].hpMax;
+
+	CreateExplodeEffect(enemyBomb[index].pos);
 }
 
 static void BurstEnemyBomb(void) {
@@ -812,7 +836,11 @@ static void DrawEnemyBomb(void) {
 		Texture texture = enemyBomb[i].texture;
 		if (enemyBomb[i].isFlash) {
 			texture.color = kFlashColor;
+		} else {
+			texture.color = kNormalColor;
 		}
+
+		//爆発範囲の描画
 		if (enemyBomb[i].burst.count >= enemyBomb[i].burst.time - 60) {
 			DrawTextureObj(enemyBomb[i].burstTexture, enemyBomb[i].pos, enemyBomb[i].bustSize);
 		}
@@ -829,12 +857,12 @@ void InitEnemy(void) {
 	InitEnemyGuardian();
 	InitEnemyBasic();
 	InitEnemyM();
-	InitEnemySmoll();
+	InitEnemySmall();
 	InitEnemyBomb();
 
 	GetMovablePos(spawner.spawnRange);
 
-	SpawnEnemy({ 100, 100 }, EnemyType::EnemySmallGroup);
+	//SpawnEnemy({ 100, 100 }, EnemyType::EnemyM);
 }
 
 void UpdateEnemy(void) {
@@ -884,7 +912,7 @@ void DrawEnemy(void) {
 	DrawEnemyGuardian();
 	DrawEnemyBasic();
 	DrawEnemyM();
-	DrawEnemySmoll();
+	DrawEnemySmall();
 	DrawEnemyBomb();
 }
 
@@ -990,12 +1018,17 @@ void SpawnEnemy(Vector2 pos, EnemyType type) {
 		int enemyFomationCount = 0;
 		for (int i = 0; i < kEnemyBasicLimit; i++) {
 			if (enemyBasic[i].isAlive) continue;
+
 			enemyBasic[i].isAlive = true;
 			enemyBasic[i].thetaUpDate = false;
+
+
 			enemyBasic[i].moveTheta = formationTheta;
 			enemyBasic[i].pos.x = pos.x+(50*enemyFomationCount-100)*cosf(formationTheta);
 			enemyBasic[i].pos.y = pos.y+(50*enemyFomationCount-100)*sinf(formationTheta);
 			enemyFomationCount++;
+
+			//5回生成したら終了
 			if (enemyFomationCount == 5) {
 				break;
 			}
@@ -1021,6 +1054,9 @@ void DamageEnemySniper(EnemySniper& enemy, int pow) {
 	//フラッシュさせる
 	enemy.isFlash = true;
 	enemy.flashTimer.count = 0;
+
+	//ダメージエフェクト
+	CreateEnemyDamageEffect(enemy.pos);
 }
 
 EnemyGuardian* GetEnemyGuardianArray(void) {
@@ -1037,6 +1073,9 @@ void DamageEnemyGuardian(EnemyGuardian& enemy, int pow) {
 	//フラッシュさせる
 	enemy.isFlash = true;
 	enemy.flashTimer.count = 0;
+
+	//ダメージエフェクト
+	CreateEnemyDamageEffect(enemy.pos);
 }
 
 EnemyBasic* GetEnemyBasicArray(void) {
@@ -1051,8 +1090,11 @@ void DamageEnemyBasic(EnemyBasic& enemy, int pow) {
 	enemy.hp -= pow;
 
 	//フラッシュさせる
-	enemy.isFlash = true;
+ 	enemy.isFlash = true;
 	enemy.flashTimer.count = 0;
+
+	//ダメージエフェクト
+	CreateEnemyDamageEffect(enemy.pos);
 }
 
 EnemyM* GetEnemyMArray(void) {
@@ -1069,6 +1111,9 @@ void DamageEnemyM(EnemyM& enemy, int pow) {
 	//フラッシュさせる
 	enemy.isFlash = true;
 	enemy.flashTimer.count = 0;
+
+	//ダメージエフェクト
+	CreateEnemyDamageEffect(enemy.pos);
 }
 
 EnemySmall* GetEnemySmallArray(void) {
@@ -1085,6 +1130,9 @@ void DamageEnemySmall(EnemySmall& enemy, int pow) {
 	//フラッシュさせる
 	enemy.isFlash = true;
 	enemy.flashTimer.count = 0;
+
+	//ダメージエフェクト
+	CreateEnemyDamageEffect(enemy.pos);
 }
 
 EnemyBomb* GetEnemyBombArray(void) {
@@ -1101,6 +1149,9 @@ void DamageEnemyBomb(EnemyBomb& enemy, int pow) {
 	//フラッシュさせる
 	enemy.isFlash = true;
 	enemy.flashTimer.count = 0;
+
+	//ダメージエフェクト
+	CreateEnemyDamageEffect(enemy.pos);
 }
 
 #pragma endregion

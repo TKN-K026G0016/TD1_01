@@ -6,6 +6,8 @@
 
 //ザコ敵の種類
 enum class EnemyType {
+	None,
+
 	//移動→射撃
 	EnemySniper,
 	//ボス防御

@@ -27,8 +27,8 @@ struct BossEnemy {
 	bool isAlive = false;
 	//当たり判定の大きさ
 	float hitRadius =	128.0f;
-	int remainLife = 500;
-	int remainLifeMax = 500;
+	int remainLife = 150;
+	int remainLifeMax = 150;
 
 	//<移動関係>
 	// 視界
@@ -53,6 +53,10 @@ struct BossEnemy {
 	//ショックを無視している状態
 	bool isIgnoreElecShock = false;
 	Timer ignoreElecShockTimer = { 20, 0 };
+
+	//フラッシュフラグ
+	bool isFlash = false;
+	Timer flashTimer = {7, 0};
 
 	//状態
 	int nowsSates=BossStates::Attack1;
@@ -94,3 +98,5 @@ void UpdateBossEnemy(void);
 void DrawBossEnemy(void);
 
 BossEnemy* GetBossEnemy(void);
+
+void DamageBossEnemy(int pow);
