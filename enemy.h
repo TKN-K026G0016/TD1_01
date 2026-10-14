@@ -26,6 +26,7 @@ enum class EnemyType {
 
 	Count
 };
+#pragma region 構造体:EnemySniper
 
 struct EnemySniper {
 	Vector2 pos = { 0, 0 };
@@ -70,6 +71,9 @@ struct EnemySniper {
 
 	Texture texture = {};
 };
+#pragma endregion
+
+#pragma region 構造体:EnemyGuardian
 
 struct EnemyGuardian {
 	Vector2 pos = { 0, 0 };
@@ -97,6 +101,10 @@ struct EnemyGuardian {
 
 	Texture texture = {};
 };
+ 
+#pragma endregion
+
+#pragma region 構造体:EnemyBasic
 
 struct EnemyBasic {
 	Vector2 pos = { 0, 0 };
@@ -127,6 +135,10 @@ struct EnemyBasic {
 	Texture texture = {};
 };
 
+#pragma endregion
+
+#pragma region 構造体:EnemyM
+
 struct EnemyM {
 	Vector2 pos = { 0, 0 };
 	Vector2 size = { 64, 64 };
@@ -153,6 +165,10 @@ struct EnemyM {
 
 	Texture texture = {};
 };
+
+#pragma endregion
+
+#pragma region 構造体:EnemySmall
 
 struct EnemySmall {
 	Vector2 pos = { 0, 0 };
@@ -191,6 +207,10 @@ struct EnemySmall {
 
 	Texture texture = {};
 };
+
+#pragma endregion
+
+#pragma region 構造体:EnemyBomb
 
 struct EnemyBomb {
 	Vector2 pos = { 0, 0 };
@@ -235,6 +255,8 @@ struct EnemyBomb {
 	Texture texture = {};
 	Texture burstTexture = {};
 };
+
+#pragma endregion
 
 
 void InitEnemy(void);
