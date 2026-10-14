@@ -560,7 +560,7 @@ static void InitEnemySmoll(void) {
 	for (int i = 0; i < kEnemySmallLimit; i++) {
 		enemySmall[i] = {};
 
-		enemySmall[i].texture = GetTexture(TextureType::EnemyBasic);
+		enemySmall[i].texture = GetTexture(TextureType::EnemySmall);
 	}
 }
 
