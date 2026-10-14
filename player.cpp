@@ -21,6 +21,8 @@
 constexpr bool kDodgeCloseSwitch = true;
 //ジェムをロックオンの対象にするフラグ
 constexpr bool kGemLockOnSwitch = true;
+//一定範囲内に敵がいなければ、ジェムをロックオンするスイッチ
+constexpr bool KCancelLockOnEnemySwitch = true;
 
 #pragma region データ: player本体
 struct Player {
@@ -121,6 +123,9 @@ enum class LockTargetType {
 LockTargetType nowTargetType = LockTargetType::None;
 //ターゲットの番号
 int targetIndex = -1;
+
+//敵を除外する範囲
+static constexpr float kCancelLockOnEnemyRange = 300;
 
 struct LockOnSign {
 	Vector2 pos = {};
@@ -403,8 +408,22 @@ static void RotatePlayer(void) {
 		}
 	}
 
+	// boss探索
+	BossEnemy* boss = GetBossEnemy();
+	if (boss->isAlive) {
+		float dx = boss->pos.x - player.pos.x;
+		float dy = boss->pos.y - player.pos.y;
+		float dis = sqrtf(dx * dx + dy * dy);
+
+		if (dis < closestDis) {
+			closestDis = dis;
+			targetIndex = 0;
+			nowTargetType = LockTargetType::Boss;
+		}
+	}
+
 	//ジェム
-	if (kGemLockOnSwitch) {
+	if (kGemLockOnSwitch && KCancelLockOnEnemySwitch && closestDis > kCancelLockOnEnemyRange) {
 		for (int i = 0; i < gemLimit; i++) {
 			if (!gem[i].isAlive) continue;
 
@@ -417,20 +436,6 @@ static void RotatePlayer(void) {
 				targetIndex = i;
 				nowTargetType = LockTargetType::Gem;
 			}
-		}
-	}
-
-	// boss探索
-	BossEnemy* boss = GetBossEnemy();
-	if (boss->isAlive) {
-		float dx = boss->pos.x - player.pos.x;
-		float dy = boss->pos.y - player.pos.y;
-		float dis = sqrtf(dx * dx + dy * dy);
-
-		if (dis < closestDis) {
-			closestDis = dis;
-			targetIndex = 0;
-			nowTargetType = LockTargetType::Boss;
 		}
 	}
 
