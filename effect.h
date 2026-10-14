@@ -51,6 +51,12 @@ void CreateChargeOrbEffect(Vector2 pos);
 void CreateChargeChipEffect();
 
 /// <summary>
+/// 爆発エフェクトの生成処理
+/// </summary>
+/// <param name="pos">生成座標</param>
+void CreateExplodeEffect(Vector2 pos);
+
+/// <summary>
 ///三角形のエフェクト生成処理　
 /// </summary>
 /// /// <param name="pos"></param>

@@ -110,6 +110,8 @@ enum class TextureType {
 	EffectCircle,
 	EffectTriangle,
 
+	ExplodeEffect,
+
 	//===============
 	//Pause
 	//===============

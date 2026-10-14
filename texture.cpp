@@ -102,6 +102,8 @@ void InitTexture(void) {
 		{ Novice::LoadTexture("./resources/texture/effect/effect.circle.png"), {256 , 256 }, {0, 0}, 0, 0, WHITE },
 		{ Novice::LoadTexture("./resources/texture/effect/effect.triangle.png"), {26 , 22 }, {0, 0}, 0, 0, WHITE },
 
+		{ Novice::LoadTexture("./resources/texture/effect/explode_effect.png"), {128 , 128 }, {2, 0}, 6, 0, WHITE },
+
 		//===============
 		//Pause
 		//===============

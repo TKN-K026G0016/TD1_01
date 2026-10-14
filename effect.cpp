@@ -228,6 +228,21 @@ ChargeChipEffect chargeChipEffect[kChargeChipEffecLimit];
 
 #pragma endregion
 
+#pragma region データ: 爆発エフェクト
+
+constexpr int kExplodeEffectLimit = 30;
+struct ExplodeEffect {
+	Vector2 pos = {};
+	Vector2 size = { 128, 128 };
+
+	bool isShoot = false;
+
+	Texture texture = {};
+};
+ExplodeEffect explodeEffect[kExplodeEffectLimit];
+
+#pragma endregion
+
 #pragma region データ: triangleEffect
 
 const int kTriangleEffectNumber = 50;
@@ -834,6 +849,54 @@ void CreateChargeChipEffect() {
 
 #pragma endregion
 
+#pragma region 関数: ExplodeEffect
+
+static void InitExplodeEffect(void) {
+	for (int i = 0; i < kExplodeEffectLimit; i++) {
+		explodeEffect[i] = {};
+		explodeEffect[i].texture = GetTexture(TextureType::ExplodeEffect);
+	}
+}
+
+static void UpdateExplodeEffect(void) {
+	for (int i = 0; i < kExplodeEffectLimit; i++) {
+		if (!explodeEffect[i].isShoot) continue;
+
+		explodeEffect[i].texture.animChangeTimer.count++;
+		if (explodeEffect[i].texture.animChangeTimer.count >= explodeEffect[i].texture.animChangeTimer.time) {
+			explodeEffect[i].texture.animChangeTimer.count = 0;
+
+			if (explodeEffect[i].texture.animNum < explodeEffect[i].texture.animLimit) {
+				explodeEffect[i].texture.animNum++;
+			} else {
+				explodeEffect[i].texture.animNum = 0;
+				explodeEffect[i].isShoot = false;
+			}
+		}
+	}
+}
+
+static void DrawExplodeEffect(void) {
+	for (int i = 0; i < kExplodeEffectLimit; i++) {
+		if (!explodeEffect[i].isShoot) continue;
+
+		DrawTextureObj(explodeEffect[i].texture, explodeEffect[i].pos, explodeEffect[i].size);
+	}
+}
+
+void CreateExplodeEffect(Vector2 pos) {
+	for (int i = 0; i < kExplodeEffectLimit; i++) {
+		if (explodeEffect[i].isShoot) continue;
+
+		explodeEffect[i].isShoot = true;
+		explodeEffect[i].pos = pos;
+
+		break;
+	}
+}
+
+#pragma endregion
+
 #pragma region 関数: Triangleeffect
 
 void CreateTriangleEffect(Vector2 pos) {
@@ -962,6 +1025,8 @@ void InitEffect() {
 	InitChargeOrbEffect();
 	InitChargeChipEffect();
 
+	InitExplodeEffect();
+
 	InitTriangleEffect();
 	InitCircleEffect();
 #ifdef _DEBUG
@@ -984,6 +1049,7 @@ void UpdateEffect() {
 	UpdateElecShockChargedEffect();
 	UpdateChargeOrbEffect();
 	UpdateChargeChipEffect();
+	UpdateExplodeEffect();
 	UpdateTriangleEffect();
 	UpdateCircleEffect();
 }
@@ -995,6 +1061,7 @@ void DrawEffect() {
 	DrawElecShockChargedEffect();
 	DrawChargeOrbEffect();
 	DrawChargeChipEffect();
+	DrawExplodeEffect();
 	DrawTriangleEffect();
 	DrawCircleEffect();
 }

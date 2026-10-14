@@ -4,6 +4,7 @@
 #include "enemy_bullet.h"
 #include "gem.h"
 #include "boss_enemy.h"
+#include "effect.h"
 
 #include "vector2.h"
 #include "timer.h"
@@ -180,7 +181,11 @@ static void UpdateFlashTimerEnemySniper(void) {
 static void DeadEnemySniper(int index) {
 	enemySniper[index].isAlive = false;
 	enemySniper[index].hp = enemySniper[index].hpMax;
+
+	CreateExplodeEffect(enemySniper[index].pos);
+
 	nowEnemySniperIsAliveCount--;
+
 	spawner.spawnTimer.time = spawner.kSpawnTime * nowEnemySniperIsAliveCount;
 }
 
@@ -290,6 +295,8 @@ static void UpdateFlashTimerEnemyGuardian(void) {
 static void DeadEnemyguardian(int index) {
 	enemyGuardian[index].isAlive = false;
 	enemyGuardian[index].hp = enemyGuardian[index].hpMax;
+
+	CreateExplodeEffect(enemyGuardian[index].pos);
 }
 
 static void CheckDeadEnemyGuardian(void) {
@@ -430,6 +437,9 @@ static void UpdateFlashTimerEnemyBasic(void) {
 static void DeadEnemyBasic(int index) {
 	enemyBasic[index].isAlive = false;
 	enemyBasic[index].hp = enemyBasic[index].hpMax;
+
+	CreateExplodeEffect(enemyBasic[index].pos);
+
 	/*spawner.spawnTimer.time = spawner.kSpawnTime * nowenemyBasicIsAliveCount;*/
 }
 
@@ -533,6 +543,8 @@ static void UpdateFlashTimerEnemyM(void) {
 static void DeadEnemyM(int index) {
 	enemyM[index].isAlive = false;
 	enemyM[index].hp = enemyM[index].hpMax;
+
+	CreateExplodeEffect(enemyM[index].pos);
 }
 
 static void CheckDeadEnemyM(void) {
@@ -647,6 +659,9 @@ static void UpdateFlashTimerEnemySmall(void) {
 static void DeadEnemySmall(int index) {
 	enemySmall[index].isAlive = false;
 	enemySmall[index].hp = enemySmall[index].hpMax;
+
+	CreateExplodeEffect(enemySmall[index].pos);
+
 	/*spawner.spawnTimer.time = spawner.kSpawnTime * nowenemyBasicIsAliveCount;*/
 }
 
@@ -749,6 +764,8 @@ static void MoveEnemyBomb(void) {
 static void DeadEnemyBomb(int index) {
 	enemyBomb[index].isAlive = false;
 	enemyBomb[index].hp = enemyBomb[index].hpMax;
+
+	CreateExplodeEffect(enemyBomb[index].pos);
 }
 
 static void BurstEnemyBomb(void) {
