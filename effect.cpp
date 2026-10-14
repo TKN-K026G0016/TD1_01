@@ -235,10 +235,11 @@ struct TriangleEffect
 {
 	Vector2 pos = { };
 	Vector2 acceleration = { };
-	Vector2 size = { 32,32 };
+	Vector2 size = { 26,22 };
 	bool appear = { };
 	unsigned int color = { };
 	Texture texture = {};
+	float rotateTheta = 0.0f;
 };
 TriangleEffect triangleEffect[kTriangleEffectNumber];
 
@@ -251,8 +252,7 @@ const int kCircleEffectNumber = 20;
 struct CircleEffect
 {
 	Vector2 pos = { };
-	Vector2 acceleration = { };
-	Vector2 size = { 32,32 };
+	Vector2 size = { 256,256 };
 	bool appear = { };
 	unsigned int color = { };
 	Texture texture = {};
@@ -261,6 +261,7 @@ TriangleEffect circleEffect[kCircleEffectNumber];
 
 
 #pragma endregion
+
 
 #pragma region 関数: ジェム取得effect
 
@@ -847,6 +848,7 @@ void CreateTriangleEffect(Vector2 pos) {
 
 		float randomSpeedX = ToFloat(GetRand(-10, 10));
 		float randomSpeedY = ToFloat(GetRand(-10, 10));
+		triangleEffect[i].rotateTheta= ToFloat(GetRand(1, 4)* (M_PI) / 4);
 		triangleEffect[i].acceleration.x = randomSpeedX;
 		triangleEffect[i].acceleration.y = randomSpeedY;
 
@@ -856,12 +858,12 @@ void CreateTriangleEffect(Vector2 pos) {
 }
 
 static void InitTriangleEffect(void) {
-	for (int i = 0; i < KGageEffectNumber; i++) {
+	for (int i = 0; i < kTriangleEffectNumber; i++) {
 		triangleEffect[i].texture = GetTexture(TextureType::EffectTriangle);
 	}
 }
 
-void UodateTriangleEffect() {
+void UpdateTriangleEffect() {
 	for (int i = 0; i < kTriangleEffectNumber; i++) {
 		if (!triangleEffect[i].appear) continue;
 
@@ -885,12 +887,67 @@ void UodateTriangleEffect() {
 void DrawTriangleEffect() {
 	for (int i = 0; i < kTriangleEffectNumber; i++) {
 		if (triangleEffect[i].appear == true) {
-			DrawTextureUI(triangleEffect[i].texture, triangleEffect[i].pos, triangleEffect[i].size);
+			DrawTextureRotateObj(triangleEffect[i].texture, triangleEffect[i].pos, triangleEffect[i].size,circleEffect[i].rotateTheta);
 		}
 	}
 }
 #pragma endregion
 
+#pragma region 関数: circleeffect
+
+void CreateCircleEffect(Vector2 pos) {
+	for (int i = 0; i < kCircleEffectNumber; i++)
+	{
+		if (circleEffect[i].appear) continue;
+		circleEffect[i].pos = pos;
+		circleEffect[i].color = 0xffffffff;
+		circleEffect[i].size.x = 0;
+		circleEffect[i].size.y = 0;
+		break;
+
+	}
+}
+
+static void InitCircleEffect(void) {
+	for (int i = 0; i < kCircleEffectNumber; i++) {
+		circleEffect[i].texture = GetTexture(TextureType::EffectCircle);
+	}
+}
+
+void UpdateCircleEffect() {
+	for (int i = 0; i < kCircleEffectNumber; i++) {
+		if (!circleEffect[i].appear) continue;
+
+		circleEffect[i].size.x += 10;
+		circleEffect[i].size.y += 10;
+		if (circleEffect[i].size.x >= 256) {
+			circleEffect[i].size.x = 256;
+			circleEffect[i].size.y = 256;
+		}
+
+		//透明化(消滅)
+		if (circleEffect[i].size.x == 256) {
+			if (circleEffect[i].color >= 0xffffff05) {
+				circleEffect[i].color -= 0x00000015;
+				circleEffect[i].texture.color = circleEffect[i].color;
+			}
+			else {
+				circleEffect[i].color = 0xffffffff;
+				circleEffect[i].appear = false;
+			}
+		}
+	}
+}
+
+void DrawCircleEffect() {
+	for (int i = 0; i < kCircleEffectNumber; i++) {
+		if (circleEffect[i].appear == true) {
+			DrawTextureUI(circleEffect[i].texture, circleEffect[i].pos, circleEffect[i].size);
+		}
+	}
+}
+
+#pragma endregion
 
 void InitEffect() {
 	InitGemEffect();
@@ -906,6 +963,7 @@ void InitEffect() {
 	InitChargeChipEffect();
 
 	InitTriangleEffect();
+	InitCircleEffect();
 #ifdef _DEBUG
 
 	CreateJemEffect();
@@ -926,7 +984,8 @@ void UpdateEffect() {
 	UpdateElecShockChargedEffect();
 	UpdateChargeOrbEffect();
 	UpdateChargeChipEffect();
-	UodateTriangleEffect();
+	UpdateTriangleEffect();
+	UpdateCircleEffect();
 }
 void DrawEffect() {
 	DrawGetEffect();
@@ -937,6 +996,7 @@ void DrawEffect() {
 	DrawChargeOrbEffect();
 	DrawChargeChipEffect();
 	DrawTriangleEffect();
+	DrawCircleEffect();
 }
 
 void DrawEffectAsUI() {
