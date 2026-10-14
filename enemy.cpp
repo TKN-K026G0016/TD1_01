@@ -38,6 +38,8 @@ constexpr int kEnemyBasicLimit = 20;
 static EnemyBasic enemyBasic[kEnemyBasicLimit];
 //ジェムの生成量
 constexpr int enemyBasicGemLimit = 2;
+//Formationの生成間隔
+constexpr int formationRange = 75;
 
 #pragma endregion
 
@@ -211,7 +213,8 @@ static void DrawEnemySniper(void) {
 		Texture texture = enemySniper[i].texture;
 		if (enemySniper[i].isFlash) {
 			texture.color = kFlashColor;
-		} else {
+		}
+		else {
 			texture.color = kNormalColor;
 		}
 
@@ -319,7 +322,8 @@ static void DrawEnemyGuardian(void) {
 		Texture texture = enemyGuardian[i].texture;
 		if (enemyGuardian[i].isFlash) {
 			texture.color = kFlashColor;
-		} else {
+		}
+		else {
 			texture.color = kNormalColor;
 		}
 
@@ -378,7 +382,7 @@ static void InitEnemyBasic(void) {
 static void MoveEnemyBasic(void) {
 	for (int i = 0; i < kEnemyBasicLimit; i++) {
 		if (!enemyBasic[i].isAlive) continue;
-		if(enemyBasic[i].thetaUpDate) {
+		if (enemyBasic[i].thetaUpDate) {
 
 			Vector2 targetPos = GetPlayerPos();
 			float disX = targetPos.x - enemyBasic[i].pos.x;
@@ -392,10 +396,10 @@ static void MoveEnemyBasic(void) {
 
 			enemyBasic[i].pos.x += moveVec.x * enemyBasic[i].moveSpeed;
 			enemyBasic[i].pos.y += moveVec.y * enemyBasic[i].moveSpeed;*/
-			enemyBasic[i].moveTheta = atan2f(disY,disX);
+			enemyBasic[i].moveTheta = atan2f(disY, disX);
 		}
-			enemyBasic[i].pos.x += cosf(enemyBasic[i].moveTheta) * enemyBasic[i].moveSpeed;
-			enemyBasic[i].pos.y += sinf(enemyBasic[i].moveTheta) * enemyBasic[i].moveSpeed;
+		enemyBasic[i].pos.x += cosf(enemyBasic[i].moveTheta) * enemyBasic[i].moveSpeed;
+		enemyBasic[i].pos.y += sinf(enemyBasic[i].moveTheta) * enemyBasic[i].moveSpeed;
 	}
 }
 
@@ -770,14 +774,26 @@ static void DeadEnemyBomb(int index) {
 
 static void BurstEnemyBomb(void) {
 	Vector2 playerPos = GetPlayerPos();
+	int gemLimit = GetGemLimit();
+	Gem* gem = GetGemArray();
 	for (int i = 0;i < kEnemyBombLimit;i++) {
 		enemyBomb[i].burst.count++;
 		if (enemyBomb[i].burst.count == enemyBomb[i].burst.time) {
-			float DiffX = enemyBomb[i].pos.x - playerPos.x;
-			float DiffY = enemyBomb[i].pos.y - playerPos.y;
-			float distance = sqrtf(DiffX * DiffX + DiffY * DiffY);
-			if (distance <= enemyBomb[i].burstRadius) {
+			float PlayerDiffX = enemyBomb[i].pos.x - playerPos.x;
+			float PlayerDiffY = enemyBomb[i].pos.y - playerPos.y;
+			float playerDistance = sqrtf(PlayerDiffX * PlayerDiffX + PlayerDiffY * PlayerDiffY);
+			if (playerDistance <= enemyBomb[i].burstRadius) {
 				PlayerDamage(enemyBomb[i].pos);
+			}
+			for (int j = 0;j < gemLimit;j++) {
+				if (!gem[j].isAlive)continue;
+
+				float GemDiffX = enemyBomb[i].pos.x - gem[j].pos.x;
+				float GemDiffY = enemyBomb[i].pos.y - gem[j].pos.y;
+				float gemDistance = sqrtf(GemDiffX * GemDiffX + GemDiffY * GemDiffY);
+				if (gemDistance <= enemyBomb[i].burstRadius) {
+					BreakGem(j);
+				}
 			}
 			DeadEnemyBomb(i);
 		}
@@ -836,13 +852,21 @@ static void DrawEnemyBomb(void) {
 		Texture texture = enemyBomb[i].texture;
 		if (enemyBomb[i].isFlash) {
 			texture.color = kFlashColor;
-		} else {
+		}
+		else {
 			texture.color = kNormalColor;
 		}
 
 		//爆発範囲の描画
-		if (enemyBomb[i].burst.count >= enemyBomb[i].burst.time - 60) {
+		if (enemyBomb[i].burst.count <= enemyBomb[i].burst.time - 60) {
 			DrawTextureObj(enemyBomb[i].burstTexture, enemyBomb[i].pos, enemyBomb[i].bustSize);
+		}
+		else {
+			for (int j = 0;j < 30;j++) {
+				if (enemyBomb[i].burst.time - enemyBomb[i].burst.count == j * 2) {
+					DrawTextureObj(enemyBomb[i].burstTexture, enemyBomb[i].pos, enemyBomb[i].bustSize);
+				}
+			}
 		}
 		DrawTextureObj(texture, enemyBomb[i].pos, enemyBomb[i].size);
 	}
@@ -1024,8 +1048,8 @@ void SpawnEnemy(Vector2 pos, EnemyType type) {
 
 
 			enemyBasic[i].moveTheta = formationTheta;
-			enemyBasic[i].pos.x = pos.x+(50*enemyFomationCount-100)*cosf(formationTheta);
-			enemyBasic[i].pos.y = pos.y+(50*enemyFomationCount-100)*sinf(formationTheta);
+			enemyBasic[i].pos.x = pos.x + (formationRange * enemyFomationCount - (formationRange * 2)) * cosf(formationTheta);
+			enemyBasic[i].pos.y = pos.y + (formationRange * enemyFomationCount - (formationRange * 2)) * sinf(formationTheta);
 			enemyFomationCount++;
 
 			//5回生成したら終了
@@ -1090,7 +1114,7 @@ void DamageEnemyBasic(EnemyBasic& enemy, int pow) {
 	enemy.hp -= pow;
 
 	//フラッシュさせる
- 	enemy.isFlash = true;
+	enemy.isFlash = true;
 	enemy.flashTimer.count = 0;
 
 	//ダメージエフェクト
