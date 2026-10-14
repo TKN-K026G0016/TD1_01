@@ -65,9 +65,9 @@ Texture fadePanelTexture = {};
 //フェードの速度
 int fadeSpeed = 7;
 //アルファ値の上限値
-int alphaMax = 255;
+int kAlphaMax = 255;
 //アルファ値の下限値
-int alphaMin = 0;
+int kAlphaMin = 0;
 
 //フェードアウト完了後の待機時間
 Timer waitChangeSceneTimer = { 60, 0 };
@@ -94,8 +94,8 @@ static void MoveFadePanel(void) {
 		}
 
 		fadePanel.fadeAlpha += fadeSpeed;
-		if (fadePanel.fadeAlpha >= alphaMax) {
-			fadePanel.fadeAlpha = alphaMax;
+		if (fadePanel.fadeAlpha >= kAlphaMax) {
+			fadePanel.fadeAlpha = kAlphaMax;
 
 
 			//フェード後の処理(リトライorゲームオーバーorクリアorタイトル)
@@ -133,14 +133,14 @@ static void MoveFadePanel(void) {
 
 		//初期化
 		if (fadePanel.preFadeMode != fadePanel.nowFadeMode) {
-			fadePanel.fadeAlpha = alphaMax;
+			fadePanel.fadeAlpha = kAlphaMax;
 
 			fadePanel.preFadeMode = fadePanel.nowFadeMode;
 		}
 
 		fadePanel.fadeAlpha -= fadeSpeed;
-		if (fadePanel.fadeAlpha >= alphaMin) {
-			fadePanel.fadeAlpha = alphaMin;
+		if (fadePanel.fadeAlpha >= kAlphaMin) {
+			fadePanel.fadeAlpha = kAlphaMin;
 			fadePanel.nowFadeMode = ModeFade::Standby;
 		}
 

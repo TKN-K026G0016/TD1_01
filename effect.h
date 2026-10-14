@@ -59,8 +59,18 @@ void CreateExplodeEffect(Vector2 pos);
 /// <summary>
 ///三角形のエフェクト生成処理　
 /// </summary>
-/// /// <param name="pos"></param>
-void CreateTriangleEffect(Vector2 pos);
+/// <param name="pos">生成座標</param>
+/// <param name="color">表示する色</param>
+void CreateTriangleEffect(Vector2 pos, unsigned int color);
+
+/// <summary>
+/// 三角形のエフェクト(等速)生成処理
+/// </summary>
+/// <param name="pos">生成座標</param>
+/// <param name="sizeValue">サイズ</param>
+/// <param name="moveSpeed">移動速度</param>
+/// <param name="color">色</param>
+void CreateTriangleEffect2(Vector2 pos, float sizeValue, float moveSpeed, unsigned int color);
 
 /// <summary>
 /// 拡大する円のエフェクト生成処理
