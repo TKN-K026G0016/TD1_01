@@ -839,8 +839,12 @@ void CreateTriangleEffect(Vector2 pos) {
 	for (int i = 0; i < kTriangleEffectNumber; i++)
 	{
 		if (triangleEffect[i].appear) continue;
+
+		triangleEffect[i].appear = true;
+
 		triangleEffect[i].pos = pos;
 		triangleEffect[i].color = 0xffffffff;
+
 		float randomSpeedX = ToFloat(GetRand(-10, 10));
 		float randomSpeedY = ToFloat(GetRand(-10, 10));
 		triangleEffect[i].acceleration.x = randomSpeedX;
