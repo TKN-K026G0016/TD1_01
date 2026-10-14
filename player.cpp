@@ -125,7 +125,7 @@ LockTargetType nowTargetType = LockTargetType::None;
 int targetIndex = -1;
 
 //敵を除外する範囲
-static constexpr float kCancelLockOnEnemyRange = 320;
+static constexpr float kCancelLockOnEnemyRange = 400;
 
 struct LockOnSign {
 	Vector2 pos = {};

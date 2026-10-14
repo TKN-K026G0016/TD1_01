@@ -260,7 +260,7 @@ void CheckCollisionElecBulletVSBossEnemy(void) {
 
 			int pow = elecBullet[i].pow;
 
-			boss->remainLife -= pow - 1;
+			boss->remainLife -= pow /*- 1*/;
 		}
 	}
 }

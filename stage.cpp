@@ -92,45 +92,45 @@ struct SpawnerData {
 SpawnerData spawners[ToInt(Round::Count)][kMaxSpawner] = {
 	//Round1
 	{
-		{EnemyType::EnemyBasic, {250, 0}},
+		{EnemyType::EnemyBasic, {230, 120}},
 	},
 	//Round2
 	{
 		{ EnemyType::EnemyBasic, {200, 0} },
-		{ EnemyType::EnemySmallGroup, {250, 0} },
+		{ EnemyType::EnemySmallGroup, {180, 0} },
 		{ EnemyType::EnemyFormation, {300, 0} },
 	},
 	//Round3
 	{
 		{ EnemyType::EnemyBasic, {150, 0} },
-		{ EnemyType::EnemySmallGroup, {250, 0} },
+		{ EnemyType::EnemySmallGroup, {160, 0} },
 		{ EnemyType::EnemyFormation, {280, 0} },
 		{ EnemyType::EnemySniper, {300, 0} },
 	},
 	//Round4
 	{
-		{ EnemyType::EnemyBasic, {200, 0} },
-		//{ EnemyType::EnemySmallGroup, {250, 0} },
+		{ EnemyType::EnemyBasic, {180, 0} },
+		{ EnemyType::EnemySmallGroup, {200, 0} },
 		//{ EnemyType::EnemyFormation, {280, 0} },
 		//{ EnemyType::EnemySniper, {300, 0} },
 		{EnemyType::EnemyBomb, {300, 300}},
 	},
 	//Round5
 	{
-		{ EnemyType::EnemyBasic, {150, 0} },
-		{ EnemyType::EnemySmallGroup, {200, 0} },
-		{ EnemyType::EnemyFormation, {280, 0} },
-		{ EnemyType::EnemySniper, {300, 0} },
-		{EnemyType::EnemyBomb, {500, 0}},
+		{ EnemyType::EnemyBasic, {120, 0} },
+		{ EnemyType::EnemySmallGroup, {60, 50} },
+		{ EnemyType::EnemyFormation, {250, 0} },
+		{ EnemyType::EnemySniper, {100, 0} },
+		{EnemyType::EnemyBomb, {300, 0}},
 	},
 
 	//BossRound
 		{
 		{ EnemyType::EnemyBasic, {150, 0} },
-		{ EnemyType::EnemySmallGroup, {190, 0} },
+		{ EnemyType::EnemySmallGroup, {200, 50} },
 		{ EnemyType::EnemyFormation, {250, 0} },
 		{ EnemyType::EnemySniper, {250, 0} },
-		{EnemyType::EnemyBomb, {500, 0}},
+		//{EnemyType::EnemyBomb, {500, 0}},
 	},
 };
 
