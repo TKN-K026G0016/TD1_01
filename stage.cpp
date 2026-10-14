@@ -311,7 +311,7 @@ static void SpawnEnemyByRound(void) {
 			//ランダムな位置を生成
 			Vector2 createPos = CreatePosOutCameraZone();
 
-			SpawnEnemy(createPos, EnemyType::EnemyBasic);
+			SpawnEnemy(createPos, EnemyType::EnemyFormation);
 		}
 
 #pragma endregion

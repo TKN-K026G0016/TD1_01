@@ -990,12 +990,17 @@ void SpawnEnemy(Vector2 pos, EnemyType type) {
 		int enemyFomationCount = 0;
 		for (int i = 0; i < kEnemyBasicLimit; i++) {
 			if (enemyBasic[i].isAlive) continue;
+
 			enemyBasic[i].isAlive = true;
 			enemyBasic[i].thetaUpDate = false;
+
+
 			enemyBasic[i].moveTheta = formationTheta;
 			enemyBasic[i].pos.x = pos.x+(50*enemyFomationCount-100)*cosf(formationTheta);
 			enemyBasic[i].pos.y = pos.y+(50*enemyFomationCount-100)*sinf(formationTheta);
 			enemyFomationCount++;
+
+			//5回生成したら終了
 			if (enemyFomationCount == 5) {
 				break;
 			}
