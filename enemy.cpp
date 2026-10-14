@@ -978,6 +978,23 @@ void SpawnEnemy(Vector2 pos, EnemyType type) {
 		}
 		break;
 	}
+	case EnemyType::EnemyFormation: {
+		Vector2 playerPos = GetPlayerPos();
+		float formationTheta = atan2f(playerPos.y - pos.y, playerPos.x - pos.x);
+		int enemyFomationCount = 0;
+		for (int i = 0; i < kEnemyBasicLimit; i++) {
+			if (enemyBasic[i].isAlive) continue;
+			enemyBasic[i].isAlive = true;
+			enemyBasic[i].pos.x = pos.x+(50*enemyFomationCount-100)*cosf(formationTheta);
+			enemyBasic[i].pos.y = pos.y+(50*enemyFomationCount-100)*sinf(formationTheta);
+			enemyFomationCount++;
+			if (enemyFomationCount == 5) {
+				break;
+			}
+		}
+
+		break;
+	}
 	}
 }
 

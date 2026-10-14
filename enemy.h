@@ -12,6 +12,8 @@ enum class EnemyType {
 	EnemyGuardian,
 	//移動のみ
 	EnemyBasic,
+	//隊列移動
+	EnemyFormation,
 	//小雑魚召喚
 	EnemyM,
 	//小雑魚
