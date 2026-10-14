@@ -64,19 +64,20 @@ enum class TextureType {
 	GemSmallLight,
 
 	//Enemy
-	Enemy1,
+	EnemySniper,
 	EnemyGuardian,
 	EnemyBasic,
 	EnemySmall,
+
+
+	BossBomb,
+	BossBomBurstRange,
 
 	EnemyBullet,
 	EnemyLaser,
 
 	//BossEnemy
 	BossEnemy,
-
-	BossBomb,
-	BossBomBurstRange,
 
 	//MapChip
 

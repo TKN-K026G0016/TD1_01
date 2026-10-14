@@ -14,6 +14,10 @@
 #define _USE_MATH_DEFINES
 #include <math.h>
 
+//カラー関係
+static constexpr unsigned int kNormalColor = 0xE01068FF;
+static constexpr unsigned int kFlashColor = WHITE;
+
 BossEnemy bossEnemy;
 
 #pragma region データ: Bomb攻撃

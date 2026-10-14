@@ -56,19 +56,20 @@ void InitTexture(void) {
 		{ Novice::LoadTexture("./resources/texture/item/gem_small_light.png"), { 16, 16 }, {7, 0}, 2, 0, WHITE },
 
 		//Enemy
-		{ Novice::LoadTexture("./resources/texture/enemy/enemy1.png"), { 128, 128 }, {0, 0}, 0, 0, WHITE },
-		{ Novice::LoadTexture("./resources/texture/enemy/enemy2.png"), { 128, 128 }, {0, 0}, 0, 0, WHITE },
+
+		{ Novice::LoadTexture("./resources/texture/enemy/enemy_sniper.png"), { 128, 128 }, {0, 0}, 0, 0, WHITE },
+		{ Novice::LoadTexture("./resources/texture/enemy/enemy_guardian.png"), { 128, 128 }, {0, 0}, 0, 0, WHITE },
 		{ Novice::LoadTexture("./resources/texture/enemy/enemy_basic.png"), { 128, 128 }, {0, 0}, 0, 0, WHITE },
 		{ Novice::LoadTexture("./resources/texture/enemy/enemy_small.png"), { 32, 32 }, {0, 0}, 0, 0, WHITE },
+
+		{Novice::LoadTexture("./resources/texture/enemy/enemy_bomb.png"), { 128, 128 }, {0, 0}, 0, 0, WHITE},
+		{Novice::LoadTexture("./resources/texture/enemy/bossBomBurstRange.png"), { 128, 128 }, {0, 0}, 0, 0, WHITE},
 
 		{ Novice::LoadTexture("./resources/texture/enemy/enemy_bullet1.png"), { 32, 32 }, {6, 0}, 3, 0, WHITE },
 		{ Novice::LoadTexture("./resources/texture/player/laser2.png"), { 64, 64 }, {0, 0}, 0, 0, WHITE },
 
 		//BossEnemy
-		{ Novice::LoadTexture("./resources/texture/enemy/bossEnemy.png"), { 512, 512 }, {0, 0}, 0, 0, WHITE },
-
-		{Novice::LoadTexture("./resources/texture/enemy/bossBom.png"), { 128, 128 }, {0, 0}, 0, 0, WHITE},
-		{Novice::LoadTexture("./resources/texture/enemy/bossBomBurstRange.png"), { 128, 128 }, {0, 0}, 0, 0, WHITE},
+		{ Novice::LoadTexture("./resources/texture/enemy/boss_enemy.png"), { 512, 512 }, {0, 0}, 0, 0, WHITE },
 
 		//MapChip
 
