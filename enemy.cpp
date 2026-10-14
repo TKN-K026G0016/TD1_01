@@ -1054,6 +1054,9 @@ void DamageEnemySniper(EnemySniper& enemy, int pow) {
 	//フラッシュさせる
 	enemy.isFlash = true;
 	enemy.flashTimer.count = 0;
+
+	//ダメージエフェクト
+	CreateEnemyDamageEffect(enemy.pos);
 }
 
 EnemyGuardian* GetEnemyGuardianArray(void) {
@@ -1070,6 +1073,9 @@ void DamageEnemyGuardian(EnemyGuardian& enemy, int pow) {
 	//フラッシュさせる
 	enemy.isFlash = true;
 	enemy.flashTimer.count = 0;
+
+	//ダメージエフェクト
+	CreateEnemyDamageEffect(enemy.pos);
 }
 
 EnemyBasic* GetEnemyBasicArray(void) {
@@ -1086,6 +1092,9 @@ void DamageEnemyBasic(EnemyBasic& enemy, int pow) {
 	//フラッシュさせる
  	enemy.isFlash = true;
 	enemy.flashTimer.count = 0;
+
+	//ダメージエフェクト
+	CreateEnemyDamageEffect(enemy.pos);
 }
 
 EnemyM* GetEnemyMArray(void) {
@@ -1102,6 +1111,9 @@ void DamageEnemyM(EnemyM& enemy, int pow) {
 	//フラッシュさせる
 	enemy.isFlash = true;
 	enemy.flashTimer.count = 0;
+
+	//ダメージエフェクト
+	CreateEnemyDamageEffect(enemy.pos);
 }
 
 EnemySmall* GetEnemySmallArray(void) {
@@ -1118,6 +1130,9 @@ void DamageEnemySmall(EnemySmall& enemy, int pow) {
 	//フラッシュさせる
 	enemy.isFlash = true;
 	enemy.flashTimer.count = 0;
+
+	//ダメージエフェクト
+	CreateEnemyDamageEffect(enemy.pos);
 }
 
 EnemyBomb* GetEnemyBombArray(void) {
@@ -1134,6 +1149,9 @@ void DamageEnemyBomb(EnemyBomb& enemy, int pow) {
 	//フラッシュさせる
 	enemy.isFlash = true;
 	enemy.flashTimer.count = 0;
+
+	//ダメージエフェクト
+	CreateEnemyDamageEffect(enemy.pos);
 }
 
 #pragma endregion

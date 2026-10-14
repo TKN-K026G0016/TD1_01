@@ -377,6 +377,28 @@ CircleEffect circleEffect[kCircleEffectNumber];
 
 #pragma endregion
 
+#pragma region データ; PlayerDamageEffect
+struct PlayerDamageEffect {
+	int createTriangleLimit = 4;
+	float triangleSizeValue = 20.0f;
+	float triangleMoveSpeed = 20.0f;
+};
+PlayerDamageEffect playerDamageEffect;
+
+#pragma endregion
+
+#pragma region データ: EnemyDamageEffect
+
+struct EnemyDamageEffect {
+	int createTriangleLimit = 2;
+	float triangleSizeValue = 20.0f;
+	float triangleMoveSpeed = 20.0f;
+
+};
+EnemyDamageEffect enemyDamageEffect;
+
+#pragma endregion
+
 
 #pragma region 関数: ジェム取得effect
 
@@ -1286,6 +1308,26 @@ void CreateElecShockChargedEffect(Vector2 pos) {
 
 }
 
+
+#pragma endregion
+
+#pragma region 関数: PlayerDamageEffect
+
+void CreatePlayerDamageEffect(Vector2 pos) {
+	for (int i = 0; i < playerDamageEffect.createTriangleLimit; i++) {
+		CreateTriangleEffect2(pos, playerDamageEffect.triangleSizeValue, playerDamageEffect.triangleMoveSpeed, kPlayerColor);
+	}
+}
+
+#pragma endregion
+
+#pragma region 関数: EnemyDamageEffect
+
+void CreateEnemyDamageEffect(Vector2 pos) {
+	for (int i = 0; i < enemyDamageEffect.createTriangleLimit; i++) {
+		CreateTriangleEffect2(pos, enemyDamageEffect.triangleSizeValue, enemyDamageEffect.triangleMoveSpeed, kEnemyColor);
+	}
+}
 
 #pragma endregion
 

@@ -958,6 +958,8 @@ void PlayerDamage(Vector2 hitPos) {
 	//体力減らす
 	player.hp--;
 
+	CreatePlayerDamageEffect(player.pos);
+
 #pragma region ノックバック方向設定
 
 	knockBackVec = { player.pos.x - hitPos.x, player.pos.y - hitPos.y };

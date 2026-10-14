@@ -4,6 +4,7 @@
 #include "stage.h"
 #include "enemy_bullet.h"
 #include "enemy.h"
+#include "effect.h"
 
 #include "vector2.h"
 #include "tool.h"
@@ -478,6 +479,9 @@ void DamageBossEnemy(int pow) {
 
 	bossEnemy.isFlash = true;
 	bossEnemy.flashTimer.count = 0;
+
+	//ダメージエフェクト
+	CreateEnemyDamageEffect(bossEnemy.pos);
 }
 
 #pragma endregion
