@@ -112,6 +112,8 @@ struct EnemyBasic {
 
 	//移動速度
 	float moveSpeed = 1.5f;
+	float moveTheta = 0;
+	bool thetaUpDate = false;
 
 	//ショックの生成無視状態
 	bool isIgnoreShock = false;

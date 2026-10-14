@@ -367,19 +367,24 @@ static void InitEnemyBasic(void) {
 static void MoveEnemyBasic(void) {
 	for (int i = 0; i < kEnemyBasicLimit; i++) {
 		if (!enemyBasic[i].isAlive) continue;
+		if(enemyBasic[i].thetaUpDate) {
 
-		Vector2 targetPos = GetPlayerPos();
-		float disX = targetPos.x - enemyBasic[i].pos.x;
-		float disY = targetPos.y - enemyBasic[i].pos.y;
-		float disLength = sqrtf(disX * disX + disY * disY);
-		if (disLength != 0.0f) {
-			disX /= disLength;
-			disY /= disLength;
+			Vector2 targetPos = GetPlayerPos();
+			float disX = targetPos.x - enemyBasic[i].pos.x;
+			float disY = targetPos.y - enemyBasic[i].pos.y;/*
+			float disLength = sqrtf(disX * disX + disY * disY);
+			if (disLength != 0.0f) {
+				disX /= disLength;
+				disY /= disLength;
+			}
+			Vector2 moveVec = { disX, disY };
+
+			enemyBasic[i].pos.x += moveVec.x * enemyBasic[i].moveSpeed;
+			enemyBasic[i].pos.y += moveVec.y * enemyBasic[i].moveSpeed;*/
+			enemyBasic[i].moveTheta = atan2f(disY,disX);
 		}
-		Vector2 moveVec = { disX, disY };
-
-		enemyBasic[i].pos.x += moveVec.x * enemyBasic[i].moveSpeed;
-		enemyBasic[i].pos.y += moveVec.y * enemyBasic[i].moveSpeed;
+			enemyBasic[i].pos.x += cosf(enemyBasic[i].moveTheta) * enemyBasic[i].moveSpeed;
+			enemyBasic[i].pos.y += sinf(enemyBasic[i].moveTheta) * enemyBasic[i].moveSpeed;
 	}
 }
 
@@ -903,6 +908,7 @@ void SpawnEnemy(Vector2 pos, EnemyType type) {
 		for (int i = 0; i < kEnemyBasicLimit; i++) {
 			if (enemyBasic[i].isAlive) continue;
 			enemyBasic[i].isAlive = true;
+			enemyBasic[i].thetaUpDate = true;
 			enemyBasic[i].pos = pos;
 			//spawner.spawnTimer.time = spawner.kSpawnTime * nowenemyBasicIsAliveCount;
 			break;
@@ -985,6 +991,8 @@ void SpawnEnemy(Vector2 pos, EnemyType type) {
 		for (int i = 0; i < kEnemyBasicLimit; i++) {
 			if (enemyBasic[i].isAlive) continue;
 			enemyBasic[i].isAlive = true;
+			enemyBasic[i].thetaUpDate = false;
+			enemyBasic[i].moveTheta = formationTheta;
 			enemyBasic[i].pos.x = pos.x+(50*enemyFomationCount-100)*cosf(formationTheta);
 			enemyBasic[i].pos.y = pos.y+(50*enemyFomationCount-100)*sinf(formationTheta);
 			enemyFomationCount++;
