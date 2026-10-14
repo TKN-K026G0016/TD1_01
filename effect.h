@@ -49,3 +49,15 @@ void CreateChargeOrbEffect(Vector2 pos);
 /// ChargeChipエフェクト生成処理
 /// </summary>
 void CreateChargeChipEffect();
+
+/// <summary>
+///三角形のエフェクト生成処理　
+/// </summary>
+/// /// <param name="pos"></param>
+void CreateTriangleEffect(Vector2 pos);
+
+/// <summary>
+/// 拡大する円のエフェクト生成処理
+/// </summary>
+/// <param name="pos"></param>
+void CreateCircleEffect(Vector2 pos);

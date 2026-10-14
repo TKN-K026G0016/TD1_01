@@ -228,6 +228,39 @@ ChargeChipEffect chargeChipEffect[kChargeChipEffecLimit];
 
 #pragma endregion
 
+#pragma region データ: triangleEffect
+
+const int kTriangleEffectNumber = 50;
+struct TriangleEffect
+{
+	Vector2 pos = { };
+	Vector2 acceleration = { };
+	Vector2 size = { 32,32 };
+	bool appear = { };
+	unsigned int color = { };
+	Texture texture = {};
+};
+TriangleEffect triangleEffect[kTriangleEffectNumber];
+
+
+#pragma endregion
+
+#pragma region データ: circleEffect
+
+const int kCircleEffectNumber = 20;
+struct CircleEffect
+{
+	Vector2 pos = { };
+	Vector2 acceleration = { };
+	Vector2 size = { 32,32 };
+	bool appear = { };
+	unsigned int color = { };
+	Texture texture = {};
+};
+TriangleEffect circleEffect[kCircleEffectNumber];
+
+
+#pragma endregion
 
 #pragma region 関数: ジェム取得effect
 
@@ -800,6 +833,61 @@ void CreateChargeChipEffect() {
 
 #pragma endregion
 
+#pragma region 関数: Triangleeffect
+
+void CreateTriangleEffect(Vector2 pos) {
+	for (int i = 0; i < kTriangleEffectNumber; i++)
+	{
+		if (triangleEffect[i].appear) continue;
+		triangleEffect[i].pos = pos;
+		triangleEffect[i].color = 0xffffffff;
+		float randomSpeedX = ToFloat(GetRand(-10, 10));
+		float randomSpeedY = ToFloat(GetRand(-10, 10));
+		triangleEffect[i].acceleration.x = randomSpeedX;
+		triangleEffect[i].acceleration.y = randomSpeedY;
+
+		break;
+		
+	}
+}
+
+static void InitTriangleEffect(void) {
+	for (int i = 0; i < KGageEffectNumber; i++) {
+		triangleEffect[i].texture = GetTexture(TextureType::EffectTriangle);
+	}
+}
+
+void UodateTriangleEffect() {
+	for (int i = 0; i < kTriangleEffectNumber; i++) {
+		if (!triangleEffect[i].appear) continue;
+
+		//移動処理
+		triangleEffect[i].pos.x += triangleEffect[i].acceleration.x;
+		triangleEffect[i].pos.y += triangleEffect[i].acceleration.y;
+		
+
+		//透明化(消滅)
+		if (triangleEffect[i].color >= 0xffffff05) {
+			triangleEffect[i].color -= 0x00000015;
+			triangleEffect[i].texture.color = triangleEffect[i].color;
+		}
+		else {
+			triangleEffect[i].color = 0xffffffff;
+			triangleEffect[i].appear = false;
+		}
+	}
+}
+
+void DrawTriangleEffect() {
+	for (int i = 0; i < kTriangleEffectNumber; i++) {
+		if (triangleEffect[i].appear == true) {
+			DrawTextureUI(triangleEffect[i].texture, triangleEffect[i].pos, triangleEffect[i].size);
+		}
+	}
+}
+#pragma endregion
+
+
 void InitEffect() {
 	InitGemEffect();
 
@@ -813,6 +901,7 @@ void InitEffect() {
 	InitChargeOrbEffect();
 	InitChargeChipEffect();
 
+	InitTriangleEffect();
 #ifdef _DEBUG
 
 	CreateJemEffect();
@@ -833,6 +922,7 @@ void UpdateEffect() {
 	UpdateElecShockChargedEffect();
 	UpdateChargeOrbEffect();
 	UpdateChargeChipEffect();
+	UodateTriangleEffect();
 }
 void DrawEffect() {
 	DrawGetEffect();
@@ -842,6 +932,7 @@ void DrawEffect() {
 	DrawElecShockChargedEffect();
 	DrawChargeOrbEffect();
 	DrawChargeChipEffect();
+	DrawTriangleEffect();
 }
 
 void DrawEffectAsUI() {
