@@ -17,7 +17,7 @@
 #pragma region データ: 可動域
 
 constexpr Vector2 movablePos[2] = { {0, 0}, {2560, 1440} };
-constexpr Vector2 cameraMovablePos[2] = { {movablePos[0].x + 640, movablePos[0].y +360}, {movablePos[1].x - 640, movablePos[1].y - 360} };
+constexpr Vector2 cameraMovablePos[2] = { {movablePos[0].x + 640, movablePos[0].y + 360}, {movablePos[1].x - 640, movablePos[1].y - 360} };
 constexpr float cameraMovablePosOffset = 64;
 
 #pragma endregion
@@ -53,6 +53,7 @@ enum class Round {
 	Round2,
 	Round3,
 	Round4,
+	Round5,
 
 	RoundBoss,
 
@@ -67,39 +68,75 @@ TimeData gameTime = { 0, 0, 0 };
 TimeData changeRoundTime[ToInt(Round::Count)] = {
 	{ 0,0,0 },
 	{ 0,20,0 },
-	{ 0,30,0 },
 	{ 1,0,0 },
-	
-	//ボス
+	{ 1,30,0 },
 	{ 2,0,0 },
+
+	//ボス
+	{ 2,30,0 },
 };
 
 #pragma endregion
 
 #pragma region データ: Enemy生成関係
 
+constexpr int kMaxSpawner = 5;
+
+struct SpawnerData {
+	//生成する種類
+	EnemyType type = EnemyType::None;
+	Timer timer = { 0, 0 };
+};
+
+
+SpawnerData spawners[ToInt(Round::Count)][kMaxSpawner] = {
+	//Round1
+	{
+		{EnemyType::EnemyBasic, {250, 0}},
+	},
+	//Round2
+	{
+		{ EnemyType::EnemyBasic, {200, 0} },
+		{ EnemyType::EnemySmallGroup, {250, 0} },
+		{ EnemyType::EnemyFormation, {300, 0} },
+	},
+	//Round3
+	{
+		{ EnemyType::EnemyBasic, {150, 0} },
+		{ EnemyType::EnemySmallGroup, {250, 0} },
+		{ EnemyType::EnemyFormation, {280, 0} },
+		{ EnemyType::EnemySniper, {300, 0} },
+	},
+	//Round4
+	{
+		{ EnemyType::EnemyBasic, {200, 0} },
+		//{ EnemyType::EnemySmallGroup, {250, 0} },
+		//{ EnemyType::EnemyFormation, {280, 0} },
+		//{ EnemyType::EnemySniper, {300, 0} },
+		{EnemyType::EnemyBomb, {300, 300}},
+	},
+	//Round5
+	{
+		{ EnemyType::EnemyBasic, {150, 0} },
+		{ EnemyType::EnemySmallGroup, {200, 0} },
+		{ EnemyType::EnemyFormation, {280, 0} },
+		{ EnemyType::EnemySniper, {300, 0} },
+		{EnemyType::EnemyBomb, {500, 0}},
+	},
+
+	//BossRound
+		{
+		{ EnemyType::EnemyBasic, {150, 0} },
+		{ EnemyType::EnemySmallGroup, {190, 0} },
+		{ EnemyType::EnemyFormation, {250, 0} },
+		{ EnemyType::EnemySniper, {250, 0} },
+		{EnemyType::EnemyBomb, {500, 0}},
+	},
+};
+
 
 //カメラ端からの生成位置のずれ
 float spawnPosOffset = 100;
-
-//Round1
-//enemy1生成タイマー
-Timer spawnEnemyBasicRound1Timer = { 250, 0 };
-
-//Round2
-//enemy1生成タイマー
-Timer spawnEnemyBasicRound2Timer = { 200, 0 };
-//enemySmall生成タイマー
-Timer spawnEnemySmallRound2Timer = { 300, 0 };
-
-//Round3
-Timer spawnEnemy1Round3Timer = { 240, 0 };
-
-//Round4
-Timer spawnEnemy1Round4Timer = { 200, 0 };
-Timer spawnEnemySmallRound4Timer = { 190, 0 };
-
-
 
 #pragma endregion
 
@@ -232,7 +269,7 @@ static void ChangeRound(void) {
 
 	//変更時間を変えたら
 	if (totalGameTime >= totalNextRoundTime) {
-  		nowRound = static_cast<Round>(nextRound);
+		nowRound = static_cast<Round>(nextRound);
 
 		//ボス生成
 		if (nowRound == Round::RoundBoss) {
@@ -300,167 +337,20 @@ Vector2 CreatePosOutCameraZone(void) {
 /// </summary>
 /// <param name=""></param>
 static void SpawnEnemyByRound(void) {
-	switch (nowRound) {
-	case Round::Round1: {
 
-#pragma region EnemyBasic
-		spawnEnemyBasicRound1Timer.count++;
-		if (spawnEnemyBasicRound1Timer.count >= spawnEnemyBasicRound1Timer.time) {
-			spawnEnemyBasicRound1Timer.count = 0;
+	int round = ToInt(nowRound);
+	for (int i = 0; i < kMaxSpawner; i++) {
+		SpawnerData& data = spawners[round][i];
 
-			//ランダムな位置を生成
-			Vector2 createPos = CreatePosOutCameraZone();
+		if (data.type == EnemyType::None) break;
 
-			SpawnEnemy(createPos, EnemyType::EnemyFormation);
+		data.timer.count++;
+		if (data.timer.count >= data.timer.time) {
+			data.timer.count = 0;
+
+			Vector2 spawnPos = CreatePosOutCameraZone();
+			SpawnEnemy(spawnPos, data.type);
 		}
-
-#pragma endregion
-
-		break;
-	}
-	case Round::Round2: {
-
-#pragma region EnemyBasic
-
-		spawnEnemyBasicRound2Timer.count++;
-		if (spawnEnemyBasicRound2Timer.count >= spawnEnemyBasicRound2Timer.time) {
-			spawnEnemyBasicRound2Timer.count = 0;
-
-			//ランダムな位置を生成
-			Vector2 createPos = CreatePosOutCameraZone();
-
-			SpawnEnemy(createPos, EnemyType::EnemyBasic);
-		}
-
-#pragma endregion
-
-#pragma region EnemySmall
-
-		spawnEnemySmallRound2Timer.count++;
-		if (spawnEnemySmallRound2Timer.count >= spawnEnemySmallRound2Timer.time) {
-			spawnEnemySmallRound2Timer.count = 0;
-
-			//ランダムな位置を生成
-			Vector2 createPos = CreatePosOutCameraZone();
-
-			SpawnEnemy(createPos, EnemyType::EnemySmallGroup);
-		}
-
-#pragma endregion
-
-		break;
-	}
-	case Round::Round3: {
-
-#pragma region EnemyBasic
-
-		spawnEnemyBasicRound2Timer.count++;
-		if (spawnEnemyBasicRound2Timer.count >= spawnEnemyBasicRound2Timer.time) {
-			spawnEnemyBasicRound2Timer.count = 0;
-
-			//ランダムな位置を生成
-			Vector2 createPos = CreatePosOutCameraZone();
-
-			SpawnEnemy(createPos, EnemyType::EnemyBasic);
-		}
-
-#pragma endregion
-
-#pragma region Enemy1
-
-		spawnEnemy1Round3Timer.count++;
-		if (spawnEnemy1Round3Timer.count >= spawnEnemy1Round3Timer.time) {
-			spawnEnemy1Round3Timer.count = 0;
-
-			//ランダムな位置を生成
-			Vector2 createPos = CreatePosOutCameraZone();
-
-			SpawnEnemy(createPos, EnemyType::EnemySniper);
-		}
-
-#pragma endregion
-
-		break;
-	}
-	case Round::Round4: {
-
-#pragma region EnemyBasic
-
-		spawnEnemyBasicRound2Timer.count++;
-		if (spawnEnemyBasicRound2Timer.count >= spawnEnemyBasicRound2Timer.time) {
-			spawnEnemyBasicRound2Timer.count = 0;
-
-			//ランダムな位置を生成
-			Vector2 createPos = CreatePosOutCameraZone();
-
-			SpawnEnemy(createPos, EnemyType::EnemyBasic);
-		}
-
-#pragma endregion
-
-#pragma region Enemy1
-
-		spawnEnemy1Round4Timer.count++;
-		if (spawnEnemy1Round4Timer.count >= spawnEnemy1Round4Timer.time) {
-			spawnEnemy1Round4Timer.count = 0;
-
-			//ランダムな位置を生成
-			Vector2 createPos = CreatePosOutCameraZone();
-
-			SpawnEnemy(createPos, EnemyType::EnemySniper);
-		}
-
-#pragma endregion
-
-#pragma region EnemySmall
-
-		spawnEnemySmallRound4Timer.count++;
-		if (spawnEnemySmallRound4Timer.count >= spawnEnemySmallRound4Timer.time) {
-			spawnEnemySmallRound4Timer.count = 0;
-
-			//ランダムな位置を生成
-			Vector2 createPos = CreatePosOutCameraZone();
-
-			SpawnEnemy(createPos, EnemyType::EnemySmallGroup);
-		}
-
-#pragma endregion
-
-		break;
-	}
-
-	case Round::RoundBoss: {
-
-#pragma region EnemyBasic
-
-		spawnEnemyBasicRound2Timer.count++;
-		if (spawnEnemyBasicRound2Timer.count >= spawnEnemyBasicRound2Timer.time) {
-			spawnEnemyBasicRound2Timer.count = 0;
-
-			//ランダムな位置を生成
-			Vector2 createPos = CreatePosOutCameraZone();
-
-			SpawnEnemy(createPos, EnemyType::EnemyBasic);
-		}
-
-#pragma endregion
-
-#pragma region EnemySmall
-
-		spawnEnemySmallRound4Timer.count++;
-		if (spawnEnemySmallRound4Timer.count >= spawnEnemySmallRound4Timer.time) {
-			spawnEnemySmallRound4Timer.count = 0;
-
-			//ランダムな位置を生成
-			Vector2 createPos = CreatePosOutCameraZone();
-
-			SpawnEnemy(createPos, EnemyType::EnemySmallGroup);
-		}
-
-#pragma endregion
-
-		break;
-	}
 	}
 }
 
