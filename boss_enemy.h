@@ -54,6 +54,10 @@ struct BossEnemy {
 	bool isIgnoreElecShock = false;
 	Timer ignoreElecShockTimer = { 20, 0 };
 
+	//フラッシュフラグ
+	bool isFlash = false;
+	Timer flashTimer = {7, 0};
+
 	//状態
 	int nowsSates=BossStates::Attack1;
 
@@ -94,3 +98,5 @@ void UpdateBossEnemy(void);
 void DrawBossEnemy(void);
 
 BossEnemy* GetBossEnemy(void);
+
+void DamageBossEnemy(int pow);

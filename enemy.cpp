@@ -1067,7 +1067,7 @@ void DamageEnemyBasic(EnemyBasic& enemy, int pow) {
 	enemy.hp -= pow;
 
 	//フラッシュさせる
-	enemy.isFlash = true;
+ 	enemy.isFlash = true;
 	enemy.flashTimer.count = 0;
 }
 

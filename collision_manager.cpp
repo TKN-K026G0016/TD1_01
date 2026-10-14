@@ -260,7 +260,7 @@ void CheckCollisionElecBulletVSBossEnemy(void) {
 
 			int pow = elecBullet[i].pow;
 
-			boss->remainLife -= pow /*- 1*/;
+			DamageBossEnemy(pow);
 		}
 	}
 }
@@ -498,7 +498,7 @@ void CheckCollisionElecShockVSBossEnemy(void) {
 			//ダメージ判定()
 			if (elecShock[i].breakTimer.count == elecShock[i].triggerDamageFrame) {
 				int pow = elecShock[i].pow;
-				boss->remainLife -= pow;
+				DamageBossEnemy(pow);
 
 				//コンボ
 				AddShockCombo();

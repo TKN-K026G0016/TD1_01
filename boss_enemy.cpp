@@ -189,7 +189,7 @@ void MoveAttack1(void) {
 	if (bossEnemy.nowsSates == BossStates::Attack1) {
 		if (statesTimer.attack1ShootBom.count == statesTimer.attack1ShootBom.time) {
 			statesTimer.attack1ShootBom.count = 0;
-			SpawnEnemy( bossEnemy.pos, EnemyType::EnemyBomb);
+			SpawnEnemy(bossEnemy.pos, EnemyType::EnemyBomb);
 		}
 	}
 }
@@ -376,6 +376,18 @@ static void CountIgnoreElecShock(void) {
 
 }
 
+static void UpdateFlashTimer(void) {
+	if (!bossEnemy.isAlive) return;
+	if (!bossEnemy.isFlash) return;
+
+	bossEnemy.flashTimer.count++;
+	if (bossEnemy.flashTimer.count >= bossEnemy.flashTimer.time) {
+		bossEnemy.flashTimer.count = 0;
+		bossEnemy.isFlash = false;
+	}
+
+}
+
 void DeathBossEnemy(void) {
 	if (!bossEnemy.isAlive) return;
 
@@ -411,12 +423,20 @@ void UpdateBossEnemy(void) {
 	MoveAttack3();
 
 	CountIgnoreElecShock();
+	UpdateFlashTimer();
 
 	DeathBossEnemy();
 };
 void DrawBossEnemy(void) {
 	if (bossEnemy.isAlive == true) {
-		DrawTextureRotateObj(bossEnemy.texture, bossEnemy.pos, bossEnemy.size, bossEnemy.rotateTheta);
+		Texture texture = bossEnemy.texture;
+		if (bossEnemy.isFlash) {
+			texture.color = kFlashColor;
+		} else {
+			texture.color = kNormalColor;
+		}
+
+		DrawTextureRotateObj(texture, bossEnemy.pos, bossEnemy.size, bossEnemy.rotateTheta);
 	}
 }
 
@@ -451,6 +471,13 @@ Timer GetAttack2Timer(void) {
 
 BossEnemy* GetBossEnemy(void) {
 	return &bossEnemy;
+}
+
+void DamageBossEnemy(int pow) {
+	bossEnemy.remainLife -= pow;
+
+	bossEnemy.isFlash = true;
+	bossEnemy.flashTimer.count = 0;
 }
 
 #pragma endregion
