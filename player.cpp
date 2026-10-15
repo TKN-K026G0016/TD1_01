@@ -169,6 +169,7 @@ constexpr float kEnergyMax = 100.0f;
 constexpr float kEnergyMin = 0.0f;
 //エネルギーゲージの中間
 constexpr float kEnergyCenter = (kEnergyMax - kEnergyMin) / 2;
+constexpr float kFirstEnergy = 75.0f;
 
 //エネルギー消費量(常時)
 constexpr float kConsumptionEnergy = 0.05f;
@@ -211,6 +212,9 @@ struct ColorManager {
 	bool isGoToBlack = true;
 };
 ColorManager colorManager;
+
+//チャージの破片表示を開始する時間
+constexpr int kStartCreateChargeChipTime = 7;
 
 //オーバーヒート時の生成範囲(player中心で)
 constexpr int kCreateSmokeRange = 45;
@@ -749,7 +753,7 @@ static void UpdatePlayerEffect(void) {
 /// <param name=""></param>
 static void CreateChargeOrbEffect(void) {
 
-	if (chargeElecBulletTimer.count > 0) {
+	if (chargeElecBulletTimer.count > kStartCreateChargeChipTime) {
 
 		createChargeChipTimer.count++;
 		if (createChargeChipTimer.count >= createChargeChipTimer.time) {
@@ -869,7 +873,7 @@ static void ReplenishmentEnergy(void) {
 void InitPlayer(void) {
 	player = {};
 	player.texture = GetTexture(TextureType::Player);
-	player.remainEnergy = kEnergyCenter;
+	player.remainEnergy = kFirstEnergy;
 
 	//chargeOrb.texture = GetTexture(TextureType::ChargeOrb);
 
