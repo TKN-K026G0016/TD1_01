@@ -493,8 +493,7 @@ static void RotatePlayer(void) {
 			return;
 		}
 		targetPos = enemyBomb[targetIndex].pos;
-	}
-	else if (nowTargetType == LockTargetType::Gem) {
+	} else if (nowTargetType == LockTargetType::Gem) {
 		if (!gem[targetIndex].isAlive) {
 			nowTargetType = LockTargetType::None;
 			return;
@@ -843,8 +842,7 @@ static void CheckDeadPlayer(void) {
 
 			player.isAlive = false;
 		}
-	} 
-	else {
+	} else {
 		if (player.hp <= 0) {
 			player.hp = 0;
 
@@ -1007,6 +1005,23 @@ void PlayerDamage(Vector2 hitPos, float damage) {
 	player.isKnockBack = true;
 
 #pragma endregion
+
+}
+
+void PlayerKnockBack(Vector2 hitPos) {
+
+	if (player.isKnockBack) return;
+
+	knockBackVec = { player.pos.x - hitPos.x, player.pos.y - hitPos.y };
+	float length = sqrtf(knockBackVec.x * knockBackVec.x + knockBackVec.y * knockBackVec.y);
+	if (length != 0.0f) {
+		knockBackVec.x /= length;
+		knockBackVec.y /= length;
+	}
+
+	knockBackPow = kFirstKnockBackPow;
+	player.isKnockBack = true;
+
 
 }
 

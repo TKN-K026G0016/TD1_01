@@ -95,6 +95,12 @@ PlayerLaserLevel GetPlayerNowLaserLevel(void);
 /// <param name="damage">ダメージ量</param>
 void PlayerDamage(Vector2 hitPos, float damage);
 
+/// <summary>
+/// プレイヤーをノックバックさせる処理
+/// </summary>
+/// <param name="hitPos">接触した相手の座標</param>
+void PlayerKnockBack(Vector2 hitPos);
+
 bool GetDodgeCloseSwitch(void);
 
 /// <summary>

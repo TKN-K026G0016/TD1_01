@@ -685,6 +685,21 @@ static void CheckCollisionPlayerVSEnemy(void) {
 
 }
 
+static void CheckCollisionPlayerVSBossEnemy(void) {
+	Vector2 playerPos = GetPlayerPos();
+	float playerHitRadius = GetPlayerHitRadius();
+
+	BossEnemy* boss = GetBossEnemy();
+
+	if (!GetPlayerIsAlive()) return;
+	if (!boss->isAlive) return;
+
+	if (CheckCollisionCircleVSCircle(boss->pos, boss->hitRadius, playerPos, playerHitRadius)) {
+
+		PlayerKnockBack(boss->pos);
+	}
+}
+
 #pragma endregion
 
 void InitCollision() {
@@ -707,5 +722,6 @@ void UpdateCollision() {
 	CheckCollisionPlayerVSEnemyBullet();
 	CheckCollisionPlayerVSEnemyLaser();
 	CheckCollisionPlayerVSEnemy();
+	CheckCollisionPlayerVSBossEnemy();
 
 }
