@@ -783,24 +783,26 @@ static void BurstEnemyBomb(void) {
 	Gem* gem = GetGemArray();
 	for (int i = 0;i < kEnemyBombLimit;i++) {
 		enemyBomb[i].burst.count++;
-		if (enemyBomb[i].burst.count == enemyBomb[i].burst.time) {
-			float PlayerDiffX = enemyBomb[i].pos.x - playerPos.x;
-			float PlayerDiffY = enemyBomb[i].pos.y - playerPos.y;
-			float playerDistance = sqrtf(PlayerDiffX * PlayerDiffX + PlayerDiffY * PlayerDiffY);
-			if (playerDistance <= enemyBomb[i].burstRadius) {
-				PlayerDamage(enemyBomb[i].pos);
-			}
-			for (int j = 0;j < gemLimit;j++) {
-				if (!gem[j].isAlive)continue;
-
-				float GemDiffX = enemyBomb[i].pos.x - gem[j].pos.x;
-				float GemDiffY = enemyBomb[i].pos.y - gem[j].pos.y;
-				float gemDistance = sqrtf(GemDiffX * GemDiffX + GemDiffY * GemDiffY);
-				if (gemDistance <= enemyBomb[i].burstRadius) {
-					BreakGem(j);
+		if (enemyBomb[i].isAlive) {
+			if (enemyBomb[i].burst.count == enemyBomb[i].burst.time) {
+				float PlayerDiffX = enemyBomb[i].pos.x - playerPos.x;
+				float PlayerDiffY = enemyBomb[i].pos.y - playerPos.y;
+				float playerDistance = sqrtf(PlayerDiffX * PlayerDiffX + PlayerDiffY * PlayerDiffY);
+				if (playerDistance <= enemyBomb[i].burstRadius) {
+					PlayerDamage(enemyBomb[i].pos);
 				}
+				for (int j = 0;j < gemLimit;j++) {
+					if (!gem[j].isAlive)continue;
+
+					float GemDiffX = enemyBomb[i].pos.x - gem[j].pos.x;
+					float GemDiffY = enemyBomb[i].pos.y - gem[j].pos.y;
+					float gemDistance = sqrtf(GemDiffX * GemDiffX + GemDiffY * GemDiffY);
+					if (gemDistance <= enemyBomb[i].burstRadius) {
+						BreakGem(j);
+					}
+				}
+				DeadEnemyBomb(i);
 			}
-			DeadEnemyBomb(i);
 		}
 	}
 }
