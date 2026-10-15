@@ -139,9 +139,11 @@ struct ElecLineEffect {
 	//ラインの長さ
 	float length = 0.0f;
 	//ラインの太さ
-	float thickness = 5.0f;
+	float thickness = 16.0f;
 
 	Timer breakTimer = { 10, 0 };
+
+	Texture texture = {};
 };
 ElecLineEffect elecLineEffect[kElecLineEffectLimit];
 
@@ -420,8 +422,7 @@ EnemyDamageEffect enemyDamageEffect;
 
 #pragma region データ: PlayerFootprintsEffect
 const int kFootprintsEffectNumber = 20;
-struct FootprintsEffect
-{
+struct FootprintsEffect {
 	Vector2 pos;
 	Vector2 move;
 	Vector2 size;
@@ -1308,7 +1309,7 @@ void DrawCircleEffect() {
 		if (!circleEffect[i].appear) continue;
 
 		Vector2 size = { circleEffect[i].sizeValue, circleEffect[i].sizeValue };
-		
+
 		Texture texture = circleEffect[i].texture;
 		texture.color = (circleEffect[i].color & 0xFFFFFF00) | circleEffect[i].alpha;
 
@@ -1324,6 +1325,8 @@ void DrawCircleEffect() {
 static void InitElecLineEffect(void) {
 	for (int i = 0; i < kElecLineEffectLimit; i++) {
 		elecLineEffect[i] = {};
+
+		elecLineEffect[i].texture = GetTexture(TextureType::ElecLine);
 	}
 }
 
@@ -1331,11 +1334,25 @@ static void UpdateElecLineEffect(void) {
 	for (int i = 0; i < kElecLineEffectLimit; i++) {
 		if (!elecLineEffect[i].isShoot) continue;
 
-		elecLineEffect[i].breakTimer.count++;
-		if (elecLineEffect[i].breakTimer.count >= elecLineEffect[i].breakTimer.time) {
-			elecLineEffect[i].breakTimer.count = 0;
-			elecLineEffect[i].isShoot = false;
+		//elecLineEffect[i].breakTimer.count++;
+		//if (elecLineEffect[i].breakTimer.count >= elecLineEffect[i].breakTimer.time) {
+		//	elecLineEffect[i].breakTimer.count = 0;
+		//	elecLineEffect[i].isShoot = false;
+		//}
+
+		//アニメーション処理
+		elecLineEffect[i].texture.animChangeTimer.count++;
+		if (elecLineEffect[i].texture.animChangeTimer.count >= elecLineEffect[i].texture.animChangeTimer.time) {
+			elecLineEffect[i].texture.animChangeTimer.count = 0;
+
+			if (elecLineEffect[i].texture.animNum < elecLineEffect[i].texture.animLimit) {
+				elecLineEffect[i].texture.animNum++;
+			} else {
+				elecLineEffect[i].texture.animNum = 0;
+				elecLineEffect[i].isShoot = false;
+			}
 		}
+
 	}
 }
 
@@ -1350,7 +1367,7 @@ static void DrawElecLineEffect(void) {
 
 		Vector2 size = { elecLineEffect[i].length, elecLineEffect[i].thickness };
 
-		Texture texture = whiteBoxTexture;
+		Texture texture = elecLineEffect[i].texture;
 		texture.color = kPlayerColor;
 
 		DrawTextureRotateObj(texture, elecLineEffect[i].centerPos, size, elecLineEffect[i].rotateTheta);
@@ -1428,16 +1445,14 @@ void CreateEnemyDamageEffect(Vector2 pos) {
 
 #pragma region 関数: EnemyDamageEffect
 
-void CreatePlayerFootprintsEffect(Vector2 pos, Vector2 inputVec ) {
+void CreatePlayerFootprintsEffect(Vector2 pos, Vector2 inputVec) {
 
-	if (footprintsEffectTimer > 0)
-	{
+	if (footprintsEffectTimer > 0) {
 		footprintsEffectTimer--;
 	}
 
 	if (footprintsEffectTimer <= 0) {
-		for (int i = 0; i < kFootprintsEffectNumber; i++)
-		{
+		for (int i = 0; i < kFootprintsEffectNumber; i++) {
 			if (footprintsEffect[i].isAppear == false) continue;
 			footprintsEffect[i].isAppear = true;
 			footprintsEffectTimer = 5;
@@ -1454,7 +1469,7 @@ void CreatePlayerFootprintsEffect(Vector2 pos, Vector2 inputVec ) {
 
 		}
 	}
-	
+
 }
 static void InitPlayerFootprintsEffect(void) {
 	for (int i = 0; i < kFootprintsEffectNumber; i++) {
@@ -1470,8 +1485,7 @@ void UpdatePlayerFootprintsEffect() {
 		footprintsEffect[i].pos.y += footprintsEffect[i].move.y * footprintsEffect[i].speed;
 		if (footprintsEffect[i].color >= 0xffffff10) {
 			footprintsEffect[i].color -= 0x00000010;
-		}
-		else {
+		} else {
 			footprintsEffect[i].color = 0xffffffff;
 			footprintsEffect[i].isAppear = false;
 		}
@@ -1486,41 +1500,41 @@ void DrawPlayerFootprints() {
 	}
 }
 #pragma endregion
-	void InitEffect() {
-		triangleTexture = GetTexture(TextureType::EffectTriangle);
-		whiteBoxTexture = GetTexture(TextureType::White1x1);
+void InitEffect() {
+	triangleTexture = GetTexture(TextureType::EffectTriangle);
+	whiteBoxTexture = GetTexture(TextureType::White1x1);
 
-		InitGemEffect();
+	InitGemEffect();
 
-		InitGageEffect();
+	InitGageEffect();
 
-		InitSmokeEffect();
+	InitSmokeEffect();
 
-		//InitElecShockEffect();
-		//InitElecShockChargedEffect();
+	//InitElecShockEffect();
+	//InitElecShockChargedEffect();
 
-		InitChargeOrbEffect();
-		InitChargeChipEffect();
+	InitChargeOrbEffect();
+	InitChargeChipEffect();
 
-		InitExplodeEffect();
+	InitExplodeEffect();
 
-		InitTriangleEffect();
-		InitTriangleEffect2();
-		InitCircleEffect();
-		InitPlayerFootprintsEffect();
-		InitElecLineEffect();
+	InitTriangleEffect();
+	InitTriangleEffect2();
+	InitCircleEffect();
+	InitPlayerFootprintsEffect();
+	InitElecLineEffect();
 
 #ifdef _DEBUG
 
-		CreateJemEffect();
+	CreateJemEffect();
 
-		//CreateGageEffect();
+	//CreateGageEffect();
 
-		//CreateChargeOrbEffect(GetPlayerPos());
+	//CreateChargeOrbEffect(GetPlayerPos());
 
 #endif // _DEBUG
 
-	}
+}
 void UpdateEffect() {
 
 	UpdateGemEffect();
