@@ -1318,8 +1318,26 @@ static void UpdateElecLineEffect(void) {
 static void DrawElecLineEffect(void) {
 	for (int i = 0; i < kElecLineEffectLimit; i++) {
 		if (!elecLineEffect[i].isShoot) continue;
+
+		Vector2i startPos = ConvertPosWToS(elecLineEffect[i].startPos);
+		Vector2i endPos = ConvertPosWToS(elecLineEffect[i].endPos);
+
+		Novice::DrawLine(startPos.x, startPos.y, endPos.x, endPos.y, kPlayerColor);
 	}
 }
+
+void CreateElecLine(Vector2 startPos, Vector2 endPos) {
+	for (int i = 0; i < kElecLineEffectLimit; i++) {
+		if (elecLineEffect[i].isShoot) continue;
+
+		elecLineEffect[i].isShoot = true;
+		elecLineEffect[i].breakTimer.count;
+
+		elecLineEffect[i].startPos = startPos;
+		elecLineEffect[i].endPos = endPos;
+	}
+}
+
 
 void CreateElecShockEffect(Vector2 pos) {
 	//円を生成
