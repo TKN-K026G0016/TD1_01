@@ -1347,10 +1347,12 @@ void CreateElecLine(Vector2 startPos, Vector2 endPos) {
 		if (elecLineEffect[i].isShoot) continue;
 
 		elecLineEffect[i].isShoot = true;
-		elecLineEffect[i].breakTimer.count;
+		elecLineEffect[i].breakTimer.count = 0;
 
 		elecLineEffect[i].startPos = startPos;
 		elecLineEffect[i].endPos = endPos;
+
+		break;
 	}
 }
 
