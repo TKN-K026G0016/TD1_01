@@ -231,7 +231,7 @@ int GetElecBulletLimit(void) {
 	return kElecBulletLimit;
 }
 
-void SpawnElecShock(Vector2 pos, ElecBulletType type) {
+void SpawnElecShock(Vector2 pos, ElecBulletType type, ElecShockOriginType originType, int originIndex) {
 	for (int i = 0; i < kElecShockLimit; i++) {
 		if (elecShock[i].isShoot) continue;
 
@@ -241,6 +241,10 @@ void SpawnElecShock(Vector2 pos, ElecBulletType type) {
 		elecShock[i].type = type;
 		elecShock[i].hitRadius = elecShockSpec[ToInt(type)].hitRadius;
 		elecShock[i].pow = elecShockSpec[ToInt(type)].pow;
+
+		//発生元を保存
+		elecShock[i].originType = originType;
+		elecShock[i].originIndex = originIndex;
 
 		//エフェクトの生成
 		if (type == ElecBulletType::Normal) {

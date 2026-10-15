@@ -65,6 +65,10 @@ struct ElecShock {
 	float hitRadius = 120.0f;
 	int pow = 2;
 
+	//ショックの発生元
+	ElecShockOriginType originType = ElecShockOriginType::Gem;
+	int originIndex = -1;
+
 	unsigned int color = RED;
 };
 
@@ -104,7 +108,9 @@ int GetElecBulletLimit(void);
 /// </summary>
 /// <param name="pos">生成座標</param>
 /// <param name="type">生成する種類</param>
-void SpawnElecShock(Vector2 pos, ElecBulletType type);
+/// <param name="type">生成元objの種類</param>
+/// <param name="type">生成元objの番号</param>
+void SpawnElecShock(Vector2 pos, ElecBulletType type, ElecShockOriginType originType, int originIndex);
 
 /// <summary>
 /// デンゲキショックの破壊処理
