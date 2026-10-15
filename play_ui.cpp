@@ -370,7 +370,7 @@ static void DrawEnergyGauge(void) {
 static void InitBossHpGauge(void) {
 	bossHpGaugeFrame.texture = GetTexture(TextureType::BossHpGaugeFrame);
 	bossHpGaugeMeter.texture = GetTexture(TextureType::BossHpGaugeMeter);
-	bossHpGaugeDelayMeter.texture = GetTexture(TextureType::BossHpGaugeMeter);
+	bossHpGaugeDelayMeter.texture = GetTexture(TextureType::BossHpGaugeDelayMeter);
 }
 
 static void UpdateBossHpGauge(void) {
