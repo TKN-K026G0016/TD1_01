@@ -358,9 +358,9 @@ static void DrawEnergyGauge(void) {
 	//フレーム
 	DrawTextureUI(energyGaugeFrame.texture, energyGaugeFrame.pos, energyGaugeFrame.size);
 	//delayメーター
-	DrawGaugeYAsUI(energyGaugeDelayMeter.texture, energyGaugeFrame.pos, energyGaugeFrame.size, energyGaugeDelayMeter.gaugeRate);
+	DrawGaugeAsUI(energyGaugeDelayMeter.texture, energyGaugeFrame.pos, energyGaugeFrame.size, energyGaugeDelayMeter.gaugeRate);
 	//メーター
-	DrawGaugeYAsUI(energyGaugeMeter.texture, energyGaugeFrame.pos, energyGaugeFrame.size, energyGaugeMeter.gaugeRate);
+	DrawGaugeAsUI(energyGaugeMeter.texture, energyGaugeFrame.pos, energyGaugeFrame.size, energyGaugeMeter.gaugeRate);
 
 	//ミニゲージ
 	//フレーム
@@ -435,9 +435,9 @@ static void DrawBossHpGauge(void) {
 	//フレーム
 	DrawTextureUI(bossHpGaugeFrame.texture, bossHpGaugeFrame.pos, bossHpGaugeFrame.size);
 	//delayMeter
-	DrawGaugeYAsUI(bossHpGaugeDelayMeter.texture, bossHpGaugeFrame.pos, bossHpGaugeFrame.size, bossHpGaugeDelayMeter.gaugeRate);
+	DrawGaugeAsUI(bossHpGaugeDelayMeter.texture, bossHpGaugeFrame.pos, bossHpGaugeFrame.size, bossHpGaugeDelayMeter.gaugeRate);
 	//メーター
-	DrawGaugeYAsUI(bossHpGaugeMeter.texture, bossHpGaugeFrame.pos, bossHpGaugeFrame.size, bossHpGaugeMeter.gaugeRate);
+	DrawGaugeAsUI(bossHpGaugeMeter.texture, bossHpGaugeFrame.pos, bossHpGaugeFrame.size, bossHpGaugeMeter.gaugeRate);
 
 #ifdef _DEBUG
 
@@ -521,7 +521,7 @@ static void UpdateShockCombo(void) {
 
 	//gaugeRateの更新
 	Timer comboTimer = GetComboTimer();
-	nowCombo.gaugeRate = 1.0f - (comboTimer.count / comboTimer.time);
+	nowCombo.gaugeRate = 1.0f - ToFloat(comboTimer.count) / ToFloat(comboTimer.time);
 
 	//表示の更新
 	if (!nowCombo.isShowPreCombo) {
@@ -580,10 +580,10 @@ static void DrawShockCombo(void) {
 		texture.animNum = comboNumbers[i].animNum;
 		
 		Texture meterTexture = comboNumbersMeterTexture;
-		texture.animNum = comboNumbers[i].animNum;
+		meterTexture.animNum = comboNumbers[i].animNum;
 
-		DrawGaugeYAsUI(meterTexture, pos, comboNumbers[i].size, nowCombo.gaugeRate);
 		DrawTextureUI(texture, pos, comboNumbers[i].size);
+		DrawGaugeYAsUI(meterTexture, pos, comboNumbers[i].size, nowCombo.gaugeRate);
 	}
 
 }
