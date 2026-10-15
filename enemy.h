@@ -125,6 +125,9 @@ struct EnemyBasic {
 
 	float hitRadius = 30.0f;
 
+	//攻撃力
+	float pow = 20.0f;
+
 	//移動速度
 	float moveSpeed = 1.5f;
 	float moveTheta = 0;
@@ -192,6 +195,8 @@ struct EnemySmall {
 
 	float hitRadius = 20.0f;
 
+	float pow = 15.0f;
+
 	//<移動関係>
 	//速度
 	Vector2 velocity = { 0.0f, 0.0f };
@@ -239,6 +244,8 @@ struct EnemyBomb {
 
 	//当たり判定の大きさ
 	float hitRadius = 64.0f;
+
+	float pow = 40.0f;
 
 	//<爆発関係>
 	//爆発までの時間

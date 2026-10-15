@@ -31,11 +31,11 @@ Vector2 GetPlayerPos(void);
 /// <returns>player.hitRadius</returns>
 float GetPlayerHitRadius(void);
 
-/// <summary>
-/// playerの体力取得
-/// </summary>
-/// <returns>player.remainLife</returns>
-int GetPlayerHp(void);
+///// <summary>
+///// playerの体力取得
+///// </summary>
+///// <returns>player.remainLife</returns>
+//int GetPlayerHp(void);
 
 /// <summary>
 /// playerの生存フラグ取得
@@ -92,7 +92,8 @@ PlayerLaserLevel GetPlayerNowLaserLevel(void);
 /// playerの被弾処理
 /// </summary>
 /// <param name="hitPos">接触した相手の座標</param>
-void PlayerDamage(Vector2 hitPos);
+/// <param name="damage">ダメージ量</param>
+void PlayerDamage(Vector2 hitPos, float damage);
 
 bool GetDodgeCloseSwitch(void);
 

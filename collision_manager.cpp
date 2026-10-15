@@ -587,7 +587,7 @@ static void CheckCollisionPlayerVSEnemyBullet(void) {
 	if (!GetPlayerIsAlive()) return;
 	Vector2 playerPos = GetPlayerPos();
 	float playerHitRadius = GetPlayerHitRadius();
-	float playerDodgeCloseRadius = GetPlayerDodgeCloseRadius();
+	//float playerDodgeCloseRadius = GetPlayerDodgeCloseRadius();
 
 	EnemyBullet* eBullet = GetEnemyBulletArray();
 	int eBulletLimit = GetEnemyBulletLimit();
@@ -595,16 +595,16 @@ static void CheckCollisionPlayerVSEnemyBullet(void) {
 	for (int i = 0; i < eBulletLimit; i++) {
 		if (!eBullet[i].isShoot) continue;
 
-		//ギリ避け判定
-		if (GetDodgeCloseSwitch()) {
-			if (CheckCollisionCircleVSCircle(eBullet[i].pos, eBullet[i].hitRadius, playerPos, playerDodgeCloseRadius)) {
-				TriggerDodgeClose(eBullet[i].pos);
-			}
-		}
+		////ギリ避け判定
+		//if (GetDodgeCloseSwitch()) {
+		//	if (CheckCollisionCircleVSCircle(eBullet[i].pos, eBullet[i].hitRadius, playerPos, playerDodgeCloseRadius)) {
+		//		TriggerDodgeClose(eBullet[i].pos);
+		//	}
+		//}
 
 		//被弾判定
 		if (CheckCollisionCircleVSCircle(eBullet[i].pos, eBullet[i].hitRadius, playerPos, playerHitRadius)) {
-			PlayerDamage(eBullet[i].pos);
+			PlayerDamage(eBullet[i].pos, eBullet[i].pow);
 		}
 
 	}
@@ -617,7 +617,7 @@ static void CheckCollisionPlayerVSEnemyLaser(void) {
 	if (!GetPlayerIsAlive()) return;
 	Vector2 playerPos = GetPlayerPos();
 	float playerHitRadius = GetPlayerHitRadius();
-	float playerDodgeCloseRadius = GetPlayerDodgeCloseRadius();
+	//float playerDodgeCloseRadius = GetPlayerDodgeCloseRadius();
 
 	EnemyLaser* eLaser = GetEnemyLaserArray();
 	int eLaserLimit = GetEnemyLaserLimit();
@@ -625,16 +625,16 @@ static void CheckCollisionPlayerVSEnemyLaser(void) {
 	for (int i = 0; i < eLaserLimit; i++) {
 		if (!eLaser[i].isShoot) continue;
 
-		//ギリ避け判定
-		if (GetDodgeCloseSwitch()) {
-			if (CheckCollisionOBBvsCircle(playerPos, playerDodgeCloseRadius, eLaser[i].hitBoxVertex)) {
-				TriggerDodgeClose(eLaser[i].pos);
-			}
-		}
+		////ギリ避け判定
+		//if (GetDodgeCloseSwitch()) {
+		//	if (CheckCollisionOBBvsCircle(playerPos, playerDodgeCloseRadius, eLaser[i].hitBoxVertex)) {
+		//		TriggerDodgeClose(eLaser[i].pos);
+		//	}
+		//}
 
 		//被弾判定
 		if (CheckCollisionOBBvsCircle(playerPos, playerHitRadius, eLaser[i].hitBoxVertex)) {
-			PlayerDamage(eLaser[i].pos);
+			PlayerDamage(eLaser[i].pos, eLaser[i].pow);
 		}
 
 	}
@@ -663,7 +663,7 @@ static void CheckCollisionPlayerVSEnemy(void) {
 
 		if (CheckCollisionCircleVSCircle(enemyBasic[i].pos, enemyBasic[i].hitRadius, playerPos, playerHitRadius) ){
 
-			PlayerDamage(enemyBasic[i].pos);
+			PlayerDamage(enemyBasic[i].pos, enemyBasic[i].pow);
 		}
 	}
 
@@ -676,7 +676,7 @@ static void CheckCollisionPlayerVSEnemy(void) {
 
 		if (CheckCollisionCircleVSCircle(enemySmall[i].pos, enemySmall[i].hitRadius, playerPos, playerHitRadius)) {
 
-			PlayerDamage(enemySmall[i].pos);
+			PlayerDamage(enemySmall[i].pos, enemySmall[i].pow);
 		}
 	}
 

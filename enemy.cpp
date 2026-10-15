@@ -832,7 +832,7 @@ static void BurstEnemyBomb(void) {
 				float PlayerDiffY = enemyBomb[i].pos.y - playerPos.y;
 				float playerDistance = sqrtf(PlayerDiffX * PlayerDiffX + PlayerDiffY * PlayerDiffY);
 				if (playerDistance <= enemyBomb[i].burstRadius) {
-					PlayerDamage(enemyBomb[i].pos);
+					PlayerDamage(enemyBomb[i].pos, enemyBomb[i].pow);
 				}
 				for (int j = 0;j < gemLimit;j++) {
 					if (!gem[j].isAlive)continue;

@@ -33,8 +33,8 @@ struct Player {
 	bool isAlive = true;
 	//当たり判定の大きさ
 	float hitRadius = 10.0f;
-	int hp = 5;
-	int hpMax = 5;
+	//int hp = 5;
+	//int hpMax = 5;
 
 	//<ギリ避け関係>
 	float dodgeCloseRadius = 50.0f;
@@ -825,9 +825,9 @@ static void UpdateInvinciblePlayer(void) {
 /// <summary>
 /// 死亡判定の処理
 /// </summary>
-static void DeadPlayer(void) {
-	if (player.hp <= 0) {
-		player.hp = 0;
+static void CheckDeadPlayer(void) {
+	if (player.remainEnergy <= 0) {
+		player.remainEnergy = 0;
 
 		player.isAlive = false;
 	}
@@ -883,7 +883,7 @@ void UpdatePlayer(void) {
 
 	KnockBack();
 	UpdateInvinciblePlayer();
-	DeadPlayer();
+	CheckDeadPlayer();
 
 	ReplenishmentEnergy();
 }
@@ -913,9 +913,9 @@ float GetPlayerHitRadius(void) {
 	return player.hitRadius;
 }
 
-int GetPlayerHp(void) {
-	return player.hp;
-}
+//int GetPlayerHp(void) {
+//	return player.hp;
+//}
 
 bool GetPlayerIsAlive(void) {
 	return player.isAlive;
@@ -952,11 +952,23 @@ PlayerLaserLevel GetPlayerNowLaserLevel(void) {
 	return player.laserLevel;
 }
 
-void PlayerDamage(Vector2 hitPos) {
+void PlayerDamage(Vector2 hitPos, float damage) {
 	if (!player.isAlive || player.isInvincible) return;
 
-	//体力減らす
-	player.hp--;
+	////体力減らす
+	//player.hp--;
+
+	//if (player.hp > 0) {
+	//	//無敵開始
+	//	player.isInvincible = true;
+
+	//}
+
+	//エネルギーを減らす
+	player.remainEnergy -= damage;
+	if (player.remainEnergy > 0.0f) {
+		player.isInvincible = true;
+	}
 
 	CreatePlayerDamageEffect(player.pos);
 
@@ -974,11 +986,6 @@ void PlayerDamage(Vector2 hitPos) {
 
 #pragma endregion
 
-	if (player.hp > 0) {
-		//無敵開始
-		player.isInvincible = true;
-
-	}
 }
 
 bool GetDodgeCloseSwitch(void) {

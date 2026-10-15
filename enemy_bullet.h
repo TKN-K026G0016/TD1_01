@@ -10,6 +10,8 @@ struct EnemyBullet {
 
 	float hitRadius = 10;
 
+	float pow = 20.0f;
+
 	//<移動関係>
 	float moveSpeed = 6.0f;
 	float moveTheta = 0.0f;
@@ -29,6 +31,8 @@ struct EnemyLaser {
 	float rotateTheta = 0.0f;
 	//playerとの距離
 	float disToBoss = 0.0f;
+
+	float pow = 10.0f;
 
 	//射撃フラグ
 	bool isShoot = false;

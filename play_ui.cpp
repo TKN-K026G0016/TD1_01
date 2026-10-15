@@ -13,15 +13,15 @@
 #include <Novice.h>
 
 #pragma region データ: HPアイコン
-struct LifeIcon {
-	Vector2 startPos = { 30, 690 };
-	Vector2 size = { 40, 40 };
-
-	float intervalX = 10;
-
-	Texture texture = {};
-};
-LifeIcon lifeIcon;
+//struct LifeIcon {
+//	Vector2 startPos = { 30, 690 };
+//	Vector2 size = { 40, 40 };
+//
+//	float intervalX = 10;
+//
+//	Texture texture = {};
+//};
+//LifeIcon lifeIcon;
 
 #pragma endregion
 
@@ -193,19 +193,19 @@ Texture comboNumbersTexture = {};
 
 #pragma region 関数: ライフアイコン
 
-static void InitLifeIcon(void) {
-	lifeIcon.texture = GetTexture(TextureType::LifeIcon);
-}
-
-static void DrawLifeIcon(void) {
-	int remainLife = GetPlayerHp();
-
-	for (int i = 0; i < remainLife; i++) {
-		Vector2 posS = { lifeIcon.startPos.x  + (lifeIcon.size.x + lifeIcon.intervalX) * i, lifeIcon.startPos.y };
-
-		DrawTextureUI(lifeIcon.texture, posS, lifeIcon.size);
-	}
-}
+//static void InitLifeIcon(void) {
+//	lifeIcon.texture = GetTexture(TextureType::LifeIcon);
+//}
+//
+//static void DrawLifeIcon(void) {
+//	int remainLife = GetPlayerHp();
+//
+//	for (int i = 0; i < remainLife; i++) {
+//		Vector2 posS = { lifeIcon.startPos.x  + (lifeIcon.size.x + lifeIcon.intervalX) * i, lifeIcon.startPos.y };
+//
+//		DrawTextureUI(lifeIcon.texture, posS, lifeIcon.size);
+//	}
+//}
 
 #pragma endregion
 
@@ -561,7 +561,7 @@ static void DrawShockCombo(void) {
 #pragma endregion
 
 void InitPlayUI(void) {
-	InitLifeIcon();
+	//InitLifeIcon();
 	InitEnergyGauge();
 	InitBossHpGauge();
 	InitProgressGauge();
@@ -577,7 +577,7 @@ void UpdatePlayUI(void){
 }
 
 void DrawPlayUI(void) {
-	DrawLifeIcon();
+	//DrawLifeIcon();
 	DrawEnergyGauge();
 	DrawBossHpGauge();
 	DrawPowRate();
