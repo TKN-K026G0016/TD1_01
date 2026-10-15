@@ -257,7 +257,7 @@ void SpawnElecShock(Vector2 pos, ElecBulletType type, ElecShockOriginType origin
 		}
 
 		//ラインエフェクトの生成
-		if (originType2 != ElecShockOriginType::None) {
+		if (originType2 != ElecShockOriginType::None || originIndex2 >= 0) {
 
 			Vector2 originPos = {};
 

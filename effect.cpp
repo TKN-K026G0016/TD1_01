@@ -1335,6 +1335,8 @@ void CreateElecLine(Vector2 startPos, Vector2 endPos) {
 
 		elecLineEffect[i].startPos = startPos;
 		elecLineEffect[i].endPos = endPos;
+
+		break;
 	}
 }
 
