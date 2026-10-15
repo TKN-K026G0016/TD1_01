@@ -85,3 +85,6 @@ void CreateCircleEffect(Vector2 pos, float endSizeValue, unsigned int color);
 void CreatePlayerDamageEffect(Vector2 pos);
 
 void CreateEnemyDamageEffect(Vector2 pos);
+void CreateEnemyDamageEffect(Vector2 pos);
+
+void CreatePlayerFootprintsEffect(Vector2 pos);
