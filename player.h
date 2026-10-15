@@ -31,11 +31,11 @@ Vector2 GetPlayerPos(void);
 /// <returns>player.hitRadius</returns>
 float GetPlayerHitRadius(void);
 
-///// <summary>
-///// playerの体力取得
-///// </summary>
-///// <returns>player.remainLife</returns>
-//int GetPlayerHp(void);
+/// <summary>
+/// playerの体力取得
+/// </summary>
+/// <returns>player.remainLife</returns>
+int GetPlayerHp(void);
 
 /// <summary>
 /// playerの生存フラグ取得
@@ -114,3 +114,8 @@ void TriggerDodgeClose(Vector2 eBulletPos);
 /// </summary>
 /// <returns>player.nowState</returns>
 PlayerState GetPlayerNowState(void);
+
+/// <summary>
+/// 体力ゲージ制のスイッチ確認
+/// </summary>
+bool GetLifeGaugeSwitch(void);

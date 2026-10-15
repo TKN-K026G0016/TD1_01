@@ -23,6 +23,8 @@ constexpr bool kDodgeCloseSwitch = false;
 constexpr bool kGemLockOnSwitch = true;
 //一定範囲内に敵がいなければ、ジェムをロックオンするスイッチ
 constexpr bool KCancelLockOnEnemySwitch = true;
+//エネルギー=HPモードのスイッチ
+constexpr bool kLifeGaugeSwitch = true;
 
 #pragma region データ: player本体
 struct Player {
@@ -33,8 +35,8 @@ struct Player {
 	bool isAlive = true;
 	//当たり判定の大きさ
 	float hitRadius = 10.0f;
-	//int hp = 5;
-	//int hpMax = 5;
+	int hp = 5;
+	int hpMax = 5;
 
 	//<ギリ避け関係>
 	float dodgeCloseRadius = 50.0f;
@@ -665,6 +667,8 @@ static void ConsumptionEnergy(void) {
 static void CheckFailedMaintenance(void) {
 	if (!player.isAlive) return;
 
+	if (kLifeGaugeSwitch) return;
+
 	if (player.nowState != PlayerState::Normal) return;
 
 	//デンリョク不足
@@ -682,6 +686,8 @@ static void CheckFailedMaintenance(void) {
 /// <param name=""></param>
 static void RecoveryPlayerState(void) {
 	if (!player.isAlive) return;
+
+	if (kLifeGaugeSwitch) return;
 
 	if (player.nowState == PlayerState::DeadEnergy) {
 		player.remainEnergy += kRecoveryEnergyDuringEmpty;
@@ -826,10 +832,20 @@ static void UpdateInvinciblePlayer(void) {
 /// 死亡判定の処理
 /// </summary>
 static void CheckDeadPlayer(void) {
-	if (player.remainEnergy <= 0) {
-		player.remainEnergy = 0;
 
-		player.isAlive = false;
+	if (kLifeGaugeSwitch) {
+		if (player.remainEnergy <= 0) {
+			player.remainEnergy = 0;
+
+			player.isAlive = false;
+		}
+	} 
+	else {
+		if (player.hp <= 0) {
+			player.hp = 0;
+
+			player.isAlive = false;
+		}
 	}
 }
 
@@ -913,9 +929,9 @@ float GetPlayerHitRadius(void) {
 	return player.hitRadius;
 }
 
-//int GetPlayerHp(void) {
-//	return player.hp;
-//}
+int GetPlayerHp(void) {
+	return player.hp;
+}
 
 bool GetPlayerIsAlive(void) {
 	return player.isAlive;
@@ -955,19 +971,21 @@ PlayerLaserLevel GetPlayerNowLaserLevel(void) {
 void PlayerDamage(Vector2 hitPos, float damage) {
 	if (!player.isAlive || player.isInvincible) return;
 
-	////体力減らす
-	//player.hp--;
 
-	//if (player.hp > 0) {
-	//	//無敵開始
-	//	player.isInvincible = true;
+	if (kLifeGaugeSwitch) {
+		//エネルギーを減らす
+		player.remainEnergy -= damage;
+		if (player.remainEnergy > 0.0f) {
+			player.isInvincible = true;
+		}
+	} else {
+		//体力減らす
+		player.hp--;
 
-	//}
-
-	//エネルギーを減らす
-	player.remainEnergy -= damage;
-	if (player.remainEnergy > 0.0f) {
-		player.isInvincible = true;
+		if (player.hp > 0) {
+			//無敵開始
+			player.isInvincible = true;
+		}
 	}
 
 	CreatePlayerDamageEffect(player.pos);
@@ -1009,6 +1027,10 @@ void TriggerDodgeClose(Vector2 eBulletPos) {
 
 PlayerState GetPlayerNowState(void) {
 	return player.nowState;
+}
+
+bool GetLifeGaugeSwitch(void) {
+	return kLifeGaugeSwitch;
 }
 
 #pragma endregion
