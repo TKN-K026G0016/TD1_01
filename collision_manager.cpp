@@ -133,7 +133,7 @@ static void CheckCollisionElecBulletVSEnemy(void) {
 			if (CheckCollisionCircleVSCircle(enemy1[i].pos, enemy1[i].hitRadius, elecBullet[j].pos, elecBullet[j].hitRadius)) {
 				BreakElecBullet(j);
 				//ホウデンの生成
-				SpawnElecShock(enemy1[i].pos, elecBullet[j].type);
+				SpawnElecShock(enemy1[i].pos, elecBullet[j].type, ElecShockOriginType::EnemySniper, i, ElecShockOriginType::None, -1);
 
 				DamageEnemySniper(enemy1[i], elecBullet[j].pow);
 			}
@@ -152,7 +152,7 @@ static void CheckCollisionElecBulletVSEnemy(void) {
 
 			if (CheckCollisionCircleVSCircle(enemy2[i].pos, enemy2[i].hitRadius, elecBullet[j].pos, elecBullet[j].hitRadius)) {
 				BreakElecBullet(j);
-				SpawnElecShock(enemy2[i].pos, elecBullet[j].type);
+				SpawnElecShock(enemy2[i].pos, elecBullet[j].type, ElecShockOriginType::EnemyGuardian, i, ElecShockOriginType::None, -1);
 
 				DamageEnemyGuardian(enemy2[i], elecBullet[j].pow);
 			}
@@ -171,7 +171,7 @@ static void CheckCollisionElecBulletVSEnemy(void) {
 
 			if (CheckCollisionCircleVSCircle(enemyBasic[i].pos, enemyBasic[i].hitRadius, elecBullet[j].pos, elecBullet[j].hitRadius)) {
 				BreakElecBullet(j);
-				SpawnElecShock(enemyBasic[i].pos, elecBullet[j].type);
+				SpawnElecShock(enemyBasic[i].pos, elecBullet[j].type, ElecShockOriginType::EnemyBasic, i, ElecShockOriginType::None, -1);
 
 				DamageEnemyBasic(enemyBasic[i], elecBullet[j].pow);
 			}
@@ -191,7 +191,7 @@ static void CheckCollisionElecBulletVSEnemy(void) {
 			if (CheckCollisionCircleVSCircle(enemySmall[i].pos, enemySmall[i].hitRadius, elecBullet[j].pos, elecBullet[j].hitRadius)) {
 				BreakElecBullet(j);
 				//ホウデンの生成
-				SpawnElecShock(enemySmall[i].pos, elecBullet[j].type);
+				SpawnElecShock(enemySmall[i].pos, elecBullet[j].type, ElecShockOriginType::EnemySmall, i, ElecShockOriginType::None, -1);
 
 				DamageEnemySmall(enemySmall[i], elecBullet[j].pow);
 			}
@@ -211,7 +211,7 @@ static void CheckCollisionElecBulletVSEnemy(void) {
 			if (CheckCollisionCircleVSCircle(enemyM[i].pos, enemyM[i].hitRadius, elecBullet[j].pos, elecBullet[j].hitRadius)) {
 				BreakElecBullet(j);
 				//ホウデンの生成
-				SpawnElecShock(enemyM[i].pos, elecBullet[j].type);
+				SpawnElecShock(enemyM[i].pos, elecBullet[j].type, ElecShockOriginType::EnemyM, i, ElecShockOriginType::None, -1);
 
 				DamageEnemyM(enemyM[i], elecBullet[j].pow);
 			}
@@ -231,7 +231,7 @@ static void CheckCollisionElecBulletVSEnemy(void) {
 			if (CheckCollisionCircleVSCircle(enemyBomb[i].pos, enemyBomb[i].hitRadius, elecBullet[j].pos, elecBullet[j].hitRadius)) {
 				BreakElecBullet(j);
 				//ホウデンの生成
-				SpawnElecShock(enemyBomb[i].pos, elecBullet[j].type);
+				SpawnElecShock(enemyBomb[i].pos, elecBullet[j].type, ElecShockOriginType::EnemyBomb, i, ElecShockOriginType::None, -1);
 
 				DamageEnemyBomb(enemyBomb[i], elecBullet[j].pow);
 			}
@@ -256,7 +256,7 @@ void CheckCollisionElecBulletVSBossEnemy(void) {
 		if (CheckCollisionCircleVSCircle(boss->pos, boss->hitRadius, elecBullet[i].pos, elecBullet[i].hitRadius)) {
 			BreakElecBullet(i);
 			//ホウデンの生成
-			SpawnElecShock(elecBullet[i].pos, elecBullet[i].type);
+			SpawnElecShock(elecBullet[i].pos, elecBullet[i].type, ElecShockOriginType::BossEnemy, i, ElecShockOriginType::None, -1);
 
 			int pow = elecBullet[i].pow;
 
@@ -306,7 +306,7 @@ static void CheckCollisionElecShockVSEnemy(void) {
 
 				//ホウデンの生成
 				if (!enemy1[i].isIgnoreShock) {
-					SpawnElecShock(enemy1[i].pos, elecShock[j].type);
+					SpawnElecShock(enemy1[i].pos, elecShock[j].type, ElecShockOriginType::EnemySniper, i, elecShock[j].originType, elecShock[j].originIndex);
 					enemy1[i].isIgnoreShock = true;
 				}
 				//ダメージ判定()
@@ -337,7 +337,7 @@ static void CheckCollisionElecShockVSEnemy(void) {
 			if (CheckCollisionCircleVSCircle(enemy2[i].pos, enemy2[i].hitRadius, elecShock[j].pos, elecShock[j].hitRadius)) {
 				//ホウデンの生成
 				if (!enemy2[i].isIgnoreShock) {
-					SpawnElecShock(enemy2[i].pos, elecShock[j].type);
+					SpawnElecShock(enemy2[i].pos, elecShock[j].type, ElecShockOriginType::EnemyGuardian, i, elecShock[j].originType, elecShock[j].originIndex);
 					enemy2[i].isIgnoreShock = true;
 				}
 				//ダメージ判定()
@@ -368,7 +368,7 @@ static void CheckCollisionElecShockVSEnemy(void) {
 			if (CheckCollisionCircleVSCircle(enemyBasic[i].pos, enemyBasic[i].hitRadius, elecShock[j].pos, elecShock[j].hitRadius)) {
 				//ホウデンの生成
 				if (!enemyBasic[i].isIgnoreShock) {
-					SpawnElecShock(enemyBasic[i].pos, elecShock[j].type);
+					SpawnElecShock(enemyBasic[i].pos, elecShock[j].type, ElecShockOriginType::EnemyBasic, i, elecShock[j].originType, elecShock[j].originIndex);
 					enemyBasic[i].isIgnoreShock = true;
 				}
 				//ダメージ判定()
@@ -397,7 +397,7 @@ static void CheckCollisionElecShockVSEnemy(void) {
 
 				//ホウデンの生成
 				if (!enemySmall[i].isIgnoreShock) {
-					SpawnElecShock(enemySmall[i].pos, elecShock[j].type);
+					SpawnElecShock(enemySmall[i].pos, elecShock[j].type, ElecShockOriginType::EnemySmall, i, elecShock[j].originType, elecShock[j].originIndex);
 					enemySmall[i].isIgnoreShock = true;
 				}
 				//ダメージ判定()
@@ -426,7 +426,7 @@ static void CheckCollisionElecShockVSEnemy(void) {
 
 				//ホウデンの生成
 				if (!enemyM[i].isIgnoreShock) {
-					SpawnElecShock(enemyM[i].pos, elecShock[j].type);
+					SpawnElecShock(enemyM[i].pos, elecShock[j].type, ElecShockOriginType::EnemyM, i, elecShock[j].originType, elecShock[j].originIndex);
 					enemyM[i].isIgnoreShock = true;
 				}
 				//ダメージ判定()
@@ -445,7 +445,7 @@ static void CheckCollisionElecShockVSEnemy(void) {
 
 #pragma endregion
 
-#pragma region VSEnemyM
+#pragma region VSEnemyBomb
 	for (int i = 0; i < enemyBombLimit; i++) {
 		if (!enemyBomb[i].isAlive) continue;
 
@@ -456,7 +456,7 @@ static void CheckCollisionElecShockVSEnemy(void) {
 
 				//ホウデンの生成
 				if (!enemyBomb[i].isIgnoreShock) {
-					SpawnElecShock(enemyBomb[i].pos, elecShock[j].type);
+					SpawnElecShock(enemyBomb[i].pos, elecShock[j].type, ElecShockOriginType::EnemyBomb, i, elecShock[j].originType, elecShock[j].originIndex);
 					enemyBomb[i].isIgnoreShock = true;
 				}
 				//ダメージ判定()
@@ -492,7 +492,7 @@ void CheckCollisionElecShockVSBossEnemy(void) {
 		if (CheckCollisionCircleVSCircle(boss->pos, boss->hitRadius, elecShock[i].pos, elecShock[i].hitRadius)) {
 			//ホウデンの生成
 			if (!boss->isIgnoreElecShock) {
-				SpawnElecShock(boss->pos, elecShock[i].type);
+				SpawnElecShock(boss->pos, elecShock[i].type, ElecShockOriginType::BossEnemy, -1, elecShock[i].originType, elecShock[i].originIndex);
 				boss->isIgnoreElecShock = true;
 			}
 			//ダメージ判定()
@@ -528,7 +528,7 @@ static void CheckCollisionElecBulletVSGem(void) {
 
 			//被弾判定
 			if (CheckCollisionCircleVSCircle(elecBullet[i].pos, elecBullet[i].hitRadius, gem[j].pos, gem[j].hitRadius)) {
-				SpawnElecShock(gem[j].pos, elecBullet[i].type);
+				SpawnElecShock(gem[j].pos, elecBullet[i].type, ElecShockOriginType::Gem, j, ElecShockOriginType::None, -1);
 				gem[j].isIgnoreElecShock = true;
 
 				//BreakElecBullet(i);
@@ -556,7 +556,7 @@ static void CheckCollisionElecShockVSGem(void) {
 
 			//被弾判定
 			if (CheckCollisionCircleVSCircle(elecShock[i].pos, elecShock[i].hitRadius, gem[j].pos, gem[j].hitRadius)) {
-				SpawnElecShock(gem[j].pos, elecShock[i].type);
+				SpawnElecShock(gem[j].pos, elecShock[i].type, ElecShockOriginType::Gem, j, elecShock[i].originType, elecShock[i].originIndex);
 				gem[j].isIgnoreElecShock = true;
 
 				//規定回数放電したら破壊
