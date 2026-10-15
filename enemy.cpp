@@ -331,7 +331,7 @@ static void CheckDeadEnemyGuardian(void) {
 			DeadEnemyguardian(i);
 
 			//ジェムの生成処理
-			for (int j = 0; j < enemyGuardianGemLimit; i++) {
+			for (int j = 0; j < enemyGuardianGemLimit; j++) {
 				SpawnGem(enemyGuardian[i].pos, GemType::S);
 			}
 		}
@@ -890,7 +890,7 @@ static void CheckDeadEnemyBomb(void) {
 			DeadEnemyBomb(i);
 
 			//ジェムの生成処理
-			for (int j = 0; j < enemyBombGemLimit; i++) {
+			for (int j = 0; j < enemyBombGemLimit; j++) {
 				SpawnGem(enemyBomb[i].pos, GemType::S);
 			}
 		}

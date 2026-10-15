@@ -44,6 +44,9 @@ static void CountIgnoreElecShock(void) {
 	for (int i = 0; i < kGemLimit; i++) {
 		if (!gem[i].isAlive) continue;
 
+		UpdateAnimation(gem[i].texture);
+		UpdateAnimation(gem[i].lightTexture);
+
 		if (!gem[i].isIgnoreElecShock) continue;
 
 		gem[i].ignoreElecShockTimer.count++;
@@ -51,9 +54,6 @@ static void CountIgnoreElecShock(void) {
 			gem[i].ignoreElecShockTimer.count = 0;
 			gem[i].isIgnoreElecShock = false;
 		}
-
-		UpdateAnimation(gem[i].texture);
-		UpdateAnimation(gem[i].lightTexture);
 	}
 }
 
