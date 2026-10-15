@@ -894,7 +894,7 @@ void InitEnemy(void) {
 
 	GetMovablePos(spawner.spawnRange);
 
-	//SpawnEnemy({ 100, 100 }, EnemyType::EnemyM);
+	SpawnEnemy({ 100, 100 }, EnemyType::EnemyFormation);
 }
 
 void UpdateEnemy(void) {
