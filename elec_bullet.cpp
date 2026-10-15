@@ -1,6 +1,7 @@
 #include "elec_bullet.h"
 #include "effect.h"
 #include "play_ui.h"
+#include "enemy.h"
 
 #include "vector2.h"
 #include "timer.h"
@@ -255,10 +256,25 @@ void SpawnElecShock(Vector2 pos, ElecBulletType type, ElecShockOriginType origin
 
 		//ラインエフェクトの生成
 		if (originType2 != ElecShockOriginType::None) {
-			//自分を発生させたElecShockのoriginObjの座標を取得
 
+			Vector2 originPos = {};
+
+			//自分を発生させたElecShockのoriginObjの座標を取得
+			
+			switch (originType2) {
+			case ElecShockOriginType::EnemySniper: {
+				
+				EnemySniper* enemySniper = GetEnemSniperArray();
+
+				originPos = enemySniper[originIndex2].pos;
+
+				break;
+			}
+			}
 
 			//2点の座標をつかってLine描写
+			CreateElecLine(originPos, elecShock[i].pos);
+
 		}
 
 		break;
