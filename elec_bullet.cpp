@@ -331,7 +331,11 @@ void SpawnElecShock(Vector2 pos, ElecBulletType type, ElecShockOriginType origin
 			}
 
 			//2点の座標をつかってLine描写
-			CreateElecLine(originPos, elecShock[i].pos);
+			if (type != ElecBulletType::Charge) {
+				CreateElecLine(originPos, elecShock[i].pos, false);
+			} else {
+				CreateElecLine(originPos, elecShock[i].pos, true);
+			}
 
 		}
 

@@ -128,6 +128,9 @@ ElecShockChargedEffect elecShockChargedEffect;
 
 constexpr int kElecLineEffectLimit = 100;
 struct ElecLineEffect {
+
+	bool charged = false;
+
 	bool isShoot = false;
 
 	Vector2 startPos = {};
@@ -140,6 +143,7 @@ struct ElecLineEffect {
 	float length = 0.0f;
 	//ラインの太さ
 	float thickness = 16.0f;
+	float thicknessCharged = 23.0f;
 
 	int alpha = 90;
 
@@ -403,7 +407,7 @@ CircleEffect circleEffect[kCircleEffectNumber];
 #pragma region データ; PlayerDamageEffect
 struct PlayerDamageEffect {
 	int createTriangleLimit = 4;
-	float triangleSizeValue = 20.0f;
+	float triangleSizeValue = 25.0f;
 	float triangleMoveSpeed = 20.0f;
 };
 PlayerDamageEffect playerDamageEffect;
@@ -1369,16 +1373,23 @@ static void DrawElecLineEffect(void) {
 
 		//Novice::DrawLine(startPos.x, startPos.y, endPos.x, endPos.y, kPlayerColor);
 
-		Vector2 size = { elecLineEffect[i].length, elecLineEffect[i].thickness };
+		float thickness = (elecLineEffect[i].charged) ? elecLineEffect[i].thicknessCharged : elecLineEffect[i].thickness;
+
+		Vector2 size = { elecLineEffect[i].length, thickness };
 
 		Texture texture = elecLineEffect[i].texture;
-		texture.color = (kPlayerColor & 0xFFFFFF00) | elecLineEffect[i].alpha;
+
+		if (elecLineEffect[i].charged) {
+			texture.color = (kPlayerColor & 0xFFFFFF00) | elecLineEffect[i].alpha;
+		} else {
+			texture.color = (kPlayerChargedColor & 0xFFFFFF00) | elecLineEffect[i].alpha;
+		}
 
 		DrawTextureRotateObj(texture, elecLineEffect[i].centerPos, size, elecLineEffect[i].rotateTheta);
 	}
 }
 
-void CreateElecLine(Vector2 startPos, Vector2 endPos) {
+void CreateElecLine(Vector2 startPos, Vector2 endPos, bool charged) {
 	for (int i = 0; i < kElecLineEffectLimit; i++) {
 		if (elecLineEffect[i].isShoot) continue;
 
@@ -1396,6 +1407,8 @@ void CreateElecLine(Vector2 startPos, Vector2 endPos) {
 
 		elecLineEffect[i].centerPos.x = (startPos.x + endPos.x) / 2.0f;
 		elecLineEffect[i].centerPos.y = (startPos.y + endPos.y) / 2.0f;
+
+		elecLineEffect[i].charged = charged;
 
 		break;
 	}
