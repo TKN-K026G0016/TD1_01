@@ -31,6 +31,10 @@ struct ElecBullet {
 	//攻撃力
 	int pow;
 
+	//残像の座標
+	Vector2 prePos[2] = {};
+	int afterImageAlpha[2] = { 100, 40 };
+
 	Texture texture = {};
 };
 

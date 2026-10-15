@@ -578,6 +578,8 @@ static void UpdateLockOnSign(void) {
 		lockOnSign.pos = gem[targetIndex].pos;
 	}
 
+	UpdateAnimation(lockOnSign.texture);
+
 }
 
 static void DrawLockOnSign(void) {
