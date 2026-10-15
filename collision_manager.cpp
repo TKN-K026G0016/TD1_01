@@ -567,7 +567,9 @@ static void CheckCollisionElecShockVSGem(void) {
 				gem[j].isIgnoreElecShock = true;
 
 				//規定回数放電したら破壊
-				gem[j].hp--;
+				int damage = (elecShock[i].type == ElecBulletType::Normal) ? 1 : 2;
+
+				gem[j].hp -= damage;
 				if (gem[j].hp <= 0) {
 					BreakGem(j);
 				}
