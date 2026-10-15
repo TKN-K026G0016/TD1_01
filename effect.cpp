@@ -113,7 +113,7 @@ struct ElecShockEffect {
 	float triangleSizeValue = 20.0f;
 	float triangleMoveSpeed = 30.0f;
 
-	float circleSize = 300.0f;
+	float circleSize = 150.0f;
 };
 ElecShockEffect elecShockEffect;
 
@@ -122,7 +122,7 @@ struct ElecShockChargedEffect {
 	float triangleSizeValue = 30.0f;
 	float triangleMoveSpeed = 50.0f;
 
-	float circleSize = 550.0f;
+	float circleSize = 250.0f;
 };
 ElecShockChargedEffect elecShockChargedEffect;
 
@@ -141,7 +141,7 @@ struct ElecLineEffect {
 	//ラインの太さ
 	float thickness = 16.0f;
 
-	int alpha = 180;
+	int alpha = 90;
 
 	Timer breakTimer = { 10, 0 };
 
