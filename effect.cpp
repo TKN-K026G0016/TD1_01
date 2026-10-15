@@ -1481,11 +1481,7 @@ void DrawPlayerFootprints() {
 		InitTriangleEffect2();
 		InitCircleEffect();
 		InitPlayerFootprintsEffect();
-	InitTriangleEffect();
-	InitTriangleEffect2();
-	InitCircleEffect();
-
-	InitElecLineEffect();
+		InitElecLineEffect();
 
 #ifdef _DEBUG
 
