@@ -1064,7 +1064,7 @@ void SpawnEnemy(Vector2 pos, EnemyType type) {
 }
 
 
-EnemySniper* GetEnemSniperArray(void) {
+EnemySniper* GetEnemySniperArray(void) {
 	return enemySniper;
 }
 

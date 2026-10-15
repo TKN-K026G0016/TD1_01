@@ -2,6 +2,8 @@
 #include "effect.h"
 #include "play_ui.h"
 #include "enemy.h"
+#include "boss_enemy.h"
+#include "gem.h"
 
 #include "vector2.h"
 #include "timer.h"
@@ -262,11 +264,67 @@ void SpawnElecShock(Vector2 pos, ElecBulletType type, ElecShockOriginType origin
 			//自分を発生させたElecShockのoriginObjの座標を取得
 			
 			switch (originType2) {
+			case ElecShockOriginType::Gem: {
+
+				Gem* Gem = GetGemArray();
+
+				originPos = Gem[originIndex2].pos;
+
+				break;
+			}
 			case ElecShockOriginType::EnemySniper: {
 				
-				EnemySniper* enemySniper = GetEnemSniperArray();
+				EnemySniper* enemySniper = GetEnemySniperArray();
 
 				originPos = enemySniper[originIndex2].pos;
+
+				break;
+			}
+			case ElecShockOriginType::EnemyGuardian: {
+
+				EnemyGuardian* enemyGuardian = GetEnemyGuardianArray();
+
+				originPos = enemyGuardian[originIndex2].pos;
+
+				break;
+			}
+			case ElecShockOriginType::EnemyBasic: {
+
+				EnemyBasic* enemyBasic = GetEnemyBasicArray();
+
+				originPos = enemyBasic[originIndex2].pos;
+
+				break;
+			}
+			case ElecShockOriginType::EnemySmall: {
+
+				EnemySmall* enemySmall = GetEnemySmallArray();
+
+				originPos = enemySmall[originIndex2].pos;
+
+				break;
+			}
+			case ElecShockOriginType::EnemyM: {
+
+				EnemyM* enemyM = GetEnemyMArray();
+
+				originPos = enemyM[originIndex2].pos;
+
+				break;
+			}
+			case ElecShockOriginType::EnemyBomb: {
+
+				EnemyBomb* enemyBomb = GetEnemyBombArray();
+
+				originPos = enemyBomb[originIndex2].pos;
+
+				break;
+			}
+			case ElecShockOriginType::BossEnemy: {
+
+				BossEnemy* BossEnemy = GetBossEnemy();
+
+				originPos = BossEnemy->pos;
 
 				break;
 			}

@@ -272,7 +272,7 @@ void DrawEnemy(void);
 /// <param name="type"生成する種類></param>
 void SpawnEnemy(Vector2 pos, EnemyType type);
 
-EnemySniper* GetEnemSniperArray(void);
+EnemySniper* GetEnemySniperArray(void);
 
 int GetEnemySniperLimit(void);
 

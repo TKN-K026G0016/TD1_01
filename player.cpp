@@ -302,7 +302,7 @@ static void RotatePlayer(void) {
 	nowTargetType = LockTargetType::None;
 	targetIndex = -1;
 
-	EnemySniper* enemy1 = GetEnemSniperArray();
+	EnemySniper* enemy1 = GetEnemySniperArray();
 	int enemy1Limit = GetEnemySniperLimit();
 
 	EnemyGuardian* enemy2 = GetEnemyGuardianArray();
@@ -544,7 +544,7 @@ static void UpdateLockOnSign(void) {
 	}
 	//enemy1
 	else if (nowTargetType == LockTargetType::Enemy1) {
-		EnemySniper* enemy1 = GetEnemSniperArray();
+		EnemySniper* enemy1 = GetEnemySniperArray();
 		lockOnSign.pos = enemy1[targetIndex].pos;
 	}
 	//enemy2

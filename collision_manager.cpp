@@ -16,7 +16,7 @@
 /// playerLaserとenemyの判定
 /// </summary>
 static void CheckCollisionLaserVSEnemy(void) {
-	EnemySniper* enemy1 = GetEnemSniperArray();
+	EnemySniper* enemy1 = GetEnemySniperArray();
 	int enemy1Limit = GetEnemySniperLimit();
 
 	EnemyGuardian* enemy2 = GetEnemyGuardianArray();
@@ -102,7 +102,7 @@ void CheckCollisionLaserVSBossEnemy(void) {
 /// </summary>
 /// <param name=""></param>
 static void CheckCollisionElecBulletVSEnemy(void) {
-	EnemySniper* enemy1 = GetEnemSniperArray();
+	EnemySniper* enemy1 = GetEnemySniperArray();
 	int enemy1Limit = GetEnemySniperLimit();
 
 	EnemyGuardian* enemy2 = GetEnemyGuardianArray();
@@ -274,7 +274,7 @@ void CheckCollisionElecBulletVSBossEnemy(void) {
 /// </summary>
 /// <param name=""></param>
 static void CheckCollisionElecShockVSEnemy(void) {
-	EnemySniper* enemy1 = GetEnemSniperArray();
+	EnemySniper* enemy1 = GetEnemySniperArray();
 	int enemy1Limit = GetEnemySniperLimit();
 
 	EnemyGuardian* enemy2 = GetEnemyGuardianArray();
