@@ -30,6 +30,8 @@ constexpr int enemySniperGemLimit = 4;
 #pragma region データ: EnemyGuardian
 constexpr int kEnemyGuardianLimit = 10;
 static EnemyGuardian enemyGuardian[kEnemyGuardianLimit];
+//ジェムの生成量
+constexpr int enemyGuardianGemLimit = 1;
 
 #pragma endregion
 
@@ -76,7 +78,7 @@ constexpr int kScatterLengthMin = 0;
 constexpr int kEnemyBombLimit = 10;
 static EnemyBomb enemyBomb[kEnemyBombLimit];
 //ジェムの生成量
-constexpr int enemyBombGemLimit = 2;
+constexpr int enemyBombGemLimit = 3;
 
 #pragma endregion
 
@@ -218,7 +220,7 @@ static void CheckDeadEnemySniper(void) {
 			DeadEnemySniper(i);
 
 			//ジェムの生成処理
-			for (int j = 0;j < enemySniperGemLimit;j++) {
+			for (int j = 0; j < enemySniperGemLimit;j++) {
 				SpawnGem(enemySniper[i].pos, GemType::S);
 			}
 		}
@@ -329,7 +331,9 @@ static void CheckDeadEnemyGuardian(void) {
 			DeadEnemyguardian(i);
 
 			//ジェムの生成処理
-			SpawnGem(enemyGuardian[i].pos, GemType::M);
+			for (int j = 0; j < enemyGuardianGemLimit; i++) {
+				SpawnGem(enemyGuardian[i].pos, GemType::S);
+			}
 		}
 	}
 }
@@ -491,12 +495,12 @@ static void CheckDeadEnemyBasic(void) {
 			//ジェムの生成処理
 			if (enemyBasic[i].thetaUpDate) {
 				for (int j = 0;j < enemyBasicGemLimit;j++) {
-					SpawnGem(enemyBasic[i].pos, GemType::M);
+					SpawnGem(enemyBasic[i].pos, GemType::S);
 				}
 			}
 			else {
 				for (int j = 0;j < enemyFormationGemLimit;j++) {
-					SpawnGem(enemyBasic[i].pos, GemType::M);
+					SpawnGem(enemyBasic[i].pos, GemType::S);
 				}
 
 			}
@@ -886,7 +890,9 @@ static void CheckDeadEnemyBomb(void) {
 			DeadEnemyBomb(i);
 
 			//ジェムの生成処理
-			SpawnGem(enemyBomb[i].pos, GemType::M);
+			for (int j = 0; j < enemyBombGemLimit; i++) {
+				SpawnGem(enemyBomb[i].pos, GemType::S);
+			}
 		}
 	}
 }

@@ -278,7 +278,6 @@ struct ChargeChipEffect {
 	int alpha = 0;
 
 	Texture texture = {};
-	unsigned int color = 0x04C1E8FF;
 };
 ChargeChipEffect chargeChipEffect[kChargeChipEffecLimit];
 
@@ -993,7 +992,7 @@ static void DrawChargeChipEffect(void) {
 		Vector2 size = { chargeChipEffect[i].sizeValue, chargeChipEffect[i].sizeValue };
 
 		Texture texture = chargeChipEffect[i].texture;
-		texture.color = (chargeChipEffect[i].color & 0xFFFFFF00) | chargeChipEffect[i].alpha;
+		texture.color = (kPlayerChargedColor & 0xFFFFFF00) | chargeChipEffect[i].alpha;
 
 		DrawTextureRotateObj(texture, chargeChipEffect[i].pos, size, chargeChipEffect[i].rotateTheta);
 	}
