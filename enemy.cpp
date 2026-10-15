@@ -127,7 +127,7 @@ static void MoveEnemySniper(void) {
 	Vector2 playerPos = GetPlayerPos();
 	for (int i = 0;i < kEnemysniperLimit;i++) {
 		if (!enemySniper[i].isAlive)continue;
-		if (enemySniper[i].isFlash) continue;
+		if (enemySniper[i].isHitStop) continue;
 
 		float diffX = playerPos.x - enemySniper[i].pos.x;
 		float diffY = playerPos.y - enemySniper[i].pos.y;
@@ -178,6 +178,20 @@ static void UpdateFlashTimerEnemySniper(void) {
 		if (enemySniper[i].flashTimer.count >= enemySniper[i].flashTimer.time) {
 			enemySniper[i].flashTimer.count = 0;
 			enemySniper[i].isFlash = false;
+		}
+
+	}
+}
+
+static void UpdateHitStopTimerEnemySniper(void) {
+	for (int i = 0; i < kEnemysniperLimit; i++) {
+		if (!enemySniper[i].isAlive) continue;
+		if (!enemySniper[i].isHitStop) continue;
+
+		enemySniper[i].hitStopTimer.count++;
+		if (enemySniper[i].hitStopTimer.count >= enemySniper[i].hitStopTimer.time) {
+			enemySniper[i].hitStopTimer.count = 0;
+			enemySniper[i].isHitStop = false;
 		}
 
 	}
@@ -385,7 +399,7 @@ static void InitEnemyBasic(void) {
 static void MoveEnemyBasic(void) {
 	for (int i = 0; i < kEnemyBasicLimit; i++) {
 		if (!enemyBasic[i].isAlive) continue;
-		if (enemyBasic[i].isFlash) continue;
+		if (enemyBasic[i].isHitStop) continue;
 
 		if (enemyBasic[i].thetaUpDate) {
 
@@ -439,6 +453,19 @@ static void UpdateFlashTimerEnemyBasic(void) {
 		if (enemyBasic[i].flashTimer.count >= enemyBasic[i].flashTimer.time) {
 			enemyBasic[i].flashTimer.count = 0;
 			enemyBasic[i].isFlash = false;
+		}
+	}
+}
+
+static void UpdateHitStopTimerEnemyBasic(void) {
+	for (int i = 0; i < kEnemyBasicLimit; i++) {
+		if (!enemyBasic[i].isAlive) continue;
+		if (!enemyBasic[i].isHitStop) continue;
+
+		enemyBasic[i].hitStopTimer.count++;
+		if (enemyBasic[i].hitStopTimer.count >= enemyBasic[i].hitStopTimer.time) {
+			enemyBasic[i].hitStopTimer.count = 0;
+			enemyBasic[i].isHitStop = false;
 		}
 	}
 }
@@ -604,6 +631,7 @@ static void InitEnemySmall(void) {
 static void MoveEnemySmall(void) {
 	for (int i = 0; i < kEnemySmallLimit; i++) {
 		if (!enemySmall[i].isAlive) continue;
+		if (enemySmall[i].isHitStop) continue;
 
 		//移動方向更新処理
 		if(enemySmall[i].velocityUpDate){
@@ -902,6 +930,7 @@ void UpdateEnemy(void) {
 	CheckDeadEnemySniper();
 	MoveEnemySniper();
 	UpdateFlashTimerEnemySniper();
+	UpdateHitStopTimerEnemySniper();
 	CountIgnoreShockEnemySniper();
 
 	//enemyGuardian
@@ -914,6 +943,7 @@ void UpdateEnemy(void) {
 	MoveEnemyBasic();
 	CountIgnoreShockEnemyBasic();
 	UpdateFlashTimerEnemyBasic();
+	UpdateHitStopTimerEnemyBasic();
 	CheckDeadEnemyBasic();
 
 	//enemyM
@@ -1111,12 +1141,18 @@ int GetEnemySniperLimit(void) {
 	return kEnemysniperLimit;
 }
 
-void DamageEnemySniper(EnemySniper& enemy, int pow) {
+void DamageEnemySniper(EnemySniper& enemy, int pow, bool hitStopSwitch) {
 	enemy.hp -= pow;
 
 	//フラッシュさせる
 	enemy.isFlash = true;
 	enemy.flashTimer.count = 0;
+
+	//ヒットストップの実装
+	if (hitStopSwitch) {
+		enemy.isHitStop = true;
+		enemy.hitStopTimer.count = 0;
+	}
 
 	//ダメージエフェクト
 	CreateEnemyDamageEffect(enemy.pos);
@@ -1149,12 +1185,18 @@ int GetEnemyBasicLimit(void) {
 	return kEnemyBasicLimit;
 }
 
-void DamageEnemyBasic(EnemyBasic& enemy, int pow) {
+void DamageEnemyBasic(EnemyBasic& enemy, int pow, bool hitStopSwitch) {
 	enemy.hp -= pow;
 
 	//フラッシュさせる
 	enemy.isFlash = true;
 	enemy.flashTimer.count = 0;
+
+	//ヒットストップの実装
+	if (hitStopSwitch) {
+		enemy.isHitStop = true;
+		enemy.hitStopTimer.count = 0;
+	}
 
 	//ダメージエフェクト
 	CreateEnemyDamageEffect(enemy.pos);

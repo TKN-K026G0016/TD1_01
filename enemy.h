@@ -55,6 +55,9 @@ struct EnemySniper {
 	//<フラッシュ関係>
 	bool isFlash = false;
 	Timer flashTimer = { 7, 0 };
+	//<ヒットストップ関係>
+	bool isHitStop = false;
+	Timer hitStopTimer = { 10, 0 };
 
 
 	//<移動関係>
@@ -135,6 +138,9 @@ struct EnemyBasic {
 	//<フラッシュ関係>
 	bool isFlash = false;
 	Timer flashTimer = { 10, 0 };
+	//<ヒットストップ関係>
+	bool isHitStop = false;
+	Timer hitStopTimer = { 10, 0 };
 
 	Texture texture = {};
 };
@@ -207,6 +213,9 @@ struct EnemySmall {
 	bool isIgnoreShock = false;
 	//ショック生成無視タイマー
 	Timer ignoreSpawnShockTimer = { 20, 0 };
+	//<ヒットストップ関係>
+	bool isHitStop = false;
+	Timer hitStopTimer = { 10, 0 };
 
 	//<フラッシュ関係>
 	bool isFlash = false;
@@ -286,7 +295,7 @@ int GetEnemySniperLimit(void);
 /// </summary>
 /// <param name="enemy"></param>
 /// <param name="pow"></param>
-void DamageEnemySniper(EnemySniper& enemy, int pow);
+void DamageEnemySniper(EnemySniper& enemy, int pow, bool hitStopSwitch);
 
 EnemyGuardian* GetEnemyGuardianArray(void);
 
@@ -309,7 +318,7 @@ int GetEnemyBasicLimit(void);
 /// </summary>
 /// <param name="enemy">enemyBasic</param>
 /// <param name="pow">ダメージ</param>
-void DamageEnemyBasic(EnemyBasic& enemy, int pow);
+void DamageEnemyBasic(EnemyBasic& enemy, int pow, bool hitStopSwitch);
 
 EnemyM* GetEnemyMArray(void);
 

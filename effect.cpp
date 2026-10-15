@@ -1379,7 +1379,7 @@ static void DrawElecLineEffect(void) {
 
 		Texture texture = elecLineEffect[i].texture;
 
-		if (elecLineEffect[i].charged) {
+		if (!elecLineEffect[i].charged) {
 			texture.color = (kPlayerColor & 0xFFFFFF00) | elecLineEffect[i].alpha;
 		} else {
 			texture.color = (kPlayerChargedColor & 0xFFFFFF00) | elecLineEffect[i].alpha;
@@ -1460,7 +1460,7 @@ void CreateEnemyDamageEffect(Vector2 pos) {
 
 #pragma endregion
 
-#pragma region 関数: EnemyDamageEffect
+#pragma region 関数: PlayerFootprintEffect
 
 void CreatePlayerFootprintsEffect(Vector2 pos, Vector2 inputVec) {
 
