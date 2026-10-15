@@ -104,7 +104,7 @@ struct DataShootLaser {
 	//現在の回転速度
 	float nowRotateSpeed = 0.0f;
 	//回転速度の加速度
-	float rotateAccelerationSpeed = 0.0005f;
+	float rotateAccelerationSpeed = 0.00035f;
 	//回転速度の上限
 	float rotateSpeedMax = 0.05f;
 	//現在の回転角

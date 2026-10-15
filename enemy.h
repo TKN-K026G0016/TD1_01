@@ -57,7 +57,7 @@ struct EnemySniper {
 
 	//<移動関係>
 	// 視界
-	float viewRange = 400.0f;
+	float viewRange = 700.0f;
 	//速度
 	Vector2 velocity = { 0.0f, 0.0f };
 	//スピード

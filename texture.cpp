@@ -47,6 +47,7 @@ void InitTexture(void) {
 
 		{ Novice::LoadTexture("./resources/texture/player/elec_shock.png"), { 256, 256 }, {0, 0}, 0, 0, WHITE },
 		{ Novice::LoadTexture("./resources/texture/player/erec_shock_charged.png"), { 256, 256 }, {0, 0}, 0, 0, WHITE },
+		{ Novice::LoadTexture("./resources/texture/player/elec.png"), { 64, 64 }, {2, 0}, 2, 0, WHITE },
 
 		{ Novice::LoadTexture("./resources/texture/player/lock_on.png"), { 64, 64 }, {0, 0}, 0, 0, WHITE },
 

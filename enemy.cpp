@@ -858,11 +858,11 @@ static void DrawEnemyBomb(void) {
 		}
 
 		//爆発範囲の描画
-		if (enemyBomb[i].burst.count <= enemyBomb[i].burst.time - 60) {
+		if (enemyBomb[i].burst.count <= enemyBomb[i].burst.time - 90) {
 			DrawTextureObj(enemyBomb[i].burstTexture, enemyBomb[i].pos, enemyBomb[i].bustSize);
 		}
 		else {
-			for (int j = 0;j < 30;j++) {
+			for (int j = 0;j < 45;j++) {
 				if (enemyBomb[i].burst.time - enemyBomb[i].burst.count == j * 2) {
 					DrawTextureObj(enemyBomb[i].burstTexture, enemyBomb[i].pos, enemyBomb[i].bustSize);
 				}
