@@ -126,6 +126,17 @@ struct ElecShockChargedEffect {
 };
 ElecShockChargedEffect elecShockChargedEffect;
 
+constexpr int kElecLineEffectLimit = 50;
+struct ElecLineEffect {
+	bool isShoot = false;
+
+	Vector2 startPos = {};
+	Vector2 endPos = {};
+
+	Timer breakTimer = { 10, 0 };
+};
+ElecLineEffect elecLineEffect[kElecLineEffectLimit];
+
 #pragma region 廃棄予定
 //constexpr int kElecShockEffectLimit = 30;
 //struct ElecShockEffect {
@@ -1286,6 +1297,30 @@ void DrawCircleEffect() {
 
 #pragma region 関数: ElecShockEffect
 
+static void InitElecLineEffect(void) {
+	for (int i = 0; i < kElecLineEffectLimit; i++) {
+		elecLineEffect[i] = {};
+	}
+}
+
+static void UpdateElecLineEffect(void) {
+	for (int i = 0; i < kElecLineEffectLimit; i++) {
+		if (!elecLineEffect[i].isShoot) continue;
+
+		elecLineEffect[i].breakTimer.count++;
+		if (elecLineEffect[i].breakTimer.count >= elecLineEffect[i].breakTimer.time) {
+			elecLineEffect[i].breakTimer.count = 0;
+			elecLineEffect[i].isShoot = false;
+		}
+	}
+}
+
+static void DrawElecLineEffect(void) {
+	for (int i = 0; i < kElecLineEffectLimit; i++) {
+		if (!elecLineEffect[i].isShoot) continue;
+	}
+}
+
 void CreateElecShockEffect(Vector2 pos) {
 	//円を生成
 	CreateCircleEffect(pos, elecShockEffect.circleSize, kPlayerColor);
@@ -1351,6 +1386,9 @@ void InitEffect() {
 	InitTriangleEffect();
 	InitTriangleEffect2();
 	InitCircleEffect();
+
+	InitElecLineEffect();
+
 #ifdef _DEBUG
 
 	CreateJemEffect();
@@ -1375,6 +1413,7 @@ void UpdateEffect() {
 	UpdateTriangleEffect();
 	UpdateTriangleEffect2();
 	UpdateCircleEffect();
+	UpdateElecLineEffect();
 }
 void DrawEffect() {
 	DrawGetEffect();
@@ -1388,6 +1427,7 @@ void DrawEffect() {
 	DrawTriangleEffect();
 	DrawTriangleEffect2();
 	DrawCircleEffect();
+	DrawElecLineEffect();
 }
 
 void DrawEffectAsUI() {
