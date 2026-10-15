@@ -34,6 +34,22 @@ struct ElecBullet {
 	Texture texture = {};
 };
 
+//ショックの発生元objの種類
+enum class ElecShockOriginType {
+	Gem,
+
+	EnemySniper,
+	EnemyGuardian,
+	EnemyBasic,
+	EnemyM,
+	EnemySmall,
+	EnemyBomb,
+
+	BossEnemy,
+
+	Count
+};
+
 //デンゲキショック
 struct ElecShock {
 	Vector2 pos = {};
