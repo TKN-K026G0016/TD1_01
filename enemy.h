@@ -22,6 +22,8 @@ enum class EnemyType {
 	EnemySmall,
 	//小ザコの群体
 	EnemySmallGroup,
+	//小雑魚隊列
+	EnemySmallFarmation,
 	//ボム
 	EnemyBomb,
 
@@ -197,6 +199,9 @@ struct EnemySmall {
 	float decelerationSpeed = 0.12f;
 	//方向転換の比率
 	float turnRate = 0.5f;
+	//移動方向変更フラグ
+	bool velocityUpDate = true;
+
 
 	//ショックの生成無視状態
 	bool isIgnoreShock = false;

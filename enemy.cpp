@@ -56,6 +56,8 @@ constexpr int kEnemySmallLimit = 30;
 static EnemySmall enemySmall[kEnemySmallLimit];
 //ジェムの生成量
 constexpr int enemySmallGemLimit = 1;
+//Formationの生成間隔
+constexpr int smallFormationRange = 50;
 
 #pragma endregion
 
@@ -600,18 +602,21 @@ static void MoveEnemySmall(void) {
 	for (int i = 0; i < kEnemySmallLimit; i++) {
 		if (!enemySmall[i].isAlive) continue;
 
-		Vector2 targetPos = GetPlayerPos();
-		Vector2 moveVec = { targetPos.x - enemySmall[i].pos.x,   targetPos.y - enemySmall[i].pos.y };
+		//移動方向更新処理
+		if(enemySmall[i].velocityUpDate){
+			Vector2 targetPos = GetPlayerPos();
+			Vector2 moveVec = { targetPos.x - enemySmall[i].pos.x,   targetPos.y - enemySmall[i].pos.y };
 
-		float disLength = sqrtf(moveVec.x * moveVec.x + moveVec.y * moveVec.y);
-		if (disLength != 0.0f) {
-			moveVec.x /= disLength;
-			moveVec.y /= disLength;
+			float disLength = sqrtf(moveVec.x * moveVec.x + moveVec.y * moveVec.y);
+			if (disLength != 0.0f) {
+				moveVec.x /= disLength;
+				moveVec.y /= disLength;
+			}
+
+			//移動ベクトル(ゆっくり曲がる)
+			enemySmall[i].velocity.x = (1 - enemySmall[i].turnRate) * enemySmall[i].velocity.x + moveVec.x * enemySmall[i].turnRate;
+			enemySmall[i].velocity.y = (1 - enemySmall[i].turnRate) * enemySmall[i].velocity.y + moveVec.y * enemySmall[i].turnRate;
 		}
-
-		//移動ベクトル(ゆっくり曲がる)
-		enemySmall[i].velocity.x = (1 - enemySmall[i].turnRate) * enemySmall[i].velocity.x + moveVec.x * enemySmall[i].turnRate;
-		enemySmall[i].velocity.y = (1 - enemySmall[i].turnRate) * enemySmall[i].velocity.y + moveVec.y * enemySmall[i].turnRate;
 
 		//加速処理
 		enemySmall[i].nowSpeed += enemySmall[i].accleretionSpeed;
@@ -973,6 +978,7 @@ void SpawnEnemy(Vector2 pos, EnemyType type) {
 			if (enemySmall[i].isAlive) continue;
 
 			enemySmall[i].isAlive = true;
+			enemySmall[i].velocityUpDate = true;
 			enemySmall[i].pos = pos;
 
 			// 初期化（必要なら）
@@ -989,7 +995,37 @@ void SpawnEnemy(Vector2 pos, EnemyType type) {
 				if (enemySmall[i].isAlive) continue;
 
 				enemySmall[i].isAlive = true;
+				enemySmall[i].velocityUpDate = true;
 				enemySmall[i].pos = CreateScatterPos(pos);
+
+				// 初期化
+				enemySmall[i].nowSpeed = 0.0f;
+				enemySmall[i].velocity = { 0,0 };
+
+				break;
+			}
+		}
+		break;
+	}
+	case EnemyType::EnemySmallFarmation: {
+		for (int createNum = 0; createNum < 3; createNum++) {
+			for (int i = 0; i < kEnemySmallLimit; i++) {
+				if (enemySmall[i].isAlive) continue;
+
+				enemySmall[i].isAlive = true;
+				enemySmall[i].velocityUpDate = false;
+				Vector2 targetPos = GetPlayerPos();
+				Vector2 moveVec = { targetPos.x - pos.x,   targetPos.y - pos.y };
+
+				float disLength = sqrtf(moveVec.x * moveVec.x + moveVec.y * moveVec.y);
+				if (disLength != 0.0f) {
+					moveVec.x /= disLength;
+					moveVec.y /= disLength;
+				}
+				enemySmall[i].velocity.x = moveVec.x;
+				enemySmall[i].velocity.y = moveVec.y;
+				enemySmall[i].pos.x += enemySmall[i].velocity.x*smallFormationRange*createNum;
+				enemySmall[i].pos.y += enemySmall[i].velocity.y*smallFormationRange*createNum;
 
 				// 初期化
 				enemySmall[i].nowSpeed = 0.0f;
