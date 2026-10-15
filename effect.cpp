@@ -441,7 +441,58 @@ FootprintsEffect footprintsEffect[kFootprintsEffectNumber] = {};
 int footprintsEffectTimer = 0;
 #pragma endregion
 
+#pragma region データ: BombExplosionEffect
+//爆発本体
+const int kBombExplosionEffectNumber = 4;
+struct BombExplosionEffect
+{
+	Vector2 pos;
+	bool appear = false;
 
+	//イージング関係
+	float easingT = 0.0f;
+	float easingSpeed = 0.1f;
+	//透明化が始まるタイミング
+	float startFadeEasingT = 0.1f;
+
+	//サイズ関係
+	float sizeValue = 0.0f;
+	float startSizeValue = 0.0f;
+	float endSizeValue = 0.0f;
+
+	//透明度関係
+	int alpha = kAlphaMax;
+
+	unsigned int color = WHITE;
+	Texture texture = {};
+};
+BombExplosionEffect bombExplosionEffect [kBombExplosionEffectNumber] = {};
+//爆風
+const int kBombBlastEffectNumber = 4;
+struct BombBlastEffect
+{
+	Vector2 pos;
+	bool appear = false;
+
+	//イージング関係
+	float easingT = 0.0f;
+	float easingSpeed = 0.1f;
+	//透明化が始まるタイミング
+	float startFadeEasingT = 0.1f;
+
+	//サイズ関係
+	float sizeValue = 0.0f;
+	float startSizeValue = 0.0f;
+	float endSizeValue = 0.0f;
+
+	//透明度関係
+	int alpha = kAlphaMax;
+
+	unsigned int color = WHITE;
+	Texture texture = {};
+};
+BombBlastEffect bombBlastEffect [kBombExplosionEffectNumber][kBombBlastEffectNumber] = {};
+#pragma endregion
 
 #pragma region 関数: ジェム取得effect
 
@@ -1325,6 +1376,7 @@ void DrawCircleEffect() {
 	}
 }
 
+
 #pragma endregion
 
 #pragma region 関数: ElecShockEffect
@@ -1516,6 +1568,64 @@ void DrawPlayerFootprints() {
 	}
 }
 #pragma endregion
+
+#pragma region 関数: BombExplosionEffect
+void CreateBombExplosionEffect(Vector2 pos, float endSizeValue, unsigned int color) {
+	for (int i = 0; i < kBombExplosionEffectNumber; i++) {
+		if (bombExplosionEffect[i].appear) continue;
+		bombExplosionEffect[i].appear = true;
+		bombExplosionEffect[i].pos = pos;
+		bombExplosionEffect[i].endSizeValue = endSizeValue;
+		bombExplosionEffect[i].color = color;
+		bombExplosionEffect[i].easingT = 0.0f;
+	}
+}
+
+static void InitBombExplosionEffect(void) {
+	for (int i = 0; i < kBombExplosionEffectNumber; i++) {
+		bombExplosionEffect[i] = {};
+		bombExplosionEffect[i].texture = GetTexture(TextureType::EffectExplosion);
+	}
+}
+
+void UpdateBombExplosionEffect() {
+	for (int i = 0; i < kBombExplosionEffectNumber; i++) {
+		if (!bombExplosionEffect[i].appear) continue;
+
+		//イージング
+		bombExplosionEffect[i].easingT += bombExplosionEffect[i].easingSpeed;
+		if (bombExplosionEffect[i].easingT >= 1.0f) {
+			bombExplosionEffect[i].appear = false;
+			bombExplosionEffect[i].easingT = 1.0f;
+		}
+
+		//拡大処理
+		bombExplosionEffect[i].sizeValue = UpdateValueByEasing(bombExplosionEffect[i].startSizeValue, bombExplosionEffect[i].endSizeValue, bombExplosionEffect[i].easingT, EasingMode::EaseOut);
+
+		//フェード処理
+		if (bombExplosionEffect[i].easingT >= bombExplosionEffect[i].startFadeEasingT) {
+			float t = (bombExplosionEffect[i].easingT - bombExplosionEffect[i].startFadeEasingT) / (1.0f - bombExplosionEffect[i].startFadeEasingT);
+			if (t > 1.0f) t = 1.0f;
+
+			bombExplosionEffect[i].alpha = UpdateValueByEasing(kAlphaMax, kAlphaMin, t, EasingMode::EaseOut);
+		}
+	}
+}
+
+void DrawBombExplosionEffect() {
+	for (int i = 0; i < kBombExplosionEffectNumber; i++) {
+		if (!bombExplosionEffect[i].appear) continue;
+
+		Vector2 size = { bombExplosionEffect[i].sizeValue,bombExplosionEffect[i].sizeValue };
+
+		Texture texture = bombExplosionEffect[i].texture;
+		texture.color = (bombExplosionEffect[i].color & 0xFFFFFF00) | bombExplosionEffect[i].alpha;
+
+		DrawTextureObj(texture, bombExplosionEffect[i].pos, size);
+
+	}
+}
+#pragma endregion
 void InitEffect() {
 	triangleTexture = GetTexture(TextureType::EffectTriangle);
 	whiteBoxTexture = GetTexture(TextureType::White1x1);
@@ -1539,6 +1649,7 @@ void InitEffect() {
 	InitCircleEffect();
 	InitPlayerFootprintsEffect();
 	InitElecLineEffect();
+	InitBombExplosionEffect();
 
 #ifdef _DEBUG
 
@@ -1566,6 +1677,7 @@ void UpdateEffect() {
 	UpdateCircleEffect();
 	UpdatePlayerFootprintsEffect();
 	UpdateElecLineEffect();
+	UpdateBombExplosionEffect();
 }
 void DrawEffect() {
 	DrawGetEffect();
@@ -1581,6 +1693,7 @@ void DrawEffect() {
 	DrawCircleEffect();
 	DrawElecLineEffect();
 	DrawPlayerFootprints();
+	DrawBombExplosionEffect();
 }
 
 void DrawEffectAsUI() {

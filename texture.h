@@ -114,6 +114,7 @@ enum class TextureType {
 	EffectSquareMini,
 	EffectCircle,
 	EffectTriangle,
+	EffectExplosion,
 
 	ExplodeEffect,
 
