@@ -1347,6 +1347,13 @@ static void DrawElecLineEffect(void) {
 		//Vector2i endPos = ConvertPosWToS(elecLineEffect[i].endPos);
 
 		//Novice::DrawLine(startPos.x, startPos.y, endPos.x, endPos.y, kPlayerColor);
+
+		Vector2 size = { elecLineEffect[i].length, elecLineEffect[i].thickness };
+
+		Texture texture = whiteBoxTexture;
+		texture.color = kPlayerColor;
+
+		DrawTextureRotateObj(texture, elecLineEffect[i].centerPos, size, elecLineEffect[i].rotateTheta);
 	}
 }
 
@@ -1366,8 +1373,8 @@ void CreateElecLine(Vector2 startPos, Vector2 endPos) {
 		elecLineEffect[i].length = sqrtf(disX * disX + disY * disY);
 		elecLineEffect[i].rotateTheta = atan2f(disY, disX);
 
-		elecLineEffect[i].centerPos.x = disX/ 2;
-		elecLineEffect[i].centerPos.y = disY/ 2;
+		elecLineEffect[i].centerPos.x = (startPos.x + endPos.x) / 2.0f;
+		elecLineEffect[i].centerPos.y = (startPos.y + endPos.y) / 2.0f;
 
 		break;
 	}
@@ -1481,6 +1488,7 @@ void DrawPlayerFootprints() {
 #pragma endregion
 	void InitEffect() {
 		triangleTexture = GetTexture(TextureType::EffectTriangle);
+		whiteBoxTexture = GetTexture(TextureType::White1x1);
 
 		InitGemEffect();
 
