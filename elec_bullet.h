@@ -110,9 +110,11 @@ int GetElecBulletLimit(void);
 /// </summary>
 /// <param name="pos">生成座標</param>
 /// <param name="type">生成する種類</param>
-/// <param name="type">生成元objの種類</param>
-/// <param name="type">生成元objの番号</param>
-void SpawnElecShock(Vector2 pos, ElecBulletType type, ElecShockOriginType originType, int originIndex);
+/// <param name="origionType">生成元objの種類</param>
+/// <param name="originIndex">生成元objの番号</param>
+/// <param name="originType2">生成元objの種類</param>
+/// <param name="originIndex2">生成元objの番号</param>
+void SpawnElecShock(Vector2 pos, ElecBulletType type, ElecShockOriginType originType, int originIndex, ElecShockOriginType originType2, int originIndex2);
 
 /// <summary>
 /// デンゲキショックの破壊処理
