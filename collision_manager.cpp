@@ -331,8 +331,8 @@ static void CheckCollisionElecShockVSEnemy(void) {
 		for (int j = 0; j < elecShockLimit; j++) {
 			if (!elecShock[j].isShoot) continue;
 
-			//無視状態時はダメージを受けない(仮)
-			if (enemy2[i].isIgnoreShock) continue;
+			////無視状態時はダメージを受けない(仮)
+			//if (enemy2[i].isIgnoreShock) continue;
 
 			if (CheckCollisionCircleVSCircle(enemy2[i].pos, enemy2[i].hitRadius, elecShock[j].pos, elecShock[j].hitRadius)) {
 				//ホウデンの生成
@@ -362,8 +362,8 @@ static void CheckCollisionElecShockVSEnemy(void) {
 		for (int j = 0; j < elecShockLimit; j++) {
 			if (!elecShock[j].isShoot) continue;
 
-			//無視状態時はダメージを受けない(仮)
-			if (enemyBasic[i].isIgnoreShock) continue;
+			////無視状態時はダメージを受けない(仮)
+			//if (enemyBasic[i].isIgnoreShock) continue;
 
 			if (CheckCollisionCircleVSCircle(enemyBasic[i].pos, enemyBasic[i].hitRadius, elecShock[j].pos, elecShock[j].hitRadius)) {
 				//ホウデンの生成
@@ -374,8 +374,6 @@ static void CheckCollisionElecShockVSEnemy(void) {
 				//ダメージ判定()
 				if (elecShock[j].breakTimer.count == elecShock[j].triggerDamageFrame) {
 					DamageEnemyBasic(enemyBasic[i], elecShock[j].pow);
-
-
 					//コンボ
 					AddShockCombo();
 				}

@@ -134,7 +134,7 @@ struct EnemyBasic {
 
 	//<フラッシュ関係>
 	bool isFlash = false;
-	Timer flashTimer = { 7, 0 };
+	Timer flashTimer = { 10, 0 };
 
 	Texture texture = {};
 };

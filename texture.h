@@ -56,6 +56,7 @@ enum class TextureType {
 	ElecShock,
 	ElecShockCharged,
 	Elec,
+	ElecLine,
 
 	LockOnSign,
 

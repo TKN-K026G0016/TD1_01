@@ -127,6 +127,7 @@ static void MoveEnemySniper(void) {
 	Vector2 playerPos = GetPlayerPos();
 	for (int i = 0;i < kEnemysniperLimit;i++) {
 		if (!enemySniper[i].isAlive)continue;
+		if (enemySniper[i].isFlash) continue;
 
 		float diffX = playerPos.x - enemySniper[i].pos.x;
 		float diffY = playerPos.y - enemySniper[i].pos.y;
@@ -384,6 +385,8 @@ static void InitEnemyBasic(void) {
 static void MoveEnemyBasic(void) {
 	for (int i = 0; i < kEnemyBasicLimit; i++) {
 		if (!enemyBasic[i].isAlive) continue;
+		if (enemyBasic[i].isFlash) continue;
+
 		if (enemyBasic[i].thetaUpDate) {
 
 			Vector2 targetPos = GetPlayerPos();
@@ -893,7 +896,7 @@ void InitEnemy(void) {
 
 	GetMovablePos(spawner.spawnRange);
 
-	//SpawnEnemy({ 100, 100 }, EnemyType::EnemyM);
+	SpawnEnemy({ 100, 100 }, EnemyType::EnemyFormation);
 }
 
 void UpdateEnemy(void) {
