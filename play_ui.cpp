@@ -152,7 +152,6 @@ struct ProgressGauge {
 	float gaugeRate = 0;
 
 	Texture frameTexture = {};
-	Texture meterTexture = {};
 };
 ProgressGauge progressGauge;
 
@@ -496,9 +495,6 @@ static void DrawProgressGauge(void) {
 
 	DrawTextureUI(progressGauge.frameTexture, progressGauge.pos, progressGauge.size);
 	DrawTextureUI(progressGaugeIcon.texture, progressGaugeIcon.pos, progressGaugeIcon.size);
-
-	//DrawGaugeAsUI(progressGauge.meterTexture, progressGauge.pos, progressGauge.size, progressGauge.gaugeRate);
-
 }
 
 #pragma endregion
