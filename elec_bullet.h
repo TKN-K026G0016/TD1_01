@@ -36,6 +36,8 @@ struct ElecBullet {
 
 //ショックの発生元objの種類
 enum class ElecShockOriginType {
+	None,
+
 	Gem,
 
 	EnemySniper,
@@ -66,7 +68,7 @@ struct ElecShock {
 	int pow = 2;
 
 	//ショックの発生元
-	ElecShockOriginType originType = ElecShockOriginType::Gem;
+	ElecShockOriginType originType = ElecShockOriginType::None;
 	int originIndex = -1;
 
 	unsigned int color = RED;

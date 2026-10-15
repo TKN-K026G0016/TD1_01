@@ -231,7 +231,7 @@ int GetElecBulletLimit(void) {
 	return kElecBulletLimit;
 }
 
-void SpawnElecShock(Vector2 pos, ElecBulletType type, ElecShockOriginType originType, int originIndex) {
+void SpawnElecShock(Vector2 pos, ElecBulletType type, ElecShockOriginType originType, int originIndex, ElecShockOriginType originType2, int originIndex2) {
 	for (int i = 0; i < kElecShockLimit; i++) {
 		if (elecShock[i].isShoot) continue;
 
@@ -251,6 +251,14 @@ void SpawnElecShock(Vector2 pos, ElecBulletType type, ElecShockOriginType origin
 			CreateElecShockEffect(pos);
 		} else if(type == ElecBulletType::Charge){
 			CreateElecShockChargedEffect(pos);
+		}
+
+		//ラインエフェクトの生成
+		if (originType2 != ElecShockOriginType::None) {
+			//自分を発生させたElecShockのoriginObjの座標を取得
+
+
+			//2点の座標をつかってLine描写
 		}
 
 		break;
