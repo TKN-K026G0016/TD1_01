@@ -19,7 +19,7 @@ void CreateJemEffect();
 /// ゲージエフェクトの出現処理
 /// </summary>
 /// <param name="pos">生成座標</param>
-void CreateGageEffect(Vector2 pos);
+void CreateGageEffect(Vector2 pos, unsigned int color);
 
 /// <summary>
 /// 煙エフェクトの生成処理
@@ -89,3 +89,5 @@ void CreateEnemyDamageEffect(Vector2 pos);
 
 void CreatePlayerFootprintsEffect(Vector2 pos);
 void CreateBombExplosionEffect(Vector2 pos);
+
+unsigned int GetPlayerColor(void);

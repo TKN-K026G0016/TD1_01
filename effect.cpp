@@ -48,15 +48,26 @@ JemEffect jemEffect[KJemEffectNumber];
 const int KGageEffectNumber = 20;
 struct GageEffect {
 	Vector2 pos = { };
+
 	Vector2 acceleration = { };
 	Vector2 size = { 8,8 };
-	bool appear = { };
+
+	//<回転関係>
+	float rotateTheta = 0.0f;
+	float rotateSpeed = ToFloat(M_PI) / 14.0f;
+
+	bool appear = false;
+
+	//<イージング関係>
+	float easingT = 0.0f;
+	float easingSpeed = 0.08f;
+
+	//<不透明度>
+	int alpha = kAlphaMax;
+
 	unsigned int color = { };
-	Texture texture = {};
 };
 GageEffect gageEffect[KGageEffectNumber];
-bool isGage = false;
-Timer GageTimer = { 5,0 };
 
 #pragma endregion
 
@@ -444,8 +455,7 @@ int footprintsEffectTimer = 0;
 #pragma region データ: BombExplosionEffect
 //爆発本体
 const int kBombExplosionEffectNumber = 4;
-struct BombExplosionEffect
-{
+struct BombExplosionEffect {
 	Vector2 pos;
 	bool appear = false;
 
@@ -466,11 +476,10 @@ struct BombExplosionEffect
 	unsigned int color = WHITE;
 	Texture texture = {};
 };
-BombExplosionEffect bombExplosionEffect [kBombExplosionEffectNumber] = {};
+BombExplosionEffect bombExplosionEffect[kBombExplosionEffectNumber] = {};
 //爆風
 const int kBombBlastEffectNumber = 4;
-struct BombBlastEffect
-{
+struct BombBlastEffect {
 	Vector2 pos;
 	bool appear = false;
 
@@ -491,8 +500,9 @@ struct BombBlastEffect
 	unsigned int color = WHITE;
 	Texture texture = {};
 };
-BombBlastEffect bombBlastEffect [kBombExplosionEffectNumber][kBombBlastEffectNumber] = {};
+BombBlastEffect bombBlastEffect[kBombExplosionEffectNumber][kBombBlastEffectNumber] = {};
 #pragma endregion
+
 
 #pragma region 関数: ジェム取得effect
 
@@ -554,16 +564,18 @@ void DrawGetEffect() {
 #pragma endregion
 
 #pragma region 関数: ゲージeffect
-void CreateGageEffect(Vector2 pos) {
+void CreateGageEffect(Vector2 pos, unsigned int color) {
 	for (int i = 0; i < KGageEffectNumber; i++) {
 		if (gageEffect[i].appear) continue;
 
 		gageEffect[i].appear = true;
 
-		//データ初期化
-		GageTimer.count = 20;
 		gageEffect[i].pos = pos;
-		gageEffect[i].color = 0xffffffff;
+		gageEffect[i].color = color;
+
+		gageEffect[i].rotateTheta = 0.0f;
+		gageEffect[i].easingT = 0.0f;
+
 		float randomSpeedX = ToFloat(GetRand(0, 25));
 		float randomSpeedY = ToFloat(GetRand(-10, 10));
 		gageEffect[i].acceleration.x = randomSpeedX;
@@ -577,7 +589,7 @@ void CreateGageEffect(Vector2 pos) {
 
 static void InitGageEffect(void) {
 	for (int i = 0; i < KGageEffectNumber; i++) {
-		gageEffect[i].texture = GetTexture(TextureType::EffectSquareMini);
+		gageEffect[i] = {};
 	}
 }
 
@@ -590,22 +602,39 @@ void UodateGageEffect() {
 		gageEffect[i].pos.y += gageEffect[i].acceleration.y;
 		gageEffect[i].acceleration.y -= 0.5f;
 
-		//透明化(消滅)
-		if (gageEffect[i].color >= 0xffffff05) {
-			gageEffect[i].color -= 0x00000015;
-			gageEffect[i].texture.color = gageEffect[i].color;
-		} else {
-			gageEffect[i].color = 0xffffffff;
+		//回転処理
+		gageEffect[i].rotateTheta = gageEffect[i].rotateSpeed;
+
+		//イージング
+		gageEffect[i].easingT += gageEffect[i].easingSpeed;
+		if (gageEffect[i].easingT >= 1.0f) {
+			gageEffect[i].easingT = 1.0f;
 			gageEffect[i].appear = false;
 		}
+
+		//透明化
+		gageEffect[i].alpha = UpdateValueByEasing(kAlphaMax, kAlphaMin, gageEffect[i].easingT, EasingMode::EaseIn);
+
+		////透明化(消滅)
+		//if (gageEffect[i].color >= 0xffffff05) {
+		//	gageEffect[i].color -= 0x00000015;
+		//	gageEffect[i].texture.color = gageEffect[i].color;
+		//} else {
+		//	gageEffect[i].color = 0xffffffff;
+		//	gageEffect[i].appear = false;
+		//}
 	}
 }
 
 void DrawGageEffect() {
 	for (int i = 0; i < KGageEffectNumber; i++) {
-		if (gageEffect[i].appear == true) {
-			DrawTextureUI(gageEffect[i].texture, gageEffect[i].pos, gageEffect[i].size);
-		}
+		if (!gageEffect[i].appear) continue;
+
+		Texture texture = whiteBoxTexture;
+		texture.color = (gageEffect[i].color & 0xFFFFFF00) | gageEffect[i].alpha;
+
+		DrawTextureRotateUI(texture, gageEffect[i].pos, gageEffect[i].size, gageEffect[i].rotateTheta);
+
 	}
 }
 #pragma endregion
@@ -1699,4 +1728,8 @@ void DrawEffect() {
 void DrawEffectAsUI() {
 	DrawSmokeEffectAsUI();
 	DrawGageEffect();
+}
+
+unsigned int GetPlayerColor(void) {
+	return kPlayerColor;
 }

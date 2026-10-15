@@ -288,12 +288,12 @@ static void UpdateEnergyGauge(void) {
 
 #pragma region GaugeEffectの生成
 
-	//energyGaugeFrame.createGaugeEffectTimer.count++;
-	//if (energyGaugeFrame.createGaugeEffectTimer.count >= energyGaugeFrame.createGaugeEffectTimer.time) {
-	//	energyGaugeFrame.createGaugeEffectTimer.count = 0;
+	energyGaugeFrame.createGaugeEffectTimer.count++;
+	if (energyGaugeFrame.createGaugeEffectTimer.count >= energyGaugeFrame.createGaugeEffectTimer.time) {
+		energyGaugeFrame.createGaugeEffectTimer.count = 0;
 
-	//	CreateGageEffect(GetEnergyGaugeEndPos());
-	//}
+		CreateGageEffect(GetEnergyGaugeEndPos(), GetPlayerColor());
+	}
 
 #pragma endregion
 
@@ -601,7 +601,7 @@ void DrawPlayUI(void) {
 
 Vector2 GetEnergyGaugeEndPos(void) {
 	float posX = energyGaugeFrame.pos.x - energyGaugeFrame.size.x / 2 + energyGaugeFrame.size.x * energyGaugeMeter.gaugeRate;
-	float posY = energyGaugeFrame.pos.y - energyGaugeFrame.size.y / 2;
+	float posY = energyGaugeFrame.pos.y - energyGaugeFrame.size.y * 1 / 4;
 
 	return { posX, posY };
 }
