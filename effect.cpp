@@ -141,6 +141,8 @@ struct ElecLineEffect {
 	//ラインの太さ
 	float thickness = 16.0f;
 
+	int alpha = 180;
+
 	Timer breakTimer = { 10, 0 };
 
 	Texture texture = {};
@@ -1368,7 +1370,7 @@ static void DrawElecLineEffect(void) {
 		Vector2 size = { elecLineEffect[i].length, elecLineEffect[i].thickness };
 
 		Texture texture = elecLineEffect[i].texture;
-		texture.color = kPlayerColor;
+		texture.color = (kPlayerColor & 0xFFFFFF00) | elecLineEffect[i].alpha;
 
 		DrawTextureRotateObj(texture, elecLineEffect[i].centerPos, size, elecLineEffect[i].rotateTheta);
 	}
