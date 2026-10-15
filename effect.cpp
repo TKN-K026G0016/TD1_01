@@ -132,9 +132,12 @@ struct ElecLineEffect {
 
 	Vector2 startPos = {};
 	Vector2 endPos = {};
+
 	Vector2 centerPos = {};
 	float rotateTheta = 0.0f;
 
+	//ラインの長さ
+	float length = 0.0f;
 	//ラインの太さ
 	float thickness = 5.0f;
 
@@ -1354,11 +1357,17 @@ void CreateElecLine(Vector2 startPos, Vector2 endPos) {
 		elecLineEffect[i].isShoot = true;
 		elecLineEffect[i].breakTimer.count = 0;
 
-		elecLineEffect[i].startPos = startPos;
-		elecLineEffect[i].endPos = endPos;
+		//elecLineEffect[i].startPos = startPos;
+		//elecLineEffect[i].endPos = endPos;
 
-		elecLineEffect[i].centerPos.x = endPos.x - startPos.x;
+		float disX = endPos.x - startPos.x;
+		float disY = endPos.y - startPos.y;
 
+		elecLineEffect[i].length = sqrtf(disX * disX + disY * disY);
+		elecLineEffect[i].rotateTheta = atan2f(disY, disX);
+
+		elecLineEffect[i].centerPos.x = disX/ 2;
+		elecLineEffect[i].centerPos.y = disY/ 2;
 
 		break;
 	}
