@@ -135,7 +135,9 @@ static void CheckCollisionElecBulletVSEnemy(void) {
 				//ホウデンの生成
 				SpawnElecShock(enemy1[i].pos, elecBullet[j].type, ElecShockOriginType::EnemySniper, i, ElecShockOriginType::None, -1);
 
-				DamageEnemySniper(enemy1[i], elecBullet[j].pow);
+				bool hitStopSwitch = (elecBullet[j].type == ElecBulletType::Normal) ? false: true;
+
+				DamageEnemySniper(enemy1[i], elecBullet[j].pow, hitStopSwitch);
 			}
 		}
 	}
@@ -173,7 +175,9 @@ static void CheckCollisionElecBulletVSEnemy(void) {
 				BreakElecBullet(j);
 				SpawnElecShock(enemyBasic[i].pos, elecBullet[j].type, ElecShockOriginType::EnemyBasic, i, ElecShockOriginType::None, -1);
 
-				DamageEnemyBasic(enemyBasic[i], elecBullet[j].pow);
+				bool hitStopSwitch = (elecBullet[j].type == ElecBulletType::Normal) ? false : true;
+
+				DamageEnemyBasic(enemyBasic[i], elecBullet[j].pow, hitStopSwitch);
 			}
 		}
 	}
@@ -311,7 +315,10 @@ static void CheckCollisionElecShockVSEnemy(void) {
 				}
 				//ダメージ判定()
 				if (elecShock[j].breakTimer.count == elecShock[j].triggerDamageFrame) {
-					DamageEnemySniper(enemy1[i], elecShock[j].pow);
+
+					bool hitStopSwitch = (elecShock[j].type == ElecBulletType::Normal) ? false : true;
+
+					DamageEnemySniper(enemy1[i], elecShock[j].pow, hitStopSwitch);
 
 					//コンボ
 					AddShockCombo();
@@ -373,7 +380,9 @@ static void CheckCollisionElecShockVSEnemy(void) {
 				}
 				//ダメージ判定()
 				if (elecShock[j].breakTimer.count == elecShock[j].triggerDamageFrame) {
-					DamageEnemyBasic(enemyBasic[i], elecShock[j].pow);
+					bool hitStopSwitch = (elecShock[j].type == ElecBulletType::Normal) ? false : true;
+
+					DamageEnemyBasic(enemyBasic[i], elecShock[j].pow, hitStopSwitch);
 					//コンボ
 					AddShockCombo();
 				}
