@@ -87,7 +87,7 @@ struct EnemyGuardian {
 	bool isAlive = false;
 
 	int hp = 60;
-	int hpMax = 30;
+	int hpMax = 60;
 
 	float hitRadius = 20.0f;
 
@@ -117,8 +117,8 @@ struct EnemyBasic {
 	//生存フラグ
 	bool isAlive = false;
 
-	int hp = 10;
-	int hpMax = 10;
+	int hp = 20;
+	int hpMax = 20;
 
 	float hitRadius = 30.0f;
 
