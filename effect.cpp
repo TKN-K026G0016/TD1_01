@@ -132,6 +132,11 @@ struct ElecLineEffect {
 
 	Vector2 startPos = {};
 	Vector2 endPos = {};
+	Vector2 centerPos = {};
+	float rotateTheta = 0.0f;
+
+	//ラインの太さ
+	float thickness = 5.0f;
 
 	Timer breakTimer = { 10, 0 };
 };
@@ -1335,10 +1340,10 @@ static void DrawElecLineEffect(void) {
 	for (int i = 0; i < kElecLineEffectLimit; i++) {
 		if (!elecLineEffect[i].isShoot) continue;
 
-		Vector2i startPos = ConvertPosWToS(elecLineEffect[i].startPos);
-		Vector2i endPos = ConvertPosWToS(elecLineEffect[i].endPos);
+		//Vector2i startPos = ConvertPosWToS(elecLineEffect[i].startPos);
+		//Vector2i endPos = ConvertPosWToS(elecLineEffect[i].endPos);
 
-		Novice::DrawLine(startPos.x, startPos.y, endPos.x, endPos.y, kPlayerColor);
+		//Novice::DrawLine(startPos.x, startPos.y, endPos.x, endPos.y, kPlayerColor);
 	}
 }
 
@@ -1351,6 +1356,9 @@ void CreateElecLine(Vector2 startPos, Vector2 endPos) {
 
 		elecLineEffect[i].startPos = startPos;
 		elecLineEffect[i].endPos = endPos;
+
+		elecLineEffect[i].centerPos.x = endPos.x - startPos.x;
+
 
 		break;
 	}
