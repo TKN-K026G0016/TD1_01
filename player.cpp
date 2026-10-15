@@ -18,7 +18,7 @@
 
 
 //ギリ避けスイッチ
-constexpr bool kDodgeCloseSwitch = true;
+constexpr bool kDodgeCloseSwitch = false;
 //ジェムをロックオンの対象にするフラグ
 constexpr bool kGemLockOnSwitch = true;
 //一定範囲内に敵がいなければ、ジェムをロックオンするスイッチ
