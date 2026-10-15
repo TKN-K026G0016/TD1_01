@@ -38,6 +38,8 @@ constexpr int kEnemyBasicLimit = 20;
 static EnemyBasic enemyBasic[kEnemyBasicLimit];
 //ジェムの生成量
 constexpr int enemyBasicGemLimit = 2;
+//ジェムの生成量（隊列）
+constexpr int enemyFormationGemLimit = 1;
 //Formationの生成間隔
 constexpr int formationRange = 75;
 
@@ -460,10 +462,16 @@ static void CheckDeadEnemyBasic(void) {
 			DeadEnemyBasic(i);
 
 			//ジェムの生成処理
-			SpawnGem(enemyBasic[i].pos, GemType::M);
+			if (enemyBasic[i].thetaUpDate) {
+				for (int j = 0;j < enemyBasicGemLimit;j++) {
+					SpawnGem(enemyBasic[i].pos, GemType::M);
+				}
+			}
+			else {
+				for (int j = 0;j < enemyFormationGemLimit;j++) {
+					SpawnGem(enemyBasic[i].pos, GemType::M);
+				}
 
-			for (int j = 0;j < enemyBasicGemLimit;j++) {
-				SpawnGem(enemyBasic[i].pos, GemType::S);
 			}
 		}
 	}
@@ -606,7 +614,7 @@ static void MoveEnemySmall(void) {
 		if (!enemySmall[i].isAlive) continue;
 
 		//移動方向更新処理
-		if(enemySmall[i].velocityUpDate){
+		if (enemySmall[i].velocityUpDate) {
 			Vector2 targetPos = GetPlayerPos();
 			Vector2 moveVec = { targetPos.x - enemySmall[i].pos.x,   targetPos.y - enemySmall[i].pos.y };
 
@@ -1029,8 +1037,8 @@ void SpawnEnemy(Vector2 pos, EnemyType type) {
 				}
 				enemySmall[i].velocity.x = moveVec.x;
 				enemySmall[i].velocity.y = moveVec.y;
-				enemySmall[i].pos.x += enemySmall[i].velocity.x*smallFormationRange*createNum;
-				enemySmall[i].pos.y += enemySmall[i].velocity.y*smallFormationRange*createNum;
+				enemySmall[i].pos.x += enemySmall[i].velocity.x * smallFormationRange * createNum;
+				enemySmall[i].pos.y += enemySmall[i].velocity.y * smallFormationRange * createNum;
 
 				// 初期化
 				enemySmall[i].nowSpeed = 0.0f;
