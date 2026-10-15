@@ -216,7 +216,7 @@ struct EnemySmall {
 
 struct EnemyBomb {
 	Vector2 pos = { 0, 0 };
-	Vector2 size = { 64, 64 };
+	Vector2 size = { 128, 128 };
 	//<生存関係>
 	bool isAlive = false;
 
@@ -224,14 +224,14 @@ struct EnemyBomb {
 	int hpMax = 60;
 
 	//当たり判定の大きさ
-	float hitRadius = 32.0f;
+	float hitRadius = 64.0f;
 
 	//<爆発関係>
 	//爆発までの時間
 	Timer burst = { 0,0 };
 	//爆発範囲
-	float burstRadius = 128.0f;
-	Vector2 bustSize = { 256,256 };
+	float burstRadius = 384.0f;
+	Vector2 bustSize = { 768,768 };
 	//<移動関係>
 	//速度
 	Vector2 velocity = { 0.0f, 0.0f };
