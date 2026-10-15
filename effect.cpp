@@ -22,7 +22,7 @@ constexpr int kAlphaMax = 255;
 constexpr int kAlphaMin = 0;
 
 unsigned int kPlayerColor = 0x04C1E8FF;
-unsigned int kPlayerChargedColor = 0x0483E8FF;
+unsigned int kPlayerChargedColor = 0x5004e8FF;
 unsigned int kEnemyColor = 0xE01068FF;
 
 #pragma endregion
@@ -126,7 +126,7 @@ struct ElecShockChargedEffect {
 };
 ElecShockChargedEffect elecShockChargedEffect;
 
-constexpr int kElecLineEffectLimit = 50;
+constexpr int kElecLineEffectLimit = 100;
 struct ElecLineEffect {
 	bool isShoot = false;
 
@@ -413,9 +413,9 @@ PlayerDamageEffect playerDamageEffect;
 #pragma region データ: EnemyDamageEffect
 
 struct EnemyDamageEffect {
-	int createTriangleLimit = 2;
-	float triangleSizeValue = 20.0f;
-	float triangleMoveSpeed = 20.0f;
+	int createTriangleLimit = 3;
+	float triangleSizeValue = 30.0f;
+	float triangleMoveSpeed = 30.0f;
 
 };
 EnemyDamageEffect enemyDamageEffect;
@@ -437,6 +437,8 @@ struct FootprintsEffect {
 FootprintsEffect footprintsEffect[kFootprintsEffectNumber] = {};
 int footprintsEffectTimer = 0;
 #pragma endregion
+
+
 
 #pragma region 関数: ジェム取得effect
 
