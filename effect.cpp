@@ -399,6 +399,22 @@ EnemyDamageEffect enemyDamageEffect;
 
 #pragma endregion
 
+#pragma region データ: PlayerFootprintsEffect
+const int kFootprintsEffectNumber = 20;
+struct FootprintsEffect
+{
+	Vector2 pos;
+	Vector2 move;
+	Vector2 size;
+	float speed;
+	float width;
+	bool isAppear;
+	unsigned int color;
+	Texture texture = {};
+};
+FootprintsEffect footprintsEffect[kFootprintsEffectNumber] = {};
+int footprintsEffectTimer = 0;
+#pragma endregion
 
 #pragma region 関数: ジェム取得effect
 
@@ -1331,37 +1347,98 @@ void CreateEnemyDamageEffect(Vector2 pos) {
 
 #pragma endregion
 
-void InitEffect() {
-	triangleTexture = GetTexture(TextureType::EffectTriangle);
+#pragma region 関数: EnemyDamageEffect
 
-	InitGemEffect();
+void CreatePlayerFootprintsEffect(Vector2 pos, Vector2 inputVec ) {
 
-	InitGageEffect();
+	if (footprintsEffectTimer > 0)
+	{
+		footprintsEffectTimer--;
+	}
 
-	InitSmokeEffect();
+	if (footprintsEffectTimer <= 0) {
+		for (int i = 0; i < kFootprintsEffectNumber; i++)
+		{
+			if (footprintsEffect[i].isAppear == false) continue;
+			footprintsEffect[i].isAppear = true;
+			footprintsEffectTimer = 5;
+			footprintsEffect[i].pos.x = pos.x + static_cast<float>((rand() % 30) - 15);
+			footprintsEffect[i].pos.y = pos.y;
+			footprintsEffect[i].color = 0xffffffff;
+			footprintsEffect[i].move.x = -inputVec.x;
+			footprintsEffect[i].move.y = -inputVec.y;
+			footprintsEffect[i].speed = 5;
+			footprintsEffect[i].size.x = 32;
+			footprintsEffect[i].size.y = 32;
 
-	//InitElecShockEffect();
-	//InitElecShockChargedEffect();
+			break;
 
-	InitChargeOrbEffect();
-	InitChargeChipEffect();
+		}
+	}
+	
+}
+static void InitPlayerFootprintsEffect(void) {
+	for (int i = 0; i < kFootprintsEffectNumber; i++) {
+		footprintsEffect[i] = {};
+		footprintsEffect[i].texture = GetTexture(TextureType::EffectSquareMini);
+	}
+}
 
-	InitExplodeEffect();
+void UpdatePlayerFootprintsEffect() {
+	for (int i = 0; i < kFootprintsEffectNumber; i++) {
+		if (!footprintsEffect[i].isAppear) continue;
+		footprintsEffect[i].pos.x += footprintsEffect[i].move.x * footprintsEffect[i].speed;
+		footprintsEffect[i].pos.y += footprintsEffect[i].move.y * footprintsEffect[i].speed;
+		if (footprintsEffect[i].color >= 0xffffff10) {
+			footprintsEffect[i].color -= 0x00000010;
+		}
+		else {
+			footprintsEffect[i].color = 0xffffffff;
+			footprintsEffect[i].isAppear = false;
+		}
+	}
+}
+void DrawPlayerFootprints() {
+	for (int i = 0; i < kFootprintsEffectNumber; i++) {
+		if (!footprintsEffect[i].isAppear) continue;
 
-	InitTriangleEffect();
-	InitTriangleEffect2();
-	InitCircleEffect();
+		Texture texture = footprintsEffect[i].texture;
+		DrawTextureObj(texture, footprintsEffect[i].pos, footprintsEffect[i].size);
+	}
+}
+#pragma endregion
+	void InitEffect() {
+		triangleTexture = GetTexture(TextureType::EffectTriangle);
+
+		InitGemEffect();
+
+		InitGageEffect();
+
+		InitSmokeEffect();
+
+		//InitElecShockEffect();
+		//InitElecShockChargedEffect();
+
+		InitChargeOrbEffect();
+		InitChargeChipEffect();
+
+		InitExplodeEffect();
+
+		InitTriangleEffect();
+		InitTriangleEffect2();
+		InitCircleEffect();
+		InitPlayerFootprintsEffect();
 #ifdef _DEBUG
 
-	CreateJemEffect();
+		CreateJemEffect();
 
-	//CreateGageEffect();
+		//CreateGageEffect();
 
-	//CreateChargeOrbEffect(GetPlayerPos());
+		//CreateChargeOrbEffect(GetPlayerPos());
 
 #endif // _DEBUG
 
-}
+	}
 void UpdateEffect() {
 
 	UpdateGemEffect();
@@ -1375,6 +1452,7 @@ void UpdateEffect() {
 	UpdateTriangleEffect();
 	UpdateTriangleEffect2();
 	UpdateCircleEffect();
+	UpdatePlayerFootprintsEffect();
 }
 void DrawEffect() {
 	DrawGetEffect();
@@ -1388,6 +1466,7 @@ void DrawEffect() {
 	DrawTriangleEffect();
 	DrawTriangleEffect2();
 	DrawCircleEffect();
+	DrawPlayerFootprints();
 }
 
 void DrawEffectAsUI() {
