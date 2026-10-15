@@ -156,6 +156,17 @@ struct ProgressGauge {
 };
 ProgressGauge progressGauge;
 
+struct ProgressGaugeIcon {
+	Vector2 pos = {0.0f, progressGauge.pos.y };
+	Vector2 size = { 32, 32 };
+
+	Vector2 startPos = { progressGauge.pos.x - progressGauge.size.x / 2, progressGauge.pos.y };
+	Vector2 endPos = { progressGauge.pos.x + progressGauge.size.x / 2, progressGauge.pos.y };
+
+	Texture texture = {};
+};
+ProgressGaugeIcon progressGaugeIcon;
+
 #pragma endregion
 
 #pragma region データ: ショックコンボ
@@ -461,11 +472,10 @@ static void InitProgressGauge(void) {
 	//ボスが出たら出現しない
 	if (GetBossEnemyIsAlive()) return;
 
-	progressGauge.frameTexture = GetTexture(TextureType::ProgressGaugeFrame);
-	progressGauge.meterTexture = GetTexture(TextureType::ProgressGaugeMeter);
+	progressGauge.frameTexture = GetTexture(TextureType::ProgressGauge);
+	progressGaugeIcon.texture = GetTexture(TextureType::ProgressGaugeIcon);
 
 	progressGauge.bossRoundTime = ConvertTimeDataToInt(GetBossRoundTimeData());
-
 }
 
 static void UpdateProgressGauge(void) {
@@ -475,6 +485,8 @@ static void UpdateProgressGauge(void) {
 
 	progressGauge.gaugeRate = ToFloat(ConvertTimeDataToInt(GetGameTimeData())) / ToFloat( progressGauge.bossRoundTime);
 
+	//アイコンの移動
+	progressGaugeIcon.pos.x = UpdateValueByEasing(progressGaugeIcon.startPos.x, progressGaugeIcon.endPos.x, progressGauge.gaugeRate, EasingMode::Linear);
 }
 
 static void DrawProgressGauge(void) {
@@ -483,8 +495,9 @@ static void DrawProgressGauge(void) {
 	if (GetBossEnemyIsAlive()) return;
 
 	DrawTextureUI(progressGauge.frameTexture, progressGauge.pos, progressGauge.size);
+	DrawTextureUI(progressGaugeIcon.texture, progressGaugeIcon.pos, progressGaugeIcon.size);
 
-	DrawGaugeAsUI(progressGauge.meterTexture, progressGauge.pos, progressGauge.size, progressGauge.gaugeRate);
+	//DrawGaugeAsUI(progressGauge.meterTexture, progressGauge.pos, progressGauge.size, progressGauge.gaugeRate);
 
 }
 

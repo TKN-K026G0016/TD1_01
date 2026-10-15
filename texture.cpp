@@ -93,6 +93,9 @@ void InitTexture(void) {
 		{ Novice::LoadTexture("./resources/texture/ui/play/boss_hp_gauge_meter.png"), { 768, 32 }, {0, 0}, 0, 0, WHITE },
 		{ Novice::LoadTexture("./resources/texture/ui/play/boss_hp_gauge_delay_meter.png"), { 768, 32 }, {0, 0}, 0, 0, WHITE },
 
+		{ Novice::LoadTexture("./resources/texture/ui/play/progress_gauge.png"), { 768, 32 }, {0, 0}, 0, 0, WHITE },
+		{ Novice::LoadTexture("./resources/texture/ui/play/progress_gauge_icon.png"), { 32, 32 }, {0, 0}, 0, 0, WHITE },
+
 		{ Novice::LoadTexture("./resources/texture/ui/play/progress_gauge_frame.png"), { 768, 32 }, {0, 0}, 0, 0, WHITE },
 		{ Novice::LoadTexture("./resources/texture/ui/play/progress_gauge_meter.png"), { 768, 32 }, {0, 0}, 0, 0, WHITE },
 

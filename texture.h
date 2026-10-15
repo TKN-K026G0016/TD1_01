@@ -101,6 +101,9 @@ enum class TextureType {
 	BossHpGaugeMeter,
 	BossHpGaugeDelayMeter,
 
+	ProgressGauge,
+	ProgressGaugeIcon,
+
 	ProgressGaugeFrame,
 	ProgressGaugeMeter,
 
