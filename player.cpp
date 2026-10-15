@@ -157,7 +157,7 @@ constexpr float kLaserPowRateIncreaseSpeed = 0.01f;
 //チャージタイマー
 Timer chargeElecBulletTimer = { 40, 0 };
 float consumptionShootNormal = 0.5f;
-float consumptionShootCharge = 5.0f;
+float consumptionShootCharge = 10.0f;
 
 #pragma endregion
 
