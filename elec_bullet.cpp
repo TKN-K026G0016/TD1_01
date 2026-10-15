@@ -60,11 +60,19 @@ ElecShock elecShock[kElecShockLimit] = {};
 #pragma region データ: ShockCombo関係
 
 //現在のコンボ数
-static int shockCombo = 0;
+static int nowCombo = 0;
 //今回のゲームの最大コンボ数
-static int maxShockCombo = 0;
+static int maxCombo = 0;
+//コンボ持続時間
+Timer comboTimer = { 120, 0 };
 
-Timer comboTimer = { 10, 0 };
+//通常弾でのコンボ回復量
+constexpr int kRecoveryComboTime = 5;
+//チャージ弾でのコンボ回復量
+constexpr int kRecoveryComboTimeCharged = 20;
+
+//コンボ中に得たスコアの合計
+int totalComboInCombo = 0;
 
 #pragma endregion
 
@@ -163,20 +171,20 @@ static void DrawElecShock(void) {
 #pragma region 関数: ショックコンボ
 
 static void InitShockCombo(void) {
-	shockCombo = 0;
-	maxShockCombo = 0;
+	nowCombo = 0;
+	maxCombo = 0;
 	comboTimer.count = 0;
 }
 
 static void UpdateShockCombo(void) {
 	//猶予時間がある際
-	if (shockCombo > 0) {
+	if (nowCombo > 0) {
 		comboTimer.count++;
 
 		//猶予時間が切れたら
 		if (comboTimer.count >= comboTimer.time) {
 			comboTimer.count = 0;
-			shockCombo = 0;
+			nowCombo = 0;
 
 			//コンボの終了をUIに知らせる
 			TriggerEndCombo();
@@ -368,12 +376,16 @@ int GetElecShockLimit(void) {
 
 void AddShockCombo(void) {
 	//コンボ増加
-	shockCombo++;
+	nowCombo++;
 	comboTimer.count = 0;
 }
 
 int GetShockCombo(void) {
-	return shockCombo;
+	return nowCombo;
+}
+
+Timer GetComboTimer(void) {
+	return comboTimer;
 }
 
 #pragma endregion

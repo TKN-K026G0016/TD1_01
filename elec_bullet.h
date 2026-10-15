@@ -149,3 +149,6 @@ void AddShockCombo(void);
 /// ショックコンボを取得
 /// </summary>
 int GetShockCombo(void);
+
+
+Timer GetComboTimer(void);

@@ -177,6 +177,8 @@ struct ShockComboNumbers {
 	Vector2 startPos = { 1200, 630 };
 	Vector2 interval = { -80.0f, 0.0f };
 
+	float offsetY = 30.0f;
+
 	int animNum = 0;
 };
 ShockComboNumbers comboNumbers[kComboNumbersLimit];
@@ -185,21 +187,27 @@ ShockComboNumbers comboNumbers[kComboNumbersLimit];
 
 struct ShockCombo {
 	//コンボ数
-	int combo = 0;
+	int nowCombo = 0;
+	float gaugeRate = 0.0f;
+
+	//アイコン座標
+	Vector2 pos = { 1050, 600 };
+	Vector2 startPos = { 1050, 600 };
+	float moveSpeed = 7.0f;
+	float stopMovePosY = 780;
 
 	//前のコンボを見せている状態
 	bool isShowPreCombo = false;
 	Timer showPreComboTimer = { 60, 0 };
-
 	//透明の時間
 	bool isInvisible = false;
-	Timer invisibleTimer = { 7, 0 };
+	Timer invisibleTimer = { 3, 0 };
 };
-ShockCombo shockCombo;
+ShockCombo nowCombo;
 
 
 Texture comboNumbersTexture = {};
-
+Texture comboNumbersMeterTexture = {};
 
 #pragma endregion
 
@@ -350,9 +358,9 @@ static void DrawEnergyGauge(void) {
 	//フレーム
 	DrawTextureUI(energyGaugeFrame.texture, energyGaugeFrame.pos, energyGaugeFrame.size);
 	//delayメーター
-	DrawGaugeAsUI(energyGaugeDelayMeter.texture, energyGaugeFrame.pos, energyGaugeFrame.size, energyGaugeDelayMeter.gaugeRate);
+	DrawGaugeYAsUI(energyGaugeDelayMeter.texture, energyGaugeFrame.pos, energyGaugeFrame.size, energyGaugeDelayMeter.gaugeRate);
 	//メーター
-	DrawGaugeAsUI(energyGaugeMeter.texture, energyGaugeFrame.pos, energyGaugeFrame.size, energyGaugeMeter.gaugeRate);
+	DrawGaugeYAsUI(energyGaugeMeter.texture, energyGaugeFrame.pos, energyGaugeFrame.size, energyGaugeMeter.gaugeRate);
 
 	//ミニゲージ
 	//フレーム
@@ -427,9 +435,9 @@ static void DrawBossHpGauge(void) {
 	//フレーム
 	DrawTextureUI(bossHpGaugeFrame.texture, bossHpGaugeFrame.pos, bossHpGaugeFrame.size);
 	//delayMeter
-	DrawGaugeAsUI(bossHpGaugeDelayMeter.texture, bossHpGaugeFrame.pos, bossHpGaugeFrame.size, bossHpGaugeDelayMeter.gaugeRate);
+	DrawGaugeYAsUI(bossHpGaugeDelayMeter.texture, bossHpGaugeFrame.pos, bossHpGaugeFrame.size, bossHpGaugeDelayMeter.gaugeRate);
 	//メーター
-	DrawGaugeAsUI(bossHpGaugeMeter.texture, bossHpGaugeFrame.pos, bossHpGaugeFrame.size, bossHpGaugeMeter.gaugeRate);
+	DrawGaugeYAsUI(bossHpGaugeMeter.texture, bossHpGaugeFrame.pos, bossHpGaugeFrame.size, bossHpGaugeMeter.gaugeRate);
 
 #ifdef _DEBUG
 
@@ -499,60 +507,66 @@ static void DrawProgressGauge(void) {
 
 #pragma endregion
 
-#pragma region 関数: 連鎖表示
+#pragma region 関数: コンボ表示
 
 static void InitShockCombo(void) {
 	for (int i = 0; i < kComboNumbersLimit; i++) {
 		comboNumbers[i] = {};
 	}
 	comboNumbersTexture = GetTexture(TextureType::ComboNumbers);
+	comboNumbersMeterTexture = GetTexture(TextureType::ComboNumbersMeter);
 }
 
 static void UpdateShockCombo(void) {
+
+	//gaugeRateの更新
+	Timer comboTimer = GetComboTimer();
+	nowCombo.gaugeRate = 1.0f - (comboTimer.count / comboTimer.time);
+
 	//表示の更新
-	if (!shockCombo.isShowPreCombo) {
-		shockCombo.combo = GetShockCombo();
+	if (!nowCombo.isShowPreCombo) {
+		nowCombo.nowCombo = GetShockCombo();
 
 		for (int i = 0; i < kComboNumbersLimit; i++) {
-			comboNumbers[i].animNum = GetValueAtDigit(shockCombo.combo, i);
+			comboNumbers[i].animNum = GetValueAtDigit(nowCombo.nowCombo, i);
 		}
 	}
 	else {
 		//点滅処理
-		shockCombo.invisibleTimer.count++;
-		if (shockCombo.invisibleTimer.count >= shockCombo.invisibleTimer.time) {
-			shockCombo.invisibleTimer.count = 0;
+		nowCombo.invisibleTimer.count++;
+		if (nowCombo.invisibleTimer.count >= nowCombo.invisibleTimer.time) {
+			nowCombo.invisibleTimer.count = 0;
 
-			if (!shockCombo.isInvisible) {
-				shockCombo.isInvisible = true;
+			if (!nowCombo.isInvisible) {
+				nowCombo.isInvisible = true;
 			} else {
-				shockCombo.isInvisible = false;
+				nowCombo.isInvisible = false;
 			}
 		}
 
-		shockCombo.showPreComboTimer.count++;
-		if (shockCombo.showPreComboTimer.count >= shockCombo.showPreComboTimer.time) {
-			shockCombo.showPreComboTimer.count = 0;
-			shockCombo.isShowPreCombo = false;
+		nowCombo.showPreComboTimer.count++;
+		if (nowCombo.showPreComboTimer.count >= nowCombo.showPreComboTimer.time) {
+			nowCombo.showPreComboTimer.count = 0;
+			nowCombo.isShowPreCombo = false;
 
-			shockCombo.isInvisible = false;
-			shockCombo.invisibleTimer.count = 0;
+			nowCombo.isInvisible = false;
+			nowCombo.invisibleTimer.count = 0;
 		}
 	}
 }
 
 static void DrawShockCombo(void) {
 
-	if (shockCombo.isInvisible) return;
+	if (nowCombo.isInvisible) return;
 
 	int digits = 0;
-	if (shockCombo.combo < 3) {
+	if (nowCombo.nowCombo < 3) {
 		return;
 	}
-	else if (shockCombo.combo < 10) {
+	else if (nowCombo.nowCombo < 10) {
 		digits = 1;
 	} 
-	else if(shockCombo.combo < 100){
+	else if(nowCombo.nowCombo < 100){
 		digits = 2;
 	} else {
 		digits = 3;
@@ -564,7 +578,11 @@ static void DrawShockCombo(void) {
 
 		Texture texture = comboNumbersTexture;
 		texture.animNum = comboNumbers[i].animNum;
+		
+		Texture meterTexture = comboNumbersMeterTexture;
+		texture.animNum = comboNumbers[i].animNum;
 
+		DrawGaugeYAsUI(meterTexture, pos, comboNumbers[i].size, nowCombo.gaugeRate);
 		DrawTextureUI(texture, pos, comboNumbers[i].size);
 	}
 
@@ -614,8 +632,8 @@ Vector2 GetBossHpGaugeEndPos(void) {
 }
 
 void TriggerEndCombo(void) {
-	shockCombo.isShowPreCombo = true;
-	shockCombo.showPreComboTimer.count = 0;
+	nowCombo.isShowPreCombo = true;
+	nowCombo.showPreComboTimer.count = 0;
 }
 
 #pragma endregion

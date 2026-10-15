@@ -100,6 +100,7 @@ void InitTexture(void) {
 		{ Novice::LoadTexture("./resources/texture/ui/play/progress_gauge_meter.png"), { 768, 32 }, {0, 0}, 0, 0, WHITE },
 
 		{ Novice::LoadTexture("./resources/texture/ui/play/combo_numbers.png"), { 68, 128 }, {0, 0}, 0, 0, WHITE },
+		{ Novice::LoadTexture("./resources/texture/ui/play/combo_numbers_meter.png"), { 68, 128 }, {0, 0}, 0, 0, WHITE },
 
 		//effect
 		{ Novice::LoadTexture("./resources/texture/effect/effect.square.png"), {128 , 128 }, {0, 0}, 0, 0, WHITE },
@@ -373,6 +374,45 @@ void DrawGaugeAsUI(Texture texture, Vector2 centerPos, Vector2 size, float rate)
 		vertexS[2].x, vertexS[2].y,
 		vertexS[3].x, vertexS[3].y,
 		texture.refSize.x * texture.animNum, 0, gaugeRefWidth, texture.refSize.y,
+		texture.tHandle, texture.color
+	);
+}
+
+/// <summary>
+/// 縦ゲージの描画処理(UI)
+/// </summary>
+/// <param name="texture">テクスチャデータ</param>
+/// <param name="centerPos">中心座標</param>
+/// <param name="size">サイズ</param>
+/// <param name="rate">ゲージの割合</param>
+void DrawGaugeYAsUI(Texture texture, Vector2 centerPos, Vector2 size, float rate) {
+	//割合に補正を掛ける
+	rate = std::clamp(rate, 0.0f, 1.0f);
+	float gaugeHeight = size.y * rate;
+	int gaugeRefHeight = ToInt(texture.refSize.y * rate);
+
+	Vector2 vertexW[kVertexNum] = { 0, 0 };
+	Vector2i vertexS[kVertexNum] = { 0, 0 };
+
+	SetVertex(centerPos, size, vertexW);
+
+	for (int i = 0; i < kVertexNum; i++) {
+		//右側の頂点をrateに合わせてx座標更新
+		if (i == 0) {
+			vertexW[i].y = vertexW[2].y + gaugeHeight;
+		} else if (i == 1) {
+			vertexW[i].y = vertexW[3].y + gaugeHeight;
+		}
+
+		vertexS[i] = ConvertPosWToSUI(vertexW[i]);
+	}
+
+	Novice::DrawQuad(
+		vertexS[0].x, vertexS[0].y,
+		vertexS[1].x, vertexS[1].y,
+		vertexS[2].x, vertexS[2].y,
+		vertexS[3].x, vertexS[3].y,
+		texture.refSize.x * texture.animNum, 0, texture.refSize.x, gaugeRefHeight,
 		texture.tHandle, texture.color
 	);
 }
