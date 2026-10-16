@@ -573,11 +573,12 @@ static void UpdateShockCombo(void) {
 
 				comboIcon.isInvisible = false;
 				comboIcon.invisibleTimer.count = 0;
+				comboIcon.nowCombo = 0;
 			}
 		}
 	}
 
-	comboIcon.pos = MoveByEasing(comboIcon.startPos, comboIcon.endPos, comboIcon.easingT, EasingMode::EaseOut);
+	comboIcon.pos = MoveByEasing(comboIcon.startPos, comboIcon.endPos, comboIcon.easingT, EasingMode::EaseIn);
 }
 
 static void DrawShockCombo(void) {
