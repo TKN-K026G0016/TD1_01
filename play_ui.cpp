@@ -177,24 +177,30 @@ struct ShockComboNumbers {
 	Vector2 startPos = { 1200, 630 };
 	Vector2 interval = { -80.0f, 0.0f };
 
-	float offsetY = 30.0f;
+	float offsetY = 80.0f;
 
 	int animNum = 0;
 };
 ShockComboNumbers comboNumbers[kComboNumbersLimit];
+Texture comboNumbersTexture = {};
+Texture comboNumbersMeterTexture = {};
 
 
-
-struct ShockCombo {
+struct ShockComboIcon {
 	//コンボ数
 	int nowCombo = 0;
 	float gaugeRate = 0.0f;
 
 	//アイコン座標
-	Vector2 pos = { 1050, 600 };
-	Vector2 startPos = { 1050, 600 };
-	float moveSpeed = 7.0f;
-	float stopMovePosY = 780;
+	Vector2 pos = { 1150, 580 };
+	Vector2 size = { 256, 128 };
+
+
+	float easingT = 0.0f;
+	float easingSpeed = 0.05f;
+
+	Vector2 startPos = { 1160, 550 };
+	Vector2 endPos = { 1160, 800 };
 
 	//前のコンボを見せている状態
 	bool isShowPreCombo = false;
@@ -202,12 +208,13 @@ struct ShockCombo {
 	//透明の時間
 	bool isInvisible = false;
 	Timer invisibleTimer = { 3, 0 };
+
+	Texture texture = {};
 };
-ShockCombo nowCombo;
+ShockComboIcon comboIcon;
 
+constexpr int kStartViewCombo = 10;
 
-Texture comboNumbersTexture = {};
-Texture comboNumbersMeterTexture = {};
 
 #pragma endregion
 
@@ -517,58 +524,75 @@ static void InitShockCombo(void) {
 	}
 	comboNumbersTexture = GetTexture(TextureType::ComboNumbers);
 	comboNumbersMeterTexture = GetTexture(TextureType::ComboNumbersMeter);
+
+	comboIcon = {};
+	comboIcon.texture = GetTexture(TextureType::ComboIcon);
 }
 
 static void UpdateShockCombo(void) {
 
 	//gaugeRateの更新
 	Timer comboTimer = GetComboTimer();
-	nowCombo.gaugeRate = 1.0f - ToFloat(comboTimer.count) / ToFloat(comboTimer.time);
+	comboIcon.gaugeRate = 1.0f - ToFloat(comboTimer.count) / ToFloat(comboTimer.time);
 
-	//表示の更新
-	if (!nowCombo.isShowPreCombo) {
-		nowCombo.nowCombo = GetShockCombo();
+	//コンボ持続中
+	if (!comboIcon.isShowPreCombo) {
+		comboIcon.nowCombo = GetShockCombo();
 
 		for (int i = 0; i < kComboNumbersLimit; i++) {
-			comboNumbers[i].animNum = GetValueAtDigit(nowCombo.nowCombo, i);
+			comboNumbers[i].animNum = GetValueAtDigit(comboIcon.nowCombo, i);
 		}
 	}
+	//コンボ終了後
 	else {
-		//点滅処理
-		nowCombo.invisibleTimer.count++;
-		if (nowCombo.invisibleTimer.count >= nowCombo.invisibleTimer.time) {
-			nowCombo.invisibleTimer.count = 0;
 
-			if (!nowCombo.isInvisible) {
-				nowCombo.isInvisible = true;
+#pragma region 点滅処理
+		comboIcon.invisibleTimer.count++;
+		if (comboIcon.invisibleTimer.count >= comboIcon.invisibleTimer.time) {
+			comboIcon.invisibleTimer.count = 0;
+
+			if (!comboIcon.isInvisible) {
+				comboIcon.isInvisible = true;
 			} else {
-				nowCombo.isInvisible = false;
+				comboIcon.isInvisible = false;
 			}
 		}
+#pragma endregion
 
-		nowCombo.showPreComboTimer.count++;
-		if (nowCombo.showPreComboTimer.count >= nowCombo.showPreComboTimer.time) {
-			nowCombo.showPreComboTimer.count = 0;
-			nowCombo.isShowPreCombo = false;
+		//表示後、上に移動する処理
+		comboIcon.showPreComboTimer.count++;
+		if (comboIcon.showPreComboTimer.count >= comboIcon.showPreComboTimer.time) {
 
-			nowCombo.isInvisible = false;
-			nowCombo.invisibleTimer.count = 0;
+			//一定時間表示したら上へ向かう
+			comboIcon.easingT += comboIcon.easingSpeed;
+			if (comboIcon.easingT >= 1.0f) {
+				comboIcon.easingT = 0.0f;
+
+				comboIcon.showPreComboTimer.count = 0;
+				comboIcon.isShowPreCombo = false;
+
+				comboIcon.isInvisible = false;
+				comboIcon.invisibleTimer.count = 0;
+			}
 		}
 	}
+
+	comboIcon.pos = MoveByEasing(comboIcon.startPos, comboIcon.endPos, comboIcon.easingT, EasingMode::EaseOut);
 }
 
 static void DrawShockCombo(void) {
 
-	if (nowCombo.isInvisible) return;
+	if (comboIcon.isInvisible) return;
 
 	int digits = 0;
-	if (nowCombo.nowCombo < 3) {
+	//表示しない
+	if (comboIcon.nowCombo < kStartViewCombo) {
 		return;
 	}
-	else if (nowCombo.nowCombo < 10) {
+	else if (comboIcon.nowCombo < 10) {
 		digits = 1;
 	} 
-	else if(nowCombo.nowCombo < 100){
+	else if(comboIcon.nowCombo < 100){
 		digits = 2;
 	} else {
 		digits = 3;
@@ -576,7 +600,7 @@ static void DrawShockCombo(void) {
 
 	//scoreNumbers
 	for (int i = 0; i < digits; i++) {
-		Vector2 pos = { comboNumbers[i].startPos.x + comboNumbers[i].interval.x * i, comboNumbers[i].startPos.y };
+		Vector2 pos = { comboNumbers[i].startPos.x + comboNumbers[i].interval.x * i, comboIcon.pos.y + comboNumbers[i].offsetY};
 
 		Texture texture = comboNumbersTexture;
 		texture.animNum = comboNumbers[i].animNum;
@@ -585,7 +609,10 @@ static void DrawShockCombo(void) {
 		meterTexture.animNum = comboNumbers[i].animNum;
 
 		DrawTextureUI(texture, pos, comboNumbers[i].size);
-		DrawGaugeYAsUI(meterTexture, pos, comboNumbers[i].size, nowCombo.gaugeRate);
+		DrawGaugeYAsUI(meterTexture, pos, comboNumbers[i].size, comboIcon.gaugeRate);
+
+		//ComboIconの表示
+		DrawTextureUI(comboIcon.texture, comboIcon.pos, comboIcon.size);
 	}
 
 }
@@ -634,8 +661,8 @@ Vector2 GetBossHpGaugeEndPos(void) {
 }
 
 void TriggerEndCombo(void) {
-	nowCombo.isShowPreCombo = true;
-	nowCombo.showPreComboTimer.count = 0;
+	comboIcon.isShowPreCombo = true;
+	comboIcon.showPreComboTimer.count = 0;
 }
 
 #pragma endregion
