@@ -107,6 +107,7 @@ enum class TextureType {
 	ProgressGaugeFrame,
 	ProgressGaugeMeter,
 
+	ComboIcon,
 	ComboNumbers,
 	ComboNumbersMeter,
 

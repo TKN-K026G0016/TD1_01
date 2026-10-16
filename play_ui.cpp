@@ -296,11 +296,13 @@ static void UpdateEnergyGauge(void) {
 
 #pragma region GaugeEffectの生成
 
-	energyGaugeFrame.createGaugeEffectTimer.count++;
-	if (energyGaugeFrame.createGaugeEffectTimer.count >= energyGaugeFrame.createGaugeEffectTimer.time) {
-		energyGaugeFrame.createGaugeEffectTimer.count = 0;
+	if (remainEnergy <= energyGaugeFrame.warnDeadEnergy) {
+		energyGaugeFrame.createGaugeEffectTimer.count++;
+		if (energyGaugeFrame.createGaugeEffectTimer.count >= energyGaugeFrame.createGaugeEffectTimer.time) {
+			energyGaugeFrame.createGaugeEffectTimer.count = 0;
 
-		CreateGageEffect(GetEnergyGaugeEndPos(), GetPlayerColor());
+			CreateGageEffect(GetEnergyGaugeEndPos(), GetPlayerColor());
+		}
 	}
 
 #pragma endregion
