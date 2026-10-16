@@ -29,7 +29,7 @@ void InitSe(void) {
 		//enemy
 
 		//ui
-		{Novice::LoadAudio("./resources/sound/se/ui/countup_score.wav"), 1.0f},
+		{Novice::LoadAudio("./resources/sound/se/ui/countup_score.wav"), 0.4f},
 
 	};
 

@@ -29,8 +29,12 @@ LifeIcon lifeIcon;
 
 #pragma region データ: エネルギーゲージ
 
+bool gaugeShackSwitch = true;
+
 struct EnergyGaugeFrame {
 	Vector2 pos = { 640, 80 };
+	Vector2 viewPos = { 640, 80 };
+
 	Vector2 size = { 512, 100 };
 
 	//デンリョク不足警告表示のタイミング
@@ -241,10 +245,10 @@ struct ScoreIcon {
 
 	//イージング関係
 	float easingT = 0.0f;
-	float easingSpeed = 0.03f;
+	float easingSpeed = 0.008f;
 
 	//イージングを使うかどうかの判定値
-	int threshold = 100;
+	int threshold = 1000;
 
 	int startScore = 0;
 	int endScore = 0;
@@ -351,18 +355,24 @@ static void UpdateEnergyGauge(void) {
 
 #pragma endregion
 
-#pragma region 点滅処理
+#pragma region 点滅処理&振動
 
 	//警告表示のラインを下回るor故障状態時
 	if (remainEnergy <= energyGaugeFrame.warnDeadEnergy /*|| GetPlayerNowState() != PlayerState::Normal*/) {
 		UpdateAnimation(energyGaugeFrame.texture);
 		UpdateAnimation(miniEnergyGauge.frameTexture);
+
+		energyGaugeFrame.viewPos.x = energyGaugeFrame.pos.x + GetRand(-2, 2);
+		energyGaugeFrame.viewPos.y = energyGaugeFrame.pos.y + GetRand(-2, 2);
+
 	} else {
 		energyGaugeFrame.texture.animNum = 0;
 		energyGaugeFrame.texture.animChangeTimer.count = 0;
 
 		miniEnergyGauge.frameTexture.animNum = 0;
 		miniEnergyGauge.frameTexture.animChangeTimer.count = 0;
+
+		energyGaugeFrame.viewPos = energyGaugeFrame.pos;
 	}
 
 #pragma endregion
@@ -401,11 +411,11 @@ static void UpdateEnergyGauge(void) {
 static void DrawEnergyGauge(void) {
 	//通常ゲージ
 	//フレーム
-	DrawTextureUI(energyGaugeFrame.texture, energyGaugeFrame.pos, energyGaugeFrame.size);
+	DrawTextureUI(energyGaugeFrame.texture, energyGaugeFrame.viewPos, energyGaugeFrame.size);
 	//delayメーター
-	DrawGaugeAsUI(energyGaugeDelayMeter.texture, energyGaugeFrame.pos, energyGaugeFrame.size, energyGaugeDelayMeter.gaugeRate);
+	DrawGaugeAsUI(energyGaugeDelayMeter.texture, energyGaugeFrame.viewPos, energyGaugeFrame.size, energyGaugeDelayMeter.gaugeRate);
 	//メーター
-	DrawGaugeAsUI(energyGaugeMeter.texture, energyGaugeFrame.pos, energyGaugeFrame.size, energyGaugeMeter.gaugeRate);
+	DrawGaugeAsUI(energyGaugeMeter.texture, energyGaugeFrame.viewPos, energyGaugeFrame.size, energyGaugeMeter.gaugeRate);
 
 	//ミニゲージ
 	//フレーム
@@ -669,15 +679,18 @@ static void UpdateScore(void) {
 
 	//一定値以上得点を得ていたら、
 	if (diff >= scoreIcon.threshold) {
-		scoreIcon.startScore = scoreIcon.showScore;
-		scoreIcon.endScore = nowScore;
+		//イージング開始時のみstartScoreを更新
+		if (scoreIcon.easingT == 0.0f) {
+			scoreIcon.startScore = scoreIcon.showScore;
+			scoreIcon.endScore = nowScore;
+		}
 
 		scoreIcon.easingT += scoreIcon.easingSpeed;
 		if (scoreIcon.easingT > 1.0f) {
 			scoreIcon.easingT = 1.0f;
 		}
 
-		scoreIcon.showScore = UpdateValueByEasing(scoreIcon.startScore, scoreIcon.endScore, scoreIcon.easingT, EasingMode::EaseOut);
+		scoreIcon.showScore = UpdateValueByEasing(scoreIcon.startScore, scoreIcon.endScore, scoreIcon.easingT, EasingMode::Linear);
 
 		PlaySe(SeType::CountUpScore);
 

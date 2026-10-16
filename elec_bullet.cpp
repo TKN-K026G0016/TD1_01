@@ -76,8 +76,10 @@ constexpr int kRecoveryComboTime = 3;
 //チャージ弾でのコンボ回復量
 constexpr int kRecoveryComboTimeCharged = 30;
 
-//コンボ中に得たスコアの合計
+
 int totalComboInCombo = 0;
+//コンボ中に得たスコアの合計
+int scoreInCombo = 0;
 //スコア数による獲得スコアの倍率
 constexpr float kScoreMugByCombo = 0.01f;
 
@@ -196,6 +198,10 @@ static void UpdateShockCombo(void) {
 
 			//コンボの終了をUIに知らせる
 			TriggerEndCombo();
+
+			//コンボ中の得点を加算する
+			AddScore(scoreInCombo);
+			scoreInCombo = 0;
 		}
 	}
 }
@@ -405,7 +411,7 @@ Timer GetComboTimer(void) {
 
 void AddScoreByDefeatEnemy(int defeatPoint) {
 	int point = (defeatPoint + totalComboInCombo) * ToInt((1.0f + ToFloat(nowCombo) * kScoreMugByCombo));
-	AddScore(point);
+	scoreInCombo += point;
 
 	totalComboInCombo += defeatPoint;
 }
