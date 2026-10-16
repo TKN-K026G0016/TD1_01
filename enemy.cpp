@@ -2,6 +2,7 @@
 #include "player.h"
 #include "stage.h"
 #include "enemy_bullet.h"
+#include "elec_bullet.h"
 #include "gem.h"
 #include "boss_enemy.h"
 #include "effect.h"
@@ -24,6 +25,8 @@ static EnemySniper enemySniper[kEnemysniperLimit];
 int nowEnemySniperIsAliveCount = 0;
 //ジェムの生成量
 constexpr int enemySniperGemLimit = 4;
+//撃破時のスコア
+constexpr int kEnemySniperDefeatScore = 150;
 
 #pragma endregion
 
@@ -32,6 +35,8 @@ constexpr int kEnemyGuardianLimit = 10;
 static EnemyGuardian enemyGuardian[kEnemyGuardianLimit];
 //ジェムの生成量
 constexpr int enemyGuardianGemLimit = 1;
+//撃破時のスコア
+constexpr int kEnemyGuardianDefeatScore = 150;
 
 #pragma endregion
 
@@ -44,6 +49,8 @@ constexpr int enemyBasicGemLimit = 2;
 constexpr int enemyFormationGemLimit = 1;
 //Formationの生成間隔
 constexpr int formationRange = 75;
+//撃破時のスコア
+constexpr int kEnemyBasicDefeatScore = 100;
 
 #pragma endregion
 
@@ -52,6 +59,8 @@ constexpr int kEnemyMLimit = 4;
 static EnemyM enemyM[kEnemyMLimit];
 //ジェムの生成量
 constexpr int enemyMGemLimit = 4;
+//撃破時のスコア
+constexpr int kEnemyMDefeatScore = 150;
 
 #pragma endregion
 
@@ -62,6 +71,8 @@ static EnemySmall enemySmall[kEnemySmallLimit];
 constexpr int enemySmallGemLimit = 1;
 //Formationの生成間隔
 constexpr int smallFormationRange = 50;
+//撃破時のスコア
+constexpr int kEnemySmallDefeatScore = 50;
 
 #pragma endregion
 
@@ -79,6 +90,8 @@ constexpr int kEnemyBombLimit = 10;
 static EnemyBomb enemyBomb[kEnemyBombLimit];
 //ジェムの生成量
 constexpr int enemyBombGemLimit = 3;
+//撃破時のスコア
+constexpr int kEnemyBombDefeatScore = 500;
 
 #pragma endregion
 
@@ -223,6 +236,8 @@ static void CheckDeadEnemySniper(void) {
 			for (int j = 0; j < enemySniperGemLimit;j++) {
 				SpawnGem(enemySniper[i].pos, GemType::S);
 			}
+
+			AddScoreByDefeatEnemy(kEnemySniperDefeatScore);
 		}
 	}
 }
@@ -316,11 +331,13 @@ static void UpdateFlashTimerEnemyGuardian(void) {
 	}
 }
 
-static void DeadEnemyguardian(int index) {
+static void DeadEnemyGuardian(int index) {
 	enemyGuardian[index].isAlive = false;
 	enemyGuardian[index].hp = enemyGuardian[index].hpMax;
 
 	CreateExplodeEffect(enemyGuardian[index].pos);
+
+	AddScoreByDefeatEnemy(kEnemyGuardianDefeatScore);
 }
 
 static void CheckDeadEnemyGuardian(void) {
@@ -328,7 +345,7 @@ static void CheckDeadEnemyGuardian(void) {
 		if (!enemyGuardian[i].isAlive) continue;
 
 		if (enemyGuardian[i].hp <= 0) {
-			DeadEnemyguardian(i);
+			DeadEnemyGuardian(i);
 
 			//ジェムの生成処理
 			for (int j = 0; j < enemyGuardianGemLimit; j++) {
@@ -447,7 +464,7 @@ static void CountIgnoreShockEnemyBasic(void) {
 }
 
 /// <summary>
-/// 
+/// フラッシュの経過時間計測処理
 /// </summary>
 /// <param name=""></param>
 static void UpdateFlashTimerEnemyBasic(void) {
@@ -481,6 +498,8 @@ static void DeadEnemyBasic(int index) {
 	enemyBasic[index].hp = enemyBasic[index].hpMax;
 
 	CreateExplodeEffect(enemyBasic[index].pos);
+
+	AddScoreByDefeatEnemy(kEnemyBasicDefeatScore);
 
 	/*spawner.spawnTimer.time = spawner.kSpawnTime * nowenemyBasicIsAliveCount;*/
 }
@@ -593,6 +612,8 @@ static void DeadEnemyM(int index) {
 	enemyM[index].hp = enemyM[index].hpMax;
 
 	CreateExplodeEffect(enemyM[index].pos);
+
+	AddScoreByDefeatEnemy(kEnemyMDefeatScore);
 }
 
 static void CheckDeadEnemyM(void) {
@@ -714,6 +735,8 @@ static void DeadEnemySmall(int index) {
 
 	CreateExplodeEffect(enemySmall[index].pos);
 
+	AddScoreByDefeatEnemy(kEnemySmallDefeatScore);
+	
 	/*spawner.spawnTimer.time = spawner.kSpawnTime * nowenemyBasicIsAliveCount;*/
 }
 
@@ -893,6 +916,9 @@ static void CheckDeadEnemyBomb(void) {
 			for (int j = 0; j < enemyBombGemLimit; j++) {
 				SpawnGem(enemyBomb[i].pos, GemType::S);
 			}
+
+			AddScoreByDefeatEnemy(kEnemyBombDefeatScore);
+
 		}
 	}
 }

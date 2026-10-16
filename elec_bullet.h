@@ -154,3 +154,9 @@ int GetShockCombo(void);
 
 
 Timer GetComboTimer(void);
+
+/// <summary>
+/// 敵撃破時のスコア取得処理
+/// </summary>
+/// <param name="defeatPoint">撃破スコア</param>
+void AddScoreByDefeatEnemy(int defeatPoint);
