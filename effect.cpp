@@ -1662,27 +1662,28 @@ void UpdateBombExplosionEffect() {
 
 			bombExplosionEffect[i].alpha = UpdateValueByEasing(kAlphaMax, kAlphaMin, t, EasingMode::EaseOut);
 		}
+		//if (bombExplosionEffect[i].easingT <= 0.5f) {
+		//	for (int j = 0; j < kBombBlastEffectNumber; j++)
+		//	{
+		//		//イージング
+		//		bombBlastEffect[i][j].easingT += bombBlastEffect[i][j].easingSpeed;
+		//		if (bombBlastEffect[i][j].easingT >= 1.0f) {
+		//			bombBlastEffect[i][j].appear = false;
+		//			bombBlastEffect[i][j].easingT = 1.0f;
+		//		}
 
-		for (int j = 0; j < kBombBlastEffectNumber; j++)
-		{
-			//イージング
-			bombBlastEffect[i][j].easingT += bombBlastEffect[i][j].easingSpeed;
-			if (bombBlastEffect[i][j].easingT >= 1.0f) {
-				bombBlastEffect[i][j].appear = false;
-				bombBlastEffect[i][j].easingT = 1.0f;
-			}
+		//		//拡大処理
+		//		bombBlastEffect[i][j].sizeValue = UpdateValueByEasing(bombBlastEffect[i][j].startSizeValue, bombBlastEffect[i][j].endSizeValue, bombBlastEffect[i][j].easingT, EasingMode::EaseOut);
 
-			//拡大処理
-			bombBlastEffect[i][j].sizeValue = UpdateValueByEasing(bombBlastEffect[i][j].startSizeValue, bombBlastEffect[i][j].endSizeValue, bombBlastEffect[i][j].easingT, EasingMode::EaseOut);
+		//		//フェード処理
+		//		if (bombBlastEffect[i][j].easingT >= bombBlastEffect[i][j].startFadeEasingT) {
+		//			float t = (bombBlastEffect[i][j].easingT - bombBlastEffect[i][j].startFadeEasingT) / (1.0f - bombBlastEffect[i][j].startFadeEasingT);
+		//			if (t > 1.0f) t = 1.0f;
 
-			//フェード処理
-			if (bombBlastEffect[i][j].easingT >= bombBlastEffect[i][j].startFadeEasingT) {
-				float t = (bombBlastEffect[i][j].easingT - bombBlastEffect[i][j].startFadeEasingT) / (1.0f - bombBlastEffect[i][j].startFadeEasingT);
-				if (t > 1.0f) t = 1.0f;
-
-				bombBlastEffect[i][j].alpha = UpdateValueByEasing(kAlphaMax, kAlphaMin, t, EasingMode::EaseOut);
-			}
-		}
+		//			bombBlastEffect[i][j].alpha = UpdateValueByEasing(kAlphaMax, kAlphaMin, t, EasingMode::EaseOut);
+		//		}
+		//	}
+		//}
 	}
 }
 
@@ -1696,6 +1697,7 @@ void DrawBombExplosionEffect() {
 		texture.color = (bombExplosionEffect[i].color & 0xFFFFFF00) | bombExplosionEffect[i].alpha;
 
 		DrawTextureObj(texture, bombExplosionEffect[i].pos, size);
+		
 		for (int j = 0; j < kBombBlastEffectNumber; j++)
 		{
 			Vector2 Blostsize = { bombBlastEffect[i][j].sizeValue,bombBlastEffect[i][j].sizeValue};
@@ -1732,6 +1734,8 @@ void InitEffect() {
 	InitPlayerFootprintsEffect();
 	InitElecLineEffect();
 	InitBombExplosionEffect();
+	
+	CreateBombExplosionEffect({100,100}, 768,WHITE);
 
 #ifdef _DEBUG
 

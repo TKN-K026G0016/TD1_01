@@ -88,6 +88,6 @@ void CreateEnemyDamageEffect(Vector2 pos);
 void CreateEnemyDamageEffect(Vector2 pos);
 
 void CreatePlayerFootprintsEffect(Vector2 pos);
-void CreateBombExplosionEffect(Vector2 pos);
+void CreateBombExplosionEffect(Vector2 pos, float endSizeValue, unsigned int color);
 
 unsigned int GetPlayerColor(void);
