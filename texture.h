@@ -111,6 +111,9 @@ enum class TextureType {
 	ComboNumbers,
 	ComboNumbersMeter,
 
+	ScoreNumbers,
+	ScoreIcon,
+
 	//effect
 	EffectSquare,
 	EffectSquareMini,

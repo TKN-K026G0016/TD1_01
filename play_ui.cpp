@@ -157,7 +157,7 @@ struct ProgressGauge {
 ProgressGauge progressGauge;
 
 struct ProgressGaugeIcon {
-	Vector2 pos = {0.0f, progressGauge.pos.y };
+	Vector2 pos = { 0.0f, progressGauge.pos.y };
 	Vector2 size = { 32, 32 };
 
 	Vector2 startPos = { progressGauge.pos.x - progressGauge.size.x / 2, progressGauge.pos.y };
@@ -178,7 +178,7 @@ struct ShockComboNumbers {
 	Vector2 startPos = { 1200, 630 };
 	Vector2 interval = { -80.0f, 0.0f };
 
-	float offsetY = 80.0f;
+	float offsetY = 85.0f;
 
 	int animNum = 0;
 };
@@ -193,8 +193,8 @@ struct ShockComboIcon {
 	float gaugeRate = 0.0f;
 
 	//アイコン座標
-	Vector2 pos = { 1150, 580 };
-	Vector2 size = { 256, 128 };
+	Vector2 pos = { 1120, 580 };
+	Vector2 size = { 160, 80 };
 
 
 	float easingT = 0.0f;
@@ -221,9 +221,36 @@ constexpr int kStartViewCombo = 10;
 
 #pragma region データ: スコア
 
-struct Score {
-	Vector2 pos = { 30, 30 };
+static constexpr int kScoreNumbersLimit = 9;
+struct ScoreNumbers {
+	Vector2 size = { 28, 56 };
+
+	Vector2 startPos = { 30, 680 };
+	Vector2 interval = { 26, 0 };
+
+	int animNum = 0;
 };
+ScoreNumbers scoreNumbers[kScoreNumbersLimit];
+
+struct ScoreIcon {
+	Vector2 pos = { 30, 30 };
+
+	//表示の数値
+	int showScore = 0;
+
+	//イージング関係
+	float easingT = 0.0f;
+	float easingSpeed = 0.03f;
+
+	//イージングを使うかどうかの判定値
+	int threshold = 100;
+
+	int startScore = 0;
+	int endScore = 0;
+
+};
+ScoreIcon scoreIcon;
+Texture scoreNumbersTexture = {};
 
 #pragma endregion
 
@@ -240,7 +267,7 @@ static void DrawLifeIcon(void) {
 	int remainLife = GetPlayerHp();
 
 	for (int i = 0; i < remainLife; i++) {
-		Vector2 posS = { lifeIcon.startPos.x  + (lifeIcon.size.x + lifeIcon.intervalX) * i, lifeIcon.startPos.y };
+		Vector2 posS = { lifeIcon.startPos.x + (lifeIcon.size.x + lifeIcon.intervalX) * i, lifeIcon.startPos.y };
 
 		DrawTextureUI(lifeIcon.texture, posS, lifeIcon.size);
 	}
@@ -298,8 +325,7 @@ static void UpdateEnergyGauge(void) {
 					energyGaugeDelayMeter.easingT,
 					EasingMode::EaseIn
 				);
-		}
-		else {
+		} else {
 			energyGaugeDelayMeter.gaugeRate = nowRate;
 			energyGaugeDelayMeter.easingT = 0.0f;
 		}
@@ -330,8 +356,7 @@ static void UpdateEnergyGauge(void) {
 	if (remainEnergy <= energyGaugeFrame.warnDeadEnergy /*|| GetPlayerNowState() != PlayerState::Normal*/) {
 		UpdateAnimation(energyGaugeFrame.texture);
 		UpdateAnimation(miniEnergyGauge.frameTexture);
-	}
-	else {
+	} else {
 		energyGaugeFrame.texture.animNum = 0;
 		energyGaugeFrame.texture.animChangeTimer.count = 0;
 
@@ -509,7 +534,7 @@ static void UpdateProgressGauge(void) {
 	//ボスが出たら出現しない
 	if (GetBossEnemyIsAlive()) return;
 
-	progressGauge.gaugeRate = ToFloat(ConvertTimeDataToInt(GetGameTimeData())) / ToFloat( progressGauge.bossRoundTime);
+	progressGauge.gaugeRate = ToFloat(ConvertTimeDataToInt(GetGameTimeData())) / ToFloat(progressGauge.bossRoundTime);
 
 	//アイコンの移動
 	progressGaugeIcon.pos.x = UpdateValueByEasing(progressGaugeIcon.startPos.x, progressGaugeIcon.endPos.x, progressGauge.gaugeRate, EasingMode::Linear);
@@ -599,11 +624,9 @@ static void DrawShockCombo(void) {
 	//表示しない
 	if (comboIcon.nowCombo < kStartViewCombo) {
 		return;
-	}
-	else if (comboIcon.nowCombo < 10) {
+	} else if (comboIcon.nowCombo < 10) {
 		digits = 1;
-	} 
-	else if(comboIcon.nowCombo < 100){
+	} else if (comboIcon.nowCombo < 100) {
 		digits = 2;
 	} else {
 		digits = 3;
@@ -611,20 +634,19 @@ static void DrawShockCombo(void) {
 
 	//scoreNumbers
 	for (int i = 0; i < digits; i++) {
-		Vector2 pos = { comboNumbers[i].startPos.x + comboNumbers[i].interval.x * i, comboIcon.pos.y + comboNumbers[i].offsetY};
+		Vector2 pos = { comboNumbers[i].startPos.x + comboNumbers[i].interval.x * i, comboIcon.pos.y + comboNumbers[i].offsetY };
 
 		Texture texture = comboNumbersTexture;
 		texture.animNum = comboNumbers[i].animNum;
-		
+
 		Texture meterTexture = comboNumbersMeterTexture;
 		meterTexture.animNum = comboNumbers[i].animNum;
 
 		DrawTextureUI(texture, pos, comboNumbers[i].size);
 		DrawGaugeYAsUI(meterTexture, pos, comboNumbers[i].size, comboIcon.gaugeRate);
-
-		//ComboIconの表示
-		DrawTextureUI(comboIcon.texture, comboIcon.pos, comboIcon.size);
 	}
+	//ComboIconの表示
+	DrawTextureUI(comboIcon.texture, comboIcon.pos, comboIcon.size);
 
 }
 
@@ -632,7 +654,54 @@ static void DrawShockCombo(void) {
 
 #pragma region 関数: スコア
 
+static void InitScore(void) {
+	for (int i = 0; i < kScoreNumbersLimit; i++) {
+		scoreNumbers[i] = {};
+	}
+	scoreNumbersTexture = GetTexture(TextureType::ScoreNumbers);
+}
+
+static void UpdateScore(void) {
+
+	int nowScore = GetNowScore();
+	int diff = nowScore - scoreIcon.showScore;
+
+	//一定値以上得点を得ていたら、
+	if (diff >= scoreIcon.threshold) {
+		scoreIcon.startScore = scoreIcon.showScore;
+		scoreIcon.endScore = nowScore;
+
+		scoreIcon.easingT += scoreIcon.easingSpeed;
+		if (scoreIcon.easingT > 1.0f) {
+			scoreIcon.easingT = 1.0f;
+		}
+
+		scoreIcon.showScore = UpdateValueByEasing(scoreIcon.startScore, scoreIcon.endScore, scoreIcon.easingT, EasingMode::EaseOut);
+
+
+	} else {
+		scoreIcon.showScore = nowScore;
+		scoreIcon.easingT = 0.0f;
+	}
+
+	for (int i = 0; i < kScoreNumbersLimit; i++) {
+		scoreNumbers[i].animNum = GetValueAtDigit(scoreIcon.showScore, i);
+	}
+}
+
 static void DrawScore(void) {
+	for (int i = 0; i < kScoreNumbersLimit; i++) {
+		Vector2 pos = { scoreNumbers[i].startPos.x + scoreNumbers[i].interval.x *(kScoreNumbersLimit - i -1), scoreNumbers[i].startPos.y };
+
+		Texture texture = scoreNumbersTexture;
+		texture.animNum = scoreNumbers[i].animNum;
+
+		DrawTextureUI(texture, pos, scoreNumbers[i].size);
+
+		//scoreIconの表示
+		//DrawTextureUI(scoreIcon.texture, scoreIcon.pos, scoreIcon.size);
+	}
+
 	Novice::ScreenPrintf(30, 30, "Score: %07d", GetNowScore());
 }
 
@@ -645,14 +714,16 @@ void InitPlayUI(void) {
 	InitBossHpGauge();
 	InitProgressGauge();
 	InitShockCombo();
+	InitScore();
 }
 
-void UpdatePlayUI(void){
+void UpdatePlayUI(void) {
 	UpdateEnergyGauge();
 	UpdateBossHpGauge();
 	UpdatePowRate();
 	UpdateProgressGauge();
 	UpdateShockCombo();
+	UpdateScore();
 }
 
 void DrawPlayUI(void) {
