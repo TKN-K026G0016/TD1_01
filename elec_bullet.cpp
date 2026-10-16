@@ -65,12 +65,16 @@ static int nowCombo = 0;
 //今回のゲームの最大コンボ数
 static int maxCombo = 0;
 //コンボ持続時間
-Timer comboTimer = { 120, 0 };
+Timer comboTimer = { 150, 0 };
 
+//通常弾のコンボ増加数
+int kAddCombo = 1;
+//チャージ弾のコンボ増加数
+int kAddComboCharged = 5;
 //通常弾でのコンボ回復量
-constexpr int kRecoveryComboTime = 5;
+constexpr int kRecoveryComboTime = 3;
 //チャージ弾でのコンボ回復量
-constexpr int kRecoveryComboTimeCharged = 20;
+constexpr int kRecoveryComboTimeCharged = 30;
 
 //コンボ中に得たスコアの合計
 int totalComboInCombo = 0;
@@ -380,7 +384,9 @@ int GetElecShockLimit(void) {
 
 void AddShockCombo(ElecBulletType type) {
 	//コンボ増加
-	nowCombo++;
+	int addCombo = (type == ElecBulletType::Normal) ? kAddCombo : kAddComboCharged;
+
+	nowCombo += addCombo;
 
 	int recoveryComboTime = (type == ElecBulletType::Normal) ? kRecoveryComboTime : kRecoveryComboTimeCharged;
 	comboTimer.count -= recoveryComboTime;

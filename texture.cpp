@@ -99,7 +99,7 @@ void InitTexture(void) {
 		{ Novice::LoadTexture("./resources/texture/ui/play/progress_gauge_frame.png"), { 768, 32 }, {0, 0}, 0, 0, WHITE },
 		{ Novice::LoadTexture("./resources/texture/ui/play/progress_gauge_meter.png"), { 768, 32 }, {0, 0}, 0, 0, WHITE },
 
-		{ Novice::LoadTexture("./resources/texture/ui/play/combo_icon.png"), { 256, 128 }, {0, 0}, 0, 0, WHITE },
+		{ Novice::LoadTexture("./resources/texture/ui/play/combo_icon.png"), { 128, 64 }, {0, 0}, 0, 0, WHITE },
 		{ Novice::LoadTexture("./resources/texture/ui/play/combo_numbers.png"), { 68, 128 }, {0, 0}, 0, 0, WHITE },
 		{ Novice::LoadTexture("./resources/texture/ui/play/combo_numbers_meter_reverse.png"), { 68, 128 }, {0, 0}, 0, 0, WHITE },
 

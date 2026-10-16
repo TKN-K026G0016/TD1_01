@@ -240,7 +240,7 @@ struct ScoreIcon {
 
 	//イージング関係
 	float easingT = 0.0f;
-	float easingSpeed = 0.01f;
+	float easingSpeed = 0.03f;
 
 	//イージングを使うかどうかの判定値
 	int threshold = 100;
