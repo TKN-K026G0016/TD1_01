@@ -221,6 +221,7 @@ struct ShockComboIcon {
 ShockComboIcon comboIcon;
 
 constexpr int kStartViewCombo = 10;
+constexpr int kStartDisplayEffectCombo = 50;
 
 #pragma endregion
 
@@ -273,12 +274,12 @@ struct DisplayEffect {
 	//サイズ関係
 	Vector2 size = {};
 	Vector2 minSize = { 1280, 720 };
-	Vector2 maxSize = { 1600, 900 };
+	Vector2 maxSize = { 1440, 810 };
 
 	//透明度関係
-	int alpha = 180;
-	int alphaMax = 180;
-	int alphaMin = 70;
+	int alpha = 80;
+	int alphaMax = 50;
+	int alphaMin = 10;
 
 	//縮小中フラグ
 	bool isScaleDown = true;
@@ -655,6 +656,13 @@ static void UpdateShockCombo(void) {
 	}
 
 	comboIcon.pos = MoveByEasing(comboIcon.startPos, comboIcon.endPos, comboIcon.easingT, EasingMode::EaseIn);
+
+	if (comboIcon.nowCombo >= kStartDisplayEffectCombo) {
+		TriggerDisplayEffect();
+	} else {
+		displayEffect.isShoot = false;
+	}
+
 }
 
 static void DrawShockCombo(void) {
@@ -791,6 +799,15 @@ static void DrawDisplayEffect(void) {
 	texture.color = (displayEffect.color & 0xFFFFFF00) | displayEffect.alpha;
 
 	DrawTextureUI(texture, displayEffect.pos, displayEffect.size);
+}
+
+void TriggerDisplayEffect(void) {
+	if (displayEffect.isShoot) return;
+
+	displayEffect.isShoot = true;
+	displayEffect.easingT = 0.0f;
+	displayEffect.isScaleDown = true;
+
 }
 
 #pragma endregion

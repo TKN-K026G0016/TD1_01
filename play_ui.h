@@ -19,3 +19,5 @@ Vector2 GetBossHpGaugeEndPos(void);
 /// コンボの終了を知らせる
 /// </summary>
 void TriggerEndCombo(void);
+
+void TriggerDisplayEffect(void);
