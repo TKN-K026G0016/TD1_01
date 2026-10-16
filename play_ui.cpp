@@ -10,6 +10,7 @@
 #include "vector2.h"
 #include "timer.h"
 #include "tool.h"
+#include "common.h"
 #include "texture.h"
 
 #include <Novice.h>
@@ -221,7 +222,6 @@ ShockComboIcon comboIcon;
 
 constexpr int kStartViewCombo = 10;
 
-
 #pragma endregion
 
 #pragma region データ: スコア
@@ -259,6 +259,36 @@ Texture scoreNumbersTexture = {};
 
 #pragma endregion
 
+#pragma region データ: 画面エフェクト
+
+struct DisplayEffect {
+	Vector2 pos = kWindowCenter;
+
+	bool isShoot = false;
+
+	//イージング
+	float easingT = 0.0f;
+	float easingSpeed = 0.03f;
+
+	//サイズ関係
+	Vector2 size = {};
+	Vector2 minSize = { 1280, 720 };
+	Vector2 maxSize = { 1600, 900 };
+
+	//透明度関係
+	int alpha = 180;
+	int alphaMax = 180;
+	int alphaMin = 70;
+
+	//縮小中フラグ
+	bool isScaleDown = true;
+
+	unsigned int color = GetPlayerColor();
+};
+DisplayEffect displayEffect = {};
+Texture displayEffectTexture = {};
+
+#pragma endregion
 
 #pragma region 関数: ライフアイコン
 
@@ -723,6 +753,47 @@ static void DrawScore(void) {
 
 #pragma endregion
 
+#pragma region 関数: DisplayEffect
+
+static void InitDisplayEffect(void) {
+	displayEffect = {};
+	displayEffectTexture = GetTexture(TextureType::DisplayEffect);
+}
+
+static void UpdateDisplayEffect(void) {
+	if (!displayEffect.isShoot) return;
+
+	//イージング処理
+	if (displayEffect.isScaleDown) {
+		displayEffect.easingT += displayEffect.easingSpeed;
+		if (displayEffect.easingT >= 1.0f) {
+			displayEffect.easingT = 1.0f;
+			displayEffect.isScaleDown = false;
+		}
+	} else {
+		displayEffect.easingT -= displayEffect.easingSpeed;
+		if (displayEffect.easingT <= 0.0f) {
+			displayEffect.easingT = 0.0f;
+			displayEffect.isScaleDown = true;
+		}
+	}
+
+	//拡大処理
+	displayEffect.size = MoveByEasing(displayEffect.maxSize, displayEffect.minSize, displayEffect.easingT, EasingMode::EaseIn);
+	//透明度の処理
+	displayEffect.alpha = UpdateValueByEasing(displayEffect.alphaMin, displayEffect.alphaMax, displayEffect.easingT, EasingMode::EaseIn);
+}
+
+static void DrawDisplayEffect(void) {
+	if (!displayEffect.isShoot) return;
+
+	Texture texture = displayEffectTexture;
+	texture.color = (displayEffect.color & 0xFFFFFF00) | displayEffect.alpha;
+
+	DrawTextureUI(texture, displayEffect.pos, displayEffect.size);
+}
+
+#pragma endregion
 
 void InitPlayUI(void) {
 	InitLifeIcon();
@@ -731,6 +802,7 @@ void InitPlayUI(void) {
 	InitProgressGauge();
 	InitShockCombo();
 	InitScore();
+	InitDisplayEffect();
 }
 
 void UpdatePlayUI(void) {
@@ -740,9 +812,12 @@ void UpdatePlayUI(void) {
 	UpdateProgressGauge();
 	UpdateShockCombo();
 	UpdateScore();
+	UpdateDisplayEffect();
 }
 
 void DrawPlayUI(void) {
+	DrawDisplayEffect();
+
 	DrawLifeIcon();
 	DrawEnergyGauge();
 	DrawBossHpGauge();

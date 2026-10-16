@@ -114,6 +114,8 @@ enum class TextureType {
 	ScoreNumbers,
 	ScoreIcon,
 
+	DisplayEffect,
+
 	//effect
 	EffectSquare,
 	EffectSquareMini,
