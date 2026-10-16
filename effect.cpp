@@ -1698,12 +1698,12 @@ void DrawBombExplosionEffect() {
 		DrawTextureObj(texture, bombExplosionEffect[i].pos, size);
 		for (int j = 0; j < kBombBlastEffectNumber; j++)
 		{
-			Vector2 size = { bombBlastEffect[i][j].sizeValue,bombBlastEffect[i][j].sizeValue};
+			Vector2 Blostsize = { bombBlastEffect[i][j].sizeValue,bombBlastEffect[i][j].sizeValue};
 
-			Texture texture = bombBlastEffect[i][j].texture;
-			texture.color = (bombBlastEffect[i][j].color & 0xFFFFFF00) | bombBlastEffect[i][j].alpha;
+			Texture Blosttexture = bombBlastEffect[i][j].texture;
+			Blosttexture.color = (bombBlastEffect[i][j].color & 0xFFFFFF00) | bombBlastEffect[i][j].alpha;
 
-			DrawTextureObj(texture, bombBlastEffect[i][j].pos, size);
+			DrawTextureObj(texture, bombBlastEffect[i][j].pos, Blostsize);
 		}
 	}
 }
