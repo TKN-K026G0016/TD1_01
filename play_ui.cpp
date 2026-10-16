@@ -178,7 +178,7 @@ struct ShockComboNumbers {
 	Vector2 startPos = { 1200, 630 };
 	Vector2 interval = { -80.0f, 0.0f };
 
-	float offsetY = 80.0f;
+	float offsetY = 85.0f;
 
 	int animNum = 0;
 };
@@ -193,8 +193,8 @@ struct ShockComboIcon {
 	float gaugeRate = 0.0f;
 
 	//アイコン座標
-	Vector2 pos = { 1150, 580 };
-	Vector2 size = { 256, 128 };
+	Vector2 pos = { 1120, 580 };
+	Vector2 size = { 160, 80 };
 
 
 	float easingT = 0.0f;
@@ -221,12 +221,12 @@ constexpr int kStartViewCombo = 10;
 
 #pragma region データ: スコア
 
-static constexpr int kScoreNumbersLimit = 7;
+static constexpr int kScoreNumbersLimit = 8;
 struct ScoreNumbers {
-	Vector2 size = { 64, 128 };
+	Vector2 size = { 28, 56 };
 
-	Vector2 startPos = { 30, 30 };
-	Vector2 interval = { 35, 0 };
+	Vector2 startPos = { 30, 680 };
+	Vector2 interval = { 26, 0 };
 
 	int animNum = 0;
 };
@@ -237,6 +237,17 @@ struct ScoreIcon {
 
 	//表示の数値
 	int showScore = 0;
+
+	//イージング関係
+	float easingT = 0.0f;
+	float easingSpeed = 0.03f;
+
+	//イージングを使うかどうかの判定値
+	int threshold = 500;
+
+	int startScore = 0;
+	int endScore = 0;
+
 };
 ScoreIcon scoreIcon;
 Texture scoreNumbersTexture = {};
@@ -633,10 +644,9 @@ static void DrawShockCombo(void) {
 
 		DrawTextureUI(texture, pos, comboNumbers[i].size);
 		DrawGaugeYAsUI(meterTexture, pos, comboNumbers[i].size, comboIcon.gaugeRate);
-
-		//ComboIconの表示
-		DrawTextureUI(comboIcon.texture, comboIcon.pos, comboIcon.size);
 	}
+	//ComboIconの表示
+	DrawTextureUI(comboIcon.texture, comboIcon.pos, comboIcon.size);
 
 }
 
@@ -653,15 +663,28 @@ static void InitScore(void) {
 
 static void UpdateScore(void) {
 
+	int nowScore = GetNowScore();
+	int diff = nowScore - scoreIcon.showScore;
+
 	scoreIcon.showScore = GetNowScore();
 
-	for (int i = 0; i < kComboNumbersLimit; i++) {
+	for (int i = 0; i < kScoreNumbersLimit; i++) {
 		scoreNumbers[i].animNum = GetValueAtDigit(scoreIcon.showScore, i);
 	}
 }
 
 static void DrawScore(void) {
+	for (int i = 0; i < kScoreNumbersLimit; i++) {
+		Vector2 pos = { scoreNumbers[i].startPos.x + scoreNumbers[i].interval.x *(kScoreNumbersLimit - i -1), scoreNumbers[i].startPos.y };
 
+		Texture texture = scoreNumbersTexture;
+		texture.animNum = scoreNumbers[i].animNum;
+
+		DrawTextureUI(texture, pos, scoreNumbers[i].size);
+
+		//scoreIconの表示
+		//DrawTextureUI(scoreIcon.texture, scoreIcon.pos, scoreIcon.size);
+	}
 
 	Novice::ScreenPrintf(30, 30, "Score: %07d", GetNowScore());
 }
@@ -675,6 +698,7 @@ void InitPlayUI(void) {
 	InitBossHpGauge();
 	InitProgressGauge();
 	InitShockCombo();
+	InitScore();
 }
 
 void UpdatePlayUI(void) {
@@ -683,6 +707,7 @@ void UpdatePlayUI(void) {
 	UpdatePowRate();
 	UpdateProgressGauge();
 	UpdateShockCombo();
+	UpdateScore();
 }
 
 void DrawPlayUI(void) {
