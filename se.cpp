@@ -46,7 +46,7 @@ void PlaySe(SeType type) {
 /// <param name="type">Seの種類</param>
 void PlaySeContinuous(SeType type) {
 	if (Novice::IsPlayingAudio(ses[ToInt(type)].pHandle) != 1) {
- 		ses[ToInt(type)].pHandle = Novice::PlayAudio(ses[ToInt(type)].aHandle, true, ses[ToInt(type)].volume * seVolume);
+		ses[ToInt(type)].pHandle = Novice::PlayAudio(ses[ToInt(type)].aHandle, true, ses[ToInt(type)].volume * seVolume);
 	}
 }
 

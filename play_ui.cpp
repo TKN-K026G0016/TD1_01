@@ -679,13 +679,12 @@ static void UpdateScore(void) {
 
 		scoreIcon.showScore = UpdateValueByEasing(scoreIcon.startScore, scoreIcon.endScore, scoreIcon.easingT, EasingMode::EaseOut);
 
-		PlaySeContinuous(SeType::CountUpScore);
+		PlaySe(SeType::CountUpScore);
 
 	} else {
 		scoreIcon.showScore = nowScore;
 		scoreIcon.easingT = 0.0f;
 		
-		StopPlayingSe(SeType::CountUpScore);
 	}
 
 	for (int i = 0; i < kScoreNumbersLimit; i++) {
