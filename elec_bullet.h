@@ -140,12 +140,17 @@ ElecShock* GetElecShockArray(void);
 /// <returns></returns>
 int GetElecShockLimit(void);
 
+
 /// <summary>
 /// ショックコンボの増加処理
 /// </summary>
-void AddShockCombo(void);
+/// <param name="type">チャージ弾か</param>
+void AddShockCombo(ElecBulletType type);
 
 /// <summary>
 /// ショックコンボを取得
 /// </summary>
 int GetShockCombo(void);
+
+
+Timer GetComboTimer(void);
