@@ -4,6 +4,7 @@
 #include "boss_enemy.h"
 #include "stage.h"
 #include "effect.h"
+#include "score_data.h"
 
 #include "vector2.h"
 #include "timer.h"
@@ -217,6 +218,15 @@ constexpr int kStartViewCombo = 10;
 
 
 #pragma endregion
+
+#pragma region データ: スコア
+
+struct Score {
+	Vector2 pos = { 30, 30 };
+};
+
+#pragma endregion
+
 
 #pragma region 関数: ライフアイコン
 
@@ -619,6 +629,15 @@ static void DrawShockCombo(void) {
 }
 
 #pragma endregion
+
+#pragma region 関数: スコア
+
+static void DrawScore(void) {
+	Novice::ScreenPrintf(30, 30, )
+}
+
+#pragma endregion
+
 
 void InitPlayUI(void) {
 	InitLifeIcon();
