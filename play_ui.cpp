@@ -633,7 +633,7 @@ static void DrawShockCombo(void) {
 #pragma region 関数: スコア
 
 static void DrawScore(void) {
-	Novice::ScreenPrintf(30, 30, )
+	Novice::ScreenPrintf(30, 30, "Score: ", GetNowScore());
 }
 
 #pragma endregion
