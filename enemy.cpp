@@ -30,6 +30,8 @@ constexpr int enemySniperGemLimit = 4;
 #pragma region データ: EnemyGuardian
 constexpr int kEnemyGuardianLimit = 10;
 static EnemyGuardian enemyGuardian[kEnemyGuardianLimit];
+//ジェムの生成量
+constexpr int enemyGuardianGemLimit = 1;
 
 #pragma endregion
 
@@ -76,7 +78,7 @@ constexpr int kScatterLengthMin = 0;
 constexpr int kEnemyBombLimit = 10;
 static EnemyBomb enemyBomb[kEnemyBombLimit];
 //ジェムの生成量
-constexpr int enemyBombGemLimit = 2;
+constexpr int enemyBombGemLimit = 3;
 
 #pragma endregion
 
@@ -129,7 +131,7 @@ static void MoveEnemySniper(void) {
 	Vector2 playerPos = GetPlayerPos();
 	for (int i = 0;i < kEnemysniperLimit;i++) {
 		if (!enemySniper[i].isAlive)continue;
-		if (enemySniper[i].isFlash) continue;
+		if (enemySniper[i].isHitStop) continue;
 
 		float diffX = playerPos.x - enemySniper[i].pos.x;
 		float diffY = playerPos.y - enemySniper[i].pos.y;
@@ -185,6 +187,20 @@ static void UpdateFlashTimerEnemySniper(void) {
 	}
 }
 
+static void UpdateHitStopTimerEnemySniper(void) {
+	for (int i = 0; i < kEnemysniperLimit; i++) {
+		if (!enemySniper[i].isAlive) continue;
+		if (!enemySniper[i].isHitStop) continue;
+
+		enemySniper[i].hitStopTimer.count++;
+		if (enemySniper[i].hitStopTimer.count >= enemySniper[i].hitStopTimer.time) {
+			enemySniper[i].hitStopTimer.count = 0;
+			enemySniper[i].isHitStop = false;
+		}
+
+	}
+}
+
 static void DeadEnemySniper(int index) {
 	enemySniper[index].isAlive = false;
 	enemySniper[index].hp = enemySniper[index].hpMax;
@@ -204,7 +220,7 @@ static void CheckDeadEnemySniper(void) {
 			DeadEnemySniper(i);
 
 			//ジェムの生成処理
-			for (int j = 0;j < enemySniperGemLimit;j++) {
+			for (int j = 0; j < enemySniperGemLimit;j++) {
 				SpawnGem(enemySniper[i].pos, GemType::S);
 			}
 		}
@@ -315,7 +331,9 @@ static void CheckDeadEnemyGuardian(void) {
 			DeadEnemyguardian(i);
 
 			//ジェムの生成処理
-			SpawnGem(enemyGuardian[i].pos, GemType::M);
+			for (int j = 0; j < enemyGuardianGemLimit; j++) {
+				SpawnGem(enemyGuardian[i].pos, GemType::S);
+			}
 		}
 	}
 }
@@ -387,7 +405,7 @@ static void InitEnemyBasic(void) {
 static void MoveEnemyBasic(void) {
 	for (int i = 0; i < kEnemyBasicLimit; i++) {
 		if (!enemyBasic[i].isAlive) continue;
-		if (enemyBasic[i].isFlash) continue;
+		if (enemyBasic[i].isHitStop) continue;
 
 		if (enemyBasic[i].thetaUpDate) {
 
@@ -445,6 +463,19 @@ static void UpdateFlashTimerEnemyBasic(void) {
 	}
 }
 
+static void UpdateHitStopTimerEnemyBasic(void) {
+	for (int i = 0; i < kEnemyBasicLimit; i++) {
+		if (!enemyBasic[i].isAlive) continue;
+		if (!enemyBasic[i].isHitStop) continue;
+
+		enemyBasic[i].hitStopTimer.count++;
+		if (enemyBasic[i].hitStopTimer.count >= enemyBasic[i].hitStopTimer.time) {
+			enemyBasic[i].hitStopTimer.count = 0;
+			enemyBasic[i].isHitStop = false;
+		}
+	}
+}
+
 static void DeadEnemyBasic(int index) {
 	enemyBasic[index].isAlive = false;
 	enemyBasic[index].hp = enemyBasic[index].hpMax;
@@ -464,12 +495,12 @@ static void CheckDeadEnemyBasic(void) {
 			//ジェムの生成処理
 			if (enemyBasic[i].thetaUpDate) {
 				for (int j = 0;j < enemyBasicGemLimit;j++) {
-					SpawnGem(enemyBasic[i].pos, GemType::M);
+					SpawnGem(enemyBasic[i].pos, GemType::S);
 				}
 			}
 			else {
 				for (int j = 0;j < enemyFormationGemLimit;j++) {
-					SpawnGem(enemyBasic[i].pos, GemType::M);
+					SpawnGem(enemyBasic[i].pos, GemType::S);
 				}
 
 			}
@@ -612,6 +643,7 @@ static void InitEnemySmall(void) {
 static void MoveEnemySmall(void) {
 	for (int i = 0; i < kEnemySmallLimit; i++) {
 		if (!enemySmall[i].isAlive) continue;
+		if (enemySmall[i].isHitStop) continue;
 
 		//移動方向更新処理
 		if (enemySmall[i].velocityUpDate) {
@@ -800,7 +832,7 @@ static void BurstEnemyBomb(void) {
 				float PlayerDiffY = enemyBomb[i].pos.y - playerPos.y;
 				float playerDistance = sqrtf(PlayerDiffX * PlayerDiffX + PlayerDiffY * PlayerDiffY);
 				if (playerDistance <= enemyBomb[i].burstRadius) {
-					PlayerDamage(enemyBomb[i].pos);
+					PlayerDamage(enemyBomb[i].pos, enemyBomb[i].pow);
 				}
 				for (int j = 0;j < gemLimit;j++) {
 					if (!gem[j].isAlive)continue;
@@ -858,7 +890,9 @@ static void CheckDeadEnemyBomb(void) {
 			DeadEnemyBomb(i);
 
 			//ジェムの生成処理
-			SpawnGem(enemyBomb[i].pos, GemType::M);
+			for (int j = 0; j < enemyBombGemLimit; j++) {
+				SpawnGem(enemyBomb[i].pos, GemType::S);
+			}
 		}
 	}
 }
@@ -912,6 +946,7 @@ void UpdateEnemy(void) {
 	CheckDeadEnemySniper();
 	MoveEnemySniper();
 	UpdateFlashTimerEnemySniper();
+	UpdateHitStopTimerEnemySniper();
 	CountIgnoreShockEnemySniper();
 
 	//enemyGuardian
@@ -924,6 +959,7 @@ void UpdateEnemy(void) {
 	MoveEnemyBasic();
 	CountIgnoreShockEnemyBasic();
 	UpdateFlashTimerEnemyBasic();
+	UpdateHitStopTimerEnemyBasic();
 	CheckDeadEnemyBasic();
 
 	//enemyM
@@ -1121,12 +1157,18 @@ int GetEnemySniperLimit(void) {
 	return kEnemysniperLimit;
 }
 
-void DamageEnemySniper(EnemySniper& enemy, int pow) {
+void DamageEnemySniper(EnemySniper& enemy, int pow, bool hitStopSwitch) {
 	enemy.hp -= pow;
 
 	//フラッシュさせる
 	enemy.isFlash = true;
 	enemy.flashTimer.count = 0;
+
+	//ヒットストップの実装
+	if (hitStopSwitch) {
+		enemy.isHitStop = true;
+		enemy.hitStopTimer.count = 0;
+	}
 
 	//ダメージエフェクト
 	CreateEnemyDamageEffect(enemy.pos);
@@ -1159,12 +1201,18 @@ int GetEnemyBasicLimit(void) {
 	return kEnemyBasicLimit;
 }
 
-void DamageEnemyBasic(EnemyBasic& enemy, int pow) {
+void DamageEnemyBasic(EnemyBasic& enemy, int pow, bool hitStopSwitch) {
 	enemy.hp -= pow;
 
 	//フラッシュさせる
 	enemy.isFlash = true;
 	enemy.flashTimer.count = 0;
+
+	//ヒットストップの実装
+	if (hitStopSwitch) {
+		enemy.isHitStop = true;
+		enemy.hitStopTimer.count = 0;
+	}
 
 	//ダメージエフェクト
 	CreateEnemyDamageEffect(enemy.pos);

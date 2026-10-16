@@ -18,11 +18,13 @@
 
 
 //ギリ避けスイッチ
-constexpr bool kDodgeCloseSwitch = true;
+constexpr bool kDodgeCloseSwitch = false;
 //ジェムをロックオンの対象にするフラグ
 constexpr bool kGemLockOnSwitch = true;
 //一定範囲内に敵がいなければ、ジェムをロックオンするスイッチ
 constexpr bool KCancelLockOnEnemySwitch = true;
+//エネルギー=HPモードのスイッチ
+constexpr bool kLifeGaugeSwitch = true;
 
 #pragma region データ: player本体
 struct Player {
@@ -155,7 +157,7 @@ constexpr float kLaserPowRateIncreaseSpeed = 0.01f;
 //チャージタイマー
 Timer chargeElecBulletTimer = { 40, 0 };
 float consumptionShootNormal = 0.5f;
-float consumptionShootCharge = 5.0f;
+float consumptionShootCharge = 10.0f;
 
 #pragma endregion
 
@@ -167,6 +169,7 @@ constexpr float kEnergyMax = 100.0f;
 constexpr float kEnergyMin = 0.0f;
 //エネルギーゲージの中間
 constexpr float kEnergyCenter = (kEnergyMax - kEnergyMin) / 2;
+constexpr float kFirstEnergy = 75.0f;
 
 //エネルギー消費量(常時)
 constexpr float kConsumptionEnergy = 0.05f;
@@ -209,6 +212,9 @@ struct ColorManager {
 	bool isGoToBlack = true;
 };
 ColorManager colorManager;
+
+//チャージの破片表示を開始する時間
+constexpr int kStartCreateChargeChipTime = 7;
 
 //オーバーヒート時の生成範囲(player中心で)
 constexpr int kCreateSmokeRange = 45;
@@ -487,8 +493,7 @@ static void RotatePlayer(void) {
 			return;
 		}
 		targetPos = enemyBomb[targetIndex].pos;
-	}
-	else if (nowTargetType == LockTargetType::Gem) {
+	} else if (nowTargetType == LockTargetType::Gem) {
 		if (!gem[targetIndex].isAlive) {
 			nowTargetType = LockTargetType::None;
 			return;
@@ -572,6 +577,8 @@ static void UpdateLockOnSign(void) {
 		Gem* gem = GetGemArray();
 		lockOnSign.pos = gem[targetIndex].pos;
 	}
+
+	UpdateAnimation(lockOnSign.texture);
 
 }
 
@@ -665,6 +672,8 @@ static void ConsumptionEnergy(void) {
 static void CheckFailedMaintenance(void) {
 	if (!player.isAlive) return;
 
+	if (kLifeGaugeSwitch) return;
+
 	if (player.nowState != PlayerState::Normal) return;
 
 	//デンリョク不足
@@ -682,6 +691,8 @@ static void CheckFailedMaintenance(void) {
 /// <param name=""></param>
 static void RecoveryPlayerState(void) {
 	if (!player.isAlive) return;
+
+	if (kLifeGaugeSwitch) return;
 
 	if (player.nowState == PlayerState::DeadEnergy) {
 		player.remainEnergy += kRecoveryEnergyDuringEmpty;
@@ -743,7 +754,7 @@ static void UpdatePlayerEffect(void) {
 /// <param name=""></param>
 static void CreateChargeOrbEffect(void) {
 
-	if (chargeElecBulletTimer.count > 0) {
+	if (chargeElecBulletTimer.count > kStartCreateChargeChipTime) {
 
 		createChargeChipTimer.count++;
 		if (createChargeChipTimer.count >= createChargeChipTimer.time) {
@@ -825,11 +836,20 @@ static void UpdateInvinciblePlayer(void) {
 /// <summary>
 /// 死亡判定の処理
 /// </summary>
-static void DeadPlayer(void) {
-	if (player.hp <= 0) {
-		player.hp = 0;
+static void CheckDeadPlayer(void) {
 
-		player.isAlive = false;
+	if (kLifeGaugeSwitch) {
+		if (player.remainEnergy <= 0) {
+			player.remainEnergy = 0;
+
+			player.isAlive = false;
+		}
+	} else {
+		if (player.hp <= 0) {
+			player.hp = 0;
+
+			player.isAlive = false;
+		}
 	}
 }
 
@@ -853,7 +873,7 @@ static void ReplenishmentEnergy(void) {
 void InitPlayer(void) {
 	player = {};
 	player.texture = GetTexture(TextureType::Player);
-	player.remainEnergy = kEnergyCenter;
+	player.remainEnergy = kFirstEnergy;
 
 	//chargeOrb.texture = GetTexture(TextureType::ChargeOrb);
 
@@ -883,7 +903,7 @@ void UpdatePlayer(void) {
 
 	KnockBack();
 	UpdateInvinciblePlayer();
-	DeadPlayer();
+	CheckDeadPlayer();
 
 	ReplenishmentEnergy();
 }
@@ -952,11 +972,25 @@ PlayerLaserLevel GetPlayerNowLaserLevel(void) {
 	return player.laserLevel;
 }
 
-void PlayerDamage(Vector2 hitPos) {
+void PlayerDamage(Vector2 hitPos, float damage) {
 	if (!player.isAlive || player.isInvincible) return;
 
-	//体力減らす
-	player.hp--;
+
+	if (kLifeGaugeSwitch) {
+		//エネルギーを減らす
+		player.remainEnergy -= damage;
+		if (player.remainEnergy > 0.0f) {
+			player.isInvincible = true;
+		}
+	} else {
+		//体力減らす
+		player.hp--;
+
+		if (player.hp > 0) {
+			//無敵開始
+			player.isInvincible = true;
+		}
+	}
 
 	CreatePlayerDamageEffect(player.pos);
 
@@ -974,11 +1008,23 @@ void PlayerDamage(Vector2 hitPos) {
 
 #pragma endregion
 
-	if (player.hp > 0) {
-		//無敵開始
-		player.isInvincible = true;
+}
 
+void PlayerKnockBack(Vector2 hitPos) {
+
+	if (player.isKnockBack) return;
+
+	knockBackVec = { player.pos.x - hitPos.x, player.pos.y - hitPos.y };
+	float length = sqrtf(knockBackVec.x * knockBackVec.x + knockBackVec.y * knockBackVec.y);
+	if (length != 0.0f) {
+		knockBackVec.x /= length;
+		knockBackVec.y /= length;
 	}
+
+	knockBackPow = kFirstKnockBackPow;
+	player.isKnockBack = true;
+
+
 }
 
 bool GetDodgeCloseSwitch(void) {
@@ -1002,6 +1048,10 @@ void TriggerDodgeClose(Vector2 eBulletPos) {
 
 PlayerState GetPlayerNowState(void) {
 	return player.nowState;
+}
+
+bool GetLifeGaugeSwitch(void) {
+	return kLifeGaugeSwitch;
 }
 
 #pragma endregion

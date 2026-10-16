@@ -87,6 +87,9 @@ static void MoveBullet(void) {
 	for (int i = 0; i < kElecBulletLimit; i++) {
 		if (!elecBullet[i].isShoot) continue;
 
+		elecBullet[i].prePos[1] = elecBullet[i].prePos[0];
+		elecBullet[i].prePos[0] = elecBullet[i].pos;
+
 		elecBullet[i].pos.x += cosf(elecBullet[i].moveTheta) * elecBullet[i].moveSpeed;
 		elecBullet[i].pos.y += sinf(elecBullet[i].moveTheta) * elecBullet[i].moveSpeed;
 	}
@@ -113,6 +116,13 @@ static void BreakBulletItSelf(void) {
 static void DrawBullet(void) {
 	for (int i = 0; i < kElecBulletLimit; i++) {
 		if (!elecBullet[i].isShoot) continue;
+
+		//残像の描画
+		for (int j = 1; j > -1; j--) {
+			Texture texture = elecBullet[i].texture;
+			texture.color = (texture.color & 0xFFFFFF00) | elecBullet[i].afterImageAlpha[j];
+			DrawTextureRotateObj(texture, elecBullet[i].prePos[j], elecBullet[i].size, elecBullet[i].moveTheta);
+		}
 
 		DrawTextureRotateObj(elecBullet[i].texture, elecBullet[i].pos, elecBullet[i].size, elecBullet[i].moveTheta);
 	}
@@ -331,7 +341,11 @@ void SpawnElecShock(Vector2 pos, ElecBulletType type, ElecShockOriginType origin
 			}
 
 			//2点の座標をつかってLine描写
-			CreateElecLine(originPos, elecShock[i].pos);
+			if (type != ElecBulletType::Charge) {
+				CreateElecLine(originPos, elecShock[i].pos, false);
+			} else {
+				CreateElecLine(originPos, elecShock[i].pos, true);
+			}
 
 		}
 

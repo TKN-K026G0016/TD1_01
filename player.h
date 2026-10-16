@@ -92,7 +92,14 @@ PlayerLaserLevel GetPlayerNowLaserLevel(void);
 /// playerの被弾処理
 /// </summary>
 /// <param name="hitPos">接触した相手の座標</param>
-void PlayerDamage(Vector2 hitPos);
+/// <param name="damage">ダメージ量</param>
+void PlayerDamage(Vector2 hitPos, float damage);
+
+/// <summary>
+/// プレイヤーをノックバックさせる処理
+/// </summary>
+/// <param name="hitPos">接触した相手の座標</param>
+void PlayerKnockBack(Vector2 hitPos);
 
 bool GetDodgeCloseSwitch(void);
 
@@ -113,3 +120,8 @@ void TriggerDodgeClose(Vector2 eBulletPos);
 /// </summary>
 /// <returns>player.nowState</returns>
 PlayerState GetPlayerNowState(void);
+
+/// <summary>
+/// 体力ゲージ制のスイッチ確認
+/// </summary>
+bool GetLifeGaugeSwitch(void);

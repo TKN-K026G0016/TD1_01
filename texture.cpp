@@ -50,12 +50,12 @@ void InitTexture(void) {
 		{ Novice::LoadTexture("./resources/texture/player/elec.png"), { 64, 64 }, {2, 0}, 2, 0, WHITE },
 		{ Novice::LoadTexture("./resources/texture/player/elec_line2.png"), { 32, 32 }, {3, 0}, 4, 0, WHITE },
 
-		{ Novice::LoadTexture("./resources/texture/player/lock_on.png"), { 64, 64 }, {0, 0}, 0, 0, WHITE },
+		{ Novice::LoadTexture("./resources/texture/player/lock_on.png"), { 64, 64 }, {7, 0}, 2, 0, WHITE },
 
 		//Item
-		{ Novice::LoadTexture("./resources/texture/item/gem.png"), { 32, 32 }, {0, 0}, 0, 0, WHITE },
-		{ Novice::LoadTexture("./resources/texture/item/gem_small.png"), { 16, 16 }, {7, 0}, 2, 0, WHITE },
-		{ Novice::LoadTexture("./resources/texture/item/gem_small_light.png"), { 16, 16 }, {7, 0}, 2, 0, WHITE },
+		{ Novice::LoadTexture("./resources/texture/item/gem.png"), { 32, 32 }, {7, 0}, 3, 0, WHITE },
+		{ Novice::LoadTexture("./resources/texture/item/gem.png"), { 32, 32 }, {7, 0}, 3, 0, WHITE },
+		{ Novice::LoadTexture("./resources/texture/item/gem_light.png"), { 32, 32 }, {7, 0}, 3, 0, WHITE },
 
 		//Enemy
 
@@ -93,6 +93,9 @@ void InitTexture(void) {
 		{ Novice::LoadTexture("./resources/texture/ui/play/boss_hp_gauge_meter.png"), { 768, 32 }, {0, 0}, 0, 0, WHITE },
 		{ Novice::LoadTexture("./resources/texture/ui/play/boss_hp_gauge_delay_meter.png"), { 768, 32 }, {0, 0}, 0, 0, WHITE },
 
+		{ Novice::LoadTexture("./resources/texture/ui/play/progress_gauge.png"), { 768, 32 }, {0, 0}, 0, 0, WHITE },
+		{ Novice::LoadTexture("./resources/texture/ui/play/progress_gauge_icon.png"), { 32, 32 }, {0, 0}, 0, 0, WHITE },
+
 		{ Novice::LoadTexture("./resources/texture/ui/play/progress_gauge_frame.png"), { 768, 32 }, {0, 0}, 0, 0, WHITE },
 		{ Novice::LoadTexture("./resources/texture/ui/play/progress_gauge_meter.png"), { 768, 32 }, {0, 0}, 0, 0, WHITE },
 
@@ -103,7 +106,7 @@ void InitTexture(void) {
 		{ Novice::LoadTexture("./resources/texture/effect/effect.square.mini.png"), {32 , 32 }, {0, 0}, 0, 0, WHITE },
 		{ Novice::LoadTexture("./resources/texture/effect/effect.circle.png"), {256 , 256 }, {0, 0}, 0, 0, WHITE },
 		{ Novice::LoadTexture("./resources/texture/effect/effect.triangle.png"), {26 , 22 }, {0, 0}, 0, 0, WHITE },
-
+		{ Novice::LoadTexture("./resources/texture/effect/effect.explosion.png"),{768 , 768}, {0 ,0}, 0, 0, WHITE },
 		{ Novice::LoadTexture("./resources/texture/effect/explode_effect.png"), {128 , 128 }, {2, 0}, 6, 0, WHITE },
 
 		//===============

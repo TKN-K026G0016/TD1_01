@@ -48,15 +48,26 @@ JemEffect jemEffect[KJemEffectNumber];
 const int KGageEffectNumber = 20;
 struct GageEffect {
 	Vector2 pos = { };
+
 	Vector2 acceleration = { };
 	Vector2 size = { 8,8 };
-	bool appear = { };
+
+	//<回転関係>
+	float rotateTheta = 0.0f;
+	float rotateSpeed = ToFloat(M_PI) / 14.0f;
+
+	bool appear = false;
+
+	//<イージング関係>
+	float easingT = 0.0f;
+	float easingSpeed = 0.08f;
+
+	//<不透明度>
+	int alpha = kAlphaMax;
+
 	unsigned int color = { };
-	Texture texture = {};
 };
 GageEffect gageEffect[KGageEffectNumber];
-bool isGage = false;
-Timer GageTimer = { 5,0 };
 
 #pragma endregion
 
@@ -128,6 +139,9 @@ ElecShockChargedEffect elecShockChargedEffect;
 
 constexpr int kElecLineEffectLimit = 100;
 struct ElecLineEffect {
+
+	bool charged = false;
+
 	bool isShoot = false;
 
 	Vector2 startPos = {};
@@ -140,6 +154,7 @@ struct ElecLineEffect {
 	float length = 0.0f;
 	//ラインの太さ
 	float thickness = 16.0f;
+	float thicknessCharged = 23.0f;
 
 	int alpha = 90;
 
@@ -274,7 +289,6 @@ struct ChargeChipEffect {
 	int alpha = 0;
 
 	Texture texture = {};
-	unsigned int color = 0x04C1E8FF;
 };
 ChargeChipEffect chargeChipEffect[kChargeChipEffecLimit];
 
@@ -403,7 +417,7 @@ CircleEffect circleEffect[kCircleEffectNumber];
 #pragma region データ; PlayerDamageEffect
 struct PlayerDamageEffect {
 	int createTriangleLimit = 4;
-	float triangleSizeValue = 20.0f;
+	float triangleSizeValue = 25.0f;
 	float triangleMoveSpeed = 20.0f;
 };
 PlayerDamageEffect playerDamageEffect;
@@ -438,6 +452,56 @@ FootprintsEffect footprintsEffect[kFootprintsEffectNumber] = {};
 int footprintsEffectTimer = 0;
 #pragma endregion
 
+#pragma region データ: BombExplosionEffect
+//爆発本体
+const int kBombExplosionEffectNumber = 4;
+struct BombExplosionEffect {
+	Vector2 pos;
+	bool appear = false;
+
+	//イージング関係
+	float easingT = 0.0f;
+	float easingSpeed = 0.1f;
+	//透明化が始まるタイミング
+	float startFadeEasingT = 0.1f;
+
+	//サイズ関係
+	float sizeValue = 0.0f;
+	float startSizeValue = 0.0f;
+	float endSizeValue = 0.0f;
+
+	//透明度関係
+	int alpha = kAlphaMax;
+
+	unsigned int color = WHITE;
+	Texture texture = {};
+};
+BombExplosionEffect bombExplosionEffect[kBombExplosionEffectNumber] = {};
+//爆風
+const int kBombBlastEffectNumber = 4;
+struct BombBlastEffect {
+	Vector2 pos;
+	bool appear = false;
+
+	//イージング関係
+	float easingT = 0.0f;
+	float easingSpeed = 0.1f;
+	//透明化が始まるタイミング
+	float startFadeEasingT = 0.1f;
+
+	//サイズ関係
+	float sizeValue = 0.0f;
+	float startSizeValue = 0.0f;
+	float endSizeValue = 0.0f;
+
+	//透明度関係
+	int alpha = kAlphaMax;
+
+	unsigned int color = WHITE;
+	Texture texture = {};
+};
+BombBlastEffect bombBlastEffect[kBombExplosionEffectNumber][kBombBlastEffectNumber] = {};
+#pragma endregion
 
 
 #pragma region 関数: ジェム取得effect
@@ -500,16 +564,18 @@ void DrawGetEffect() {
 #pragma endregion
 
 #pragma region 関数: ゲージeffect
-void CreateGageEffect(Vector2 pos) {
+void CreateGageEffect(Vector2 pos, unsigned int color) {
 	for (int i = 0; i < KGageEffectNumber; i++) {
 		if (gageEffect[i].appear) continue;
 
 		gageEffect[i].appear = true;
 
-		//データ初期化
-		GageTimer.count = 20;
 		gageEffect[i].pos = pos;
-		gageEffect[i].color = 0xffffffff;
+		gageEffect[i].color = color;
+
+		gageEffect[i].rotateTheta = 0.0f;
+		gageEffect[i].easingT = 0.0f;
+
 		float randomSpeedX = ToFloat(GetRand(0, 25));
 		float randomSpeedY = ToFloat(GetRand(-10, 10));
 		gageEffect[i].acceleration.x = randomSpeedX;
@@ -523,7 +589,7 @@ void CreateGageEffect(Vector2 pos) {
 
 static void InitGageEffect(void) {
 	for (int i = 0; i < KGageEffectNumber; i++) {
-		gageEffect[i].texture = GetTexture(TextureType::EffectSquareMini);
+		gageEffect[i] = {};
 	}
 }
 
@@ -536,22 +602,39 @@ void UodateGageEffect() {
 		gageEffect[i].pos.y += gageEffect[i].acceleration.y;
 		gageEffect[i].acceleration.y -= 0.5f;
 
-		//透明化(消滅)
-		if (gageEffect[i].color >= 0xffffff05) {
-			gageEffect[i].color -= 0x00000015;
-			gageEffect[i].texture.color = gageEffect[i].color;
-		} else {
-			gageEffect[i].color = 0xffffffff;
+		//回転処理
+		gageEffect[i].rotateTheta = gageEffect[i].rotateSpeed;
+
+		//イージング
+		gageEffect[i].easingT += gageEffect[i].easingSpeed;
+		if (gageEffect[i].easingT >= 1.0f) {
+			gageEffect[i].easingT = 1.0f;
 			gageEffect[i].appear = false;
 		}
+
+		//透明化
+		gageEffect[i].alpha = UpdateValueByEasing(kAlphaMax, kAlphaMin, gageEffect[i].easingT, EasingMode::EaseIn);
+
+		////透明化(消滅)
+		//if (gageEffect[i].color >= 0xffffff05) {
+		//	gageEffect[i].color -= 0x00000015;
+		//	gageEffect[i].texture.color = gageEffect[i].color;
+		//} else {
+		//	gageEffect[i].color = 0xffffffff;
+		//	gageEffect[i].appear = false;
+		//}
 	}
 }
 
 void DrawGageEffect() {
 	for (int i = 0; i < KGageEffectNumber; i++) {
-		if (gageEffect[i].appear == true) {
-			DrawTextureUI(gageEffect[i].texture, gageEffect[i].pos, gageEffect[i].size);
-		}
+		if (!gageEffect[i].appear) continue;
+
+		Texture texture = whiteBoxTexture;
+		texture.color = (gageEffect[i].color & 0xFFFFFF00) | gageEffect[i].alpha;
+
+		DrawTextureRotateUI(texture, gageEffect[i].pos, gageEffect[i].size, gageEffect[i].rotateTheta);
+
 	}
 }
 #pragma endregion
@@ -989,7 +1072,7 @@ static void DrawChargeChipEffect(void) {
 		Vector2 size = { chargeChipEffect[i].sizeValue, chargeChipEffect[i].sizeValue };
 
 		Texture texture = chargeChipEffect[i].texture;
-		texture.color = (chargeChipEffect[i].color & 0xFFFFFF00) | chargeChipEffect[i].alpha;
+		texture.color = (kPlayerChargedColor & 0xFFFFFF00) | chargeChipEffect[i].alpha;
 
 		DrawTextureRotateObj(texture, chargeChipEffect[i].pos, size, chargeChipEffect[i].rotateTheta);
 	}
@@ -1322,6 +1405,7 @@ void DrawCircleEffect() {
 	}
 }
 
+
 #pragma endregion
 
 #pragma region 関数: ElecShockEffect
@@ -1369,16 +1453,23 @@ static void DrawElecLineEffect(void) {
 
 		//Novice::DrawLine(startPos.x, startPos.y, endPos.x, endPos.y, kPlayerColor);
 
-		Vector2 size = { elecLineEffect[i].length, elecLineEffect[i].thickness };
+		float thickness = (elecLineEffect[i].charged) ? elecLineEffect[i].thicknessCharged : elecLineEffect[i].thickness;
+
+		Vector2 size = { elecLineEffect[i].length, thickness };
 
 		Texture texture = elecLineEffect[i].texture;
-		texture.color = (kPlayerColor & 0xFFFFFF00) | elecLineEffect[i].alpha;
+
+		if (!elecLineEffect[i].charged) {
+			texture.color = (kPlayerColor & 0xFFFFFF00) | elecLineEffect[i].alpha;
+		} else {
+			texture.color = (kPlayerChargedColor & 0xFFFFFF00) | elecLineEffect[i].alpha;
+		}
 
 		DrawTextureRotateObj(texture, elecLineEffect[i].centerPos, size, elecLineEffect[i].rotateTheta);
 	}
 }
 
-void CreateElecLine(Vector2 startPos, Vector2 endPos) {
+void CreateElecLine(Vector2 startPos, Vector2 endPos, bool charged) {
 	for (int i = 0; i < kElecLineEffectLimit; i++) {
 		if (elecLineEffect[i].isShoot) continue;
 
@@ -1396,6 +1487,8 @@ void CreateElecLine(Vector2 startPos, Vector2 endPos) {
 
 		elecLineEffect[i].centerPos.x = (startPos.x + endPos.x) / 2.0f;
 		elecLineEffect[i].centerPos.y = (startPos.y + endPos.y) / 2.0f;
+
+		elecLineEffect[i].charged = charged;
 
 		break;
 	}
@@ -1447,7 +1540,7 @@ void CreateEnemyDamageEffect(Vector2 pos) {
 
 #pragma endregion
 
-#pragma region 関数: EnemyDamageEffect
+#pragma region 関数: PlayerFootprintEffect
 
 void CreatePlayerFootprintsEffect(Vector2 pos, Vector2 inputVec) {
 
@@ -1504,6 +1597,64 @@ void DrawPlayerFootprints() {
 	}
 }
 #pragma endregion
+
+#pragma region 関数: BombExplosionEffect
+void CreateBombExplosionEffect(Vector2 pos, float endSizeValue, unsigned int color) {
+	for (int i = 0; i < kBombExplosionEffectNumber; i++) {
+		if (bombExplosionEffect[i].appear) continue;
+		bombExplosionEffect[i].appear = true;
+		bombExplosionEffect[i].pos = pos;
+		bombExplosionEffect[i].endSizeValue = endSizeValue;
+		bombExplosionEffect[i].color = color;
+		bombExplosionEffect[i].easingT = 0.0f;
+	}
+}
+
+static void InitBombExplosionEffect(void) {
+	for (int i = 0; i < kBombExplosionEffectNumber; i++) {
+		bombExplosionEffect[i] = {};
+		bombExplosionEffect[i].texture = GetTexture(TextureType::EffectExplosion);
+	}
+}
+
+void UpdateBombExplosionEffect() {
+	for (int i = 0; i < kBombExplosionEffectNumber; i++) {
+		if (!bombExplosionEffect[i].appear) continue;
+
+		//イージング
+		bombExplosionEffect[i].easingT += bombExplosionEffect[i].easingSpeed;
+		if (bombExplosionEffect[i].easingT >= 1.0f) {
+			bombExplosionEffect[i].appear = false;
+			bombExplosionEffect[i].easingT = 1.0f;
+		}
+
+		//拡大処理
+		bombExplosionEffect[i].sizeValue = UpdateValueByEasing(bombExplosionEffect[i].startSizeValue, bombExplosionEffect[i].endSizeValue, bombExplosionEffect[i].easingT, EasingMode::EaseOut);
+
+		//フェード処理
+		if (bombExplosionEffect[i].easingT >= bombExplosionEffect[i].startFadeEasingT) {
+			float t = (bombExplosionEffect[i].easingT - bombExplosionEffect[i].startFadeEasingT) / (1.0f - bombExplosionEffect[i].startFadeEasingT);
+			if (t > 1.0f) t = 1.0f;
+
+			bombExplosionEffect[i].alpha = UpdateValueByEasing(kAlphaMax, kAlphaMin, t, EasingMode::EaseOut);
+		}
+	}
+}
+
+void DrawBombExplosionEffect() {
+	for (int i = 0; i < kBombExplosionEffectNumber; i++) {
+		if (!bombExplosionEffect[i].appear) continue;
+
+		Vector2 size = { bombExplosionEffect[i].sizeValue,bombExplosionEffect[i].sizeValue };
+
+		Texture texture = bombExplosionEffect[i].texture;
+		texture.color = (bombExplosionEffect[i].color & 0xFFFFFF00) | bombExplosionEffect[i].alpha;
+
+		DrawTextureObj(texture, bombExplosionEffect[i].pos, size);
+
+	}
+}
+#pragma endregion
 void InitEffect() {
 	triangleTexture = GetTexture(TextureType::EffectTriangle);
 	whiteBoxTexture = GetTexture(TextureType::White1x1);
@@ -1527,6 +1678,7 @@ void InitEffect() {
 	InitCircleEffect();
 	InitPlayerFootprintsEffect();
 	InitElecLineEffect();
+	InitBombExplosionEffect();
 
 #ifdef _DEBUG
 
@@ -1554,6 +1706,7 @@ void UpdateEffect() {
 	UpdateCircleEffect();
 	UpdatePlayerFootprintsEffect();
 	UpdateElecLineEffect();
+	UpdateBombExplosionEffect();
 }
 void DrawEffect() {
 	DrawGetEffect();
@@ -1569,9 +1722,14 @@ void DrawEffect() {
 	DrawCircleEffect();
 	DrawElecLineEffect();
 	DrawPlayerFootprints();
+	DrawBombExplosionEffect();
 }
 
 void DrawEffectAsUI() {
 	DrawSmokeEffectAsUI();
 	DrawGageEffect();
+}
+
+unsigned int GetPlayerColor(void) {
+	return kPlayerColor;
 }

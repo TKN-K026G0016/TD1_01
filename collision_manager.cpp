@@ -135,7 +135,9 @@ static void CheckCollisionElecBulletVSEnemy(void) {
 				//ホウデンの生成
 				SpawnElecShock(enemy1[i].pos, elecBullet[j].type, ElecShockOriginType::EnemySniper, i, ElecShockOriginType::None, -1);
 
-				DamageEnemySniper(enemy1[i], elecBullet[j].pow);
+				bool hitStopSwitch = (elecBullet[j].type == ElecBulletType::Normal) ? false: true;
+
+				DamageEnemySniper(enemy1[i], elecBullet[j].pow, hitStopSwitch);
 			}
 		}
 	}
@@ -173,7 +175,9 @@ static void CheckCollisionElecBulletVSEnemy(void) {
 				BreakElecBullet(j);
 				SpawnElecShock(enemyBasic[i].pos, elecBullet[j].type, ElecShockOriginType::EnemyBasic, i, ElecShockOriginType::None, -1);
 
-				DamageEnemyBasic(enemyBasic[i], elecBullet[j].pow);
+				bool hitStopSwitch = (elecBullet[j].type == ElecBulletType::Normal) ? false : true;
+
+				DamageEnemyBasic(enemyBasic[i], elecBullet[j].pow, hitStopSwitch);
 			}
 		}
 	}
@@ -311,7 +315,10 @@ static void CheckCollisionElecShockVSEnemy(void) {
 				}
 				//ダメージ判定()
 				if (elecShock[j].breakTimer.count == elecShock[j].triggerDamageFrame) {
-					DamageEnemySniper(enemy1[i], elecShock[j].pow);
+
+					bool hitStopSwitch = (elecShock[j].type == ElecBulletType::Normal) ? false : true;
+
+					DamageEnemySniper(enemy1[i], elecShock[j].pow, hitStopSwitch);
 
 					//コンボ
 					AddShockCombo();
@@ -373,7 +380,9 @@ static void CheckCollisionElecShockVSEnemy(void) {
 				}
 				//ダメージ判定()
 				if (elecShock[j].breakTimer.count == elecShock[j].triggerDamageFrame) {
-					DamageEnemyBasic(enemyBasic[i], elecShock[j].pow);
+					bool hitStopSwitch = (elecShock[j].type == ElecBulletType::Normal) ? false : true;
+
+					DamageEnemyBasic(enemyBasic[i], elecShock[j].pow, hitStopSwitch);
 					//コンボ
 					AddShockCombo();
 				}
@@ -558,7 +567,9 @@ static void CheckCollisionElecShockVSGem(void) {
 				gem[j].isIgnoreElecShock = true;
 
 				//規定回数放電したら破壊
-				gem[j].hp--;
+				int damage = (elecShock[i].type == ElecBulletType::Normal) ? 1 : 2;
+
+				gem[j].hp -= damage;
 				if (gem[j].hp <= 0) {
 					BreakGem(j);
 				}
@@ -578,7 +589,7 @@ static void CheckCollisionPlayerVSEnemyBullet(void) {
 	if (!GetPlayerIsAlive()) return;
 	Vector2 playerPos = GetPlayerPos();
 	float playerHitRadius = GetPlayerHitRadius();
-	float playerDodgeCloseRadius = GetPlayerDodgeCloseRadius();
+	//float playerDodgeCloseRadius = GetPlayerDodgeCloseRadius();
 
 	EnemyBullet* eBullet = GetEnemyBulletArray();
 	int eBulletLimit = GetEnemyBulletLimit();
@@ -586,16 +597,16 @@ static void CheckCollisionPlayerVSEnemyBullet(void) {
 	for (int i = 0; i < eBulletLimit; i++) {
 		if (!eBullet[i].isShoot) continue;
 
-		//ギリ避け判定
-		if (GetDodgeCloseSwitch()) {
-			if (CheckCollisionCircleVSCircle(eBullet[i].pos, eBullet[i].hitRadius, playerPos, playerDodgeCloseRadius)) {
-				TriggerDodgeClose(eBullet[i].pos);
-			}
-		}
+		////ギリ避け判定
+		//if (GetDodgeCloseSwitch()) {
+		//	if (CheckCollisionCircleVSCircle(eBullet[i].pos, eBullet[i].hitRadius, playerPos, playerDodgeCloseRadius)) {
+		//		TriggerDodgeClose(eBullet[i].pos);
+		//	}
+		//}
 
 		//被弾判定
 		if (CheckCollisionCircleVSCircle(eBullet[i].pos, eBullet[i].hitRadius, playerPos, playerHitRadius)) {
-			PlayerDamage(eBullet[i].pos);
+			PlayerDamage(eBullet[i].pos, eBullet[i].pow);
 		}
 
 	}
@@ -608,7 +619,7 @@ static void CheckCollisionPlayerVSEnemyLaser(void) {
 	if (!GetPlayerIsAlive()) return;
 	Vector2 playerPos = GetPlayerPos();
 	float playerHitRadius = GetPlayerHitRadius();
-	float playerDodgeCloseRadius = GetPlayerDodgeCloseRadius();
+	//float playerDodgeCloseRadius = GetPlayerDodgeCloseRadius();
 
 	EnemyLaser* eLaser = GetEnemyLaserArray();
 	int eLaserLimit = GetEnemyLaserLimit();
@@ -616,16 +627,16 @@ static void CheckCollisionPlayerVSEnemyLaser(void) {
 	for (int i = 0; i < eLaserLimit; i++) {
 		if (!eLaser[i].isShoot) continue;
 
-		//ギリ避け判定
-		if (GetDodgeCloseSwitch()) {
-			if (CheckCollisionOBBvsCircle(playerPos, playerDodgeCloseRadius, eLaser[i].hitBoxVertex)) {
-				TriggerDodgeClose(eLaser[i].pos);
-			}
-		}
+		////ギリ避け判定
+		//if (GetDodgeCloseSwitch()) {
+		//	if (CheckCollisionOBBvsCircle(playerPos, playerDodgeCloseRadius, eLaser[i].hitBoxVertex)) {
+		//		TriggerDodgeClose(eLaser[i].pos);
+		//	}
+		//}
 
 		//被弾判定
 		if (CheckCollisionOBBvsCircle(playerPos, playerHitRadius, eLaser[i].hitBoxVertex)) {
-			PlayerDamage(eLaser[i].pos);
+			PlayerDamage(eLaser[i].pos, eLaser[i].pow);
 		}
 
 	}
@@ -654,7 +665,7 @@ static void CheckCollisionPlayerVSEnemy(void) {
 
 		if (CheckCollisionCircleVSCircle(enemyBasic[i].pos, enemyBasic[i].hitRadius, playerPos, playerHitRadius) ){
 
-			PlayerDamage(enemyBasic[i].pos);
+			PlayerDamage(enemyBasic[i].pos, enemyBasic[i].pow);
 		}
 	}
 
@@ -667,13 +678,28 @@ static void CheckCollisionPlayerVSEnemy(void) {
 
 		if (CheckCollisionCircleVSCircle(enemySmall[i].pos, enemySmall[i].hitRadius, playerPos, playerHitRadius)) {
 
-			PlayerDamage(enemySmall[i].pos);
+			PlayerDamage(enemySmall[i].pos, enemySmall[i].pow);
 		}
 	}
 
 #pragma endregion
 
 
+}
+
+static void CheckCollisionPlayerVSBossEnemy(void) {
+	Vector2 playerPos = GetPlayerPos();
+	float playerHitRadius = GetPlayerHitRadius();
+
+	BossEnemy* boss = GetBossEnemy();
+
+	if (!GetPlayerIsAlive()) return;
+	if (!boss->isAlive) return;
+
+	if (CheckCollisionCircleVSCircle(boss->pos, boss->hitRadius, playerPos, playerHitRadius)) {
+
+		PlayerKnockBack(boss->pos);
+	}
 }
 
 #pragma endregion
@@ -698,5 +724,6 @@ void UpdateCollision() {
 	CheckCollisionPlayerVSEnemyBullet();
 	CheckCollisionPlayerVSEnemyLaser();
 	CheckCollisionPlayerVSEnemy();
+	CheckCollisionPlayerVSBossEnemy();
 
 }

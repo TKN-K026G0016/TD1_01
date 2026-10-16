@@ -28,13 +28,15 @@ LifeIcon lifeIcon;
 #pragma region データ: エネルギーゲージ
 
 struct EnergyGaugeFrame {
-	Vector2 pos = { 640, 60 };
+	Vector2 pos = { 640, 80 };
 	Vector2 size = { 512, 100 };
 
 	//デンリョク不足警告表示のタイミング
-	float warnDeadEnergy = 20.0f;
-	//過ジュウデン警告表示のタイミング
-	float warnOverHeat = 75.0f;
+	float warnDeadEnergy = 30.0f;
+	float dangerEnergy = 15.0f;
+
+	////過ジュウデン警告表示のタイミング
+	//float warnOverHeat = 75.0f;
 
 	//ケムリの生成範囲(frameのposを中心に)
 	Vector2i spawnSmokeRange = { 250, 60 };
@@ -150,9 +152,19 @@ struct ProgressGauge {
 	float gaugeRate = 0;
 
 	Texture frameTexture = {};
-	Texture meterTexture = {};
 };
 ProgressGauge progressGauge;
+
+struct ProgressGaugeIcon {
+	Vector2 pos = {0.0f, progressGauge.pos.y };
+	Vector2 size = { 32, 32 };
+
+	Vector2 startPos = { progressGauge.pos.x - progressGauge.size.x / 2, progressGauge.pos.y };
+	Vector2 endPos = { progressGauge.pos.x + progressGauge.size.x / 2, progressGauge.pos.y };
+
+	Texture texture = {};
+};
+ProgressGaugeIcon progressGaugeIcon;
 
 #pragma endregion
 
@@ -198,6 +210,8 @@ static void InitLifeIcon(void) {
 }
 
 static void DrawLifeIcon(void) {
+	if (GetLifeGaugeSwitch()) return;
+
 	int remainLife = GetPlayerHp();
 
 	for (int i = 0; i < remainLife; i++) {
@@ -274,19 +288,19 @@ static void UpdateEnergyGauge(void) {
 
 #pragma region GaugeEffectの生成
 
-	//energyGaugeFrame.createGaugeEffectTimer.count++;
-	//if (energyGaugeFrame.createGaugeEffectTimer.count >= energyGaugeFrame.createGaugeEffectTimer.time) {
-	//	energyGaugeFrame.createGaugeEffectTimer.count = 0;
+	energyGaugeFrame.createGaugeEffectTimer.count++;
+	if (energyGaugeFrame.createGaugeEffectTimer.count >= energyGaugeFrame.createGaugeEffectTimer.time) {
+		energyGaugeFrame.createGaugeEffectTimer.count = 0;
 
-	//	CreateGageEffect(GetEnergyGaugeEndPos());
-	//}
+		CreateGageEffect(GetEnergyGaugeEndPos(), GetPlayerColor());
+	}
 
 #pragma endregion
 
 #pragma region 点滅処理
 
 	//警告表示のラインを下回るor故障状態時
-	if (remainEnergy <= energyGaugeFrame.warnDeadEnergy || GetPlayerNowState() != PlayerState::Normal) {
+	if (remainEnergy <= energyGaugeFrame.warnDeadEnergy /*|| GetPlayerNowState() != PlayerState::Normal*/) {
 		UpdateAnimation(energyGaugeFrame.texture);
 		UpdateAnimation(miniEnergyGauge.frameTexture);
 	}
@@ -302,24 +316,23 @@ static void UpdateEnergyGauge(void) {
 
 #pragma region ケムリ生成処理
 
-	//if (remainEnergy >= energyGaugeFrame.warnOverHeat) {
-	//	energyGaugeFrame.createSmokeWarningTimer.count++;
-	//}
-	//else if (GetPlayerNowState() == PlayerState::OverHeat) {
-	//	energyGaugeFrame.createSmokeOverHeatTimer.count++;
-	//}
+	if (remainEnergy <= energyGaugeFrame.warnDeadEnergy) {
+		energyGaugeFrame.createSmokeWarningTimer.count++;
+	} else if (remainEnergy <= energyGaugeFrame.dangerEnergy) {
+		energyGaugeFrame.createSmokeOverHeatTimer.count++;
+	}
 
-	//if (energyGaugeFrame.createSmokeWarningTimer.count >= energyGaugeFrame.createSmokeWarningTimer.time
-	//	|| energyGaugeFrame.createSmokeOverHeatTimer.count >= energyGaugeFrame.createSmokeOverHeatTimer.time) {
-	//	energyGaugeFrame.createSmokeWarningTimer.count = 0;
-	//	energyGaugeFrame.createSmokeOverHeatTimer.count = 0;
+	if (energyGaugeFrame.createSmokeWarningTimer.count >= energyGaugeFrame.createSmokeWarningTimer.time
+		|| energyGaugeFrame.createSmokeOverHeatTimer.count >= energyGaugeFrame.createSmokeOverHeatTimer.time) {
+		energyGaugeFrame.createSmokeWarningTimer.count = 0;
+		energyGaugeFrame.createSmokeOverHeatTimer.count = 0;
 
-	//	//生成座標を設定
-	//	float posX = energyGaugeFrame.pos.x + ToFloat(GetRand(-energyGaugeFrame.spawnSmokeRange.x, energyGaugeFrame.spawnSmokeRange.x));
-	//	float posY = energyGaugeFrame.pos.y + ToFloat(GetRand(0, energyGaugeFrame.spawnSmokeRange.y));
+		//生成座標を設定
+		float posX = energyGaugeFrame.pos.x + ToFloat(GetRand(-energyGaugeFrame.spawnSmokeRange.x, energyGaugeFrame.spawnSmokeRange.x));
+		float posY = energyGaugeFrame.pos.y + ToFloat(GetRand(0, energyGaugeFrame.spawnSmokeRange.y));
 
-	//	CreateSmokeEffect({ posX, posY }, TypeDrawEffect::UI);
-	//}
+		CreateSmokeEffect({ posX, posY }, TypeDrawEffect::UI);
+	}
 
 #pragma endregion
 
@@ -357,7 +370,7 @@ static void DrawEnergyGauge(void) {
 static void InitBossHpGauge(void) {
 	bossHpGaugeFrame.texture = GetTexture(TextureType::BossHpGaugeFrame);
 	bossHpGaugeMeter.texture = GetTexture(TextureType::BossHpGaugeMeter);
-	bossHpGaugeDelayMeter.texture = GetTexture(TextureType::BossHpGaugeMeter);
+	bossHpGaugeDelayMeter.texture = GetTexture(TextureType::BossHpGaugeDelayMeter);
 }
 
 static void UpdateBossHpGauge(void) {
@@ -458,11 +471,10 @@ static void InitProgressGauge(void) {
 	//ボスが出たら出現しない
 	if (GetBossEnemyIsAlive()) return;
 
-	progressGauge.frameTexture = GetTexture(TextureType::ProgressGaugeFrame);
-	progressGauge.meterTexture = GetTexture(TextureType::ProgressGaugeMeter);
+	progressGauge.frameTexture = GetTexture(TextureType::ProgressGauge);
+	progressGaugeIcon.texture = GetTexture(TextureType::ProgressGaugeIcon);
 
 	progressGauge.bossRoundTime = ConvertTimeDataToInt(GetBossRoundTimeData());
-
 }
 
 static void UpdateProgressGauge(void) {
@@ -472,6 +484,8 @@ static void UpdateProgressGauge(void) {
 
 	progressGauge.gaugeRate = ToFloat(ConvertTimeDataToInt(GetGameTimeData())) / ToFloat( progressGauge.bossRoundTime);
 
+	//アイコンの移動
+	progressGaugeIcon.pos.x = UpdateValueByEasing(progressGaugeIcon.startPos.x, progressGaugeIcon.endPos.x, progressGauge.gaugeRate, EasingMode::Linear);
 }
 
 static void DrawProgressGauge(void) {
@@ -480,9 +494,7 @@ static void DrawProgressGauge(void) {
 	if (GetBossEnemyIsAlive()) return;
 
 	DrawTextureUI(progressGauge.frameTexture, progressGauge.pos, progressGauge.size);
-
-	DrawGaugeAsUI(progressGauge.meterTexture, progressGauge.pos, progressGauge.size, progressGauge.gaugeRate);
-
+	DrawTextureUI(progressGaugeIcon.texture, progressGaugeIcon.pos, progressGaugeIcon.size);
 }
 
 #pragma endregion
@@ -589,7 +601,7 @@ void DrawPlayUI(void) {
 
 Vector2 GetEnergyGaugeEndPos(void) {
 	float posX = energyGaugeFrame.pos.x - energyGaugeFrame.size.x / 2 + energyGaugeFrame.size.x * energyGaugeMeter.gaugeRate;
-	float posY = energyGaugeFrame.pos.y - energyGaugeFrame.size.y / 2;
+	float posY = energyGaugeFrame.pos.y - energyGaugeFrame.size.y * 1 / 4;
 
 	return { posX, posY };
 }
