@@ -221,7 +221,7 @@ constexpr int kStartViewCombo = 10;
 
 #pragma region データ: スコア
 
-static constexpr int kScoreNumbersLimit = 8;
+static constexpr int kScoreNumbersLimit = 9;
 struct ScoreNumbers {
 	Vector2 size = { 28, 56 };
 
@@ -240,10 +240,10 @@ struct ScoreIcon {
 
 	//イージング関係
 	float easingT = 0.0f;
-	float easingSpeed = 0.03f;
+	float easingSpeed = 0.01f;
 
 	//イージングを使うかどうかの判定値
-	int threshold = 500;
+	int threshold = 100;
 
 	int startScore = 0;
 	int endScore = 0;
@@ -666,7 +666,23 @@ static void UpdateScore(void) {
 	int nowScore = GetNowScore();
 	int diff = nowScore - scoreIcon.showScore;
 
-	scoreIcon.showScore = GetNowScore();
+	//一定値以上得点を得ていたら、
+	if (diff >= scoreIcon.threshold) {
+		scoreIcon.startScore = scoreIcon.showScore;
+		scoreIcon.endScore = nowScore;
+
+		scoreIcon.easingT += scoreIcon.easingSpeed;
+		if (scoreIcon.easingT > 1.0f) {
+			scoreIcon.easingT = 1.0f;
+		}
+
+		scoreIcon.showScore = UpdateValueByEasing(scoreIcon.startScore, scoreIcon.endScore, scoreIcon.easingT, EasingMode::EaseOut);
+
+
+	} else {
+		scoreIcon.showScore = nowScore;
+		scoreIcon.easingT = 0.0f;
+	}
 
 	for (int i = 0; i < kScoreNumbersLimit; i++) {
 		scoreNumbers[i].animNum = GetValueAtDigit(scoreIcon.showScore, i);
