@@ -633,7 +633,7 @@ static void DrawShockCombo(void) {
 #pragma region 関数: スコア
 
 static void DrawScore(void) {
-	Novice::ScreenPrintf(30, 30, "Score: ", GetNowScore());
+	Novice::ScreenPrintf(30, 30, "Score: %07d", GetNowScore());
 }
 
 #pragma endregion
@@ -662,6 +662,8 @@ void DrawPlayUI(void) {
 	DrawPowRate();
 	DrawProgressGauge();
 	DrawShockCombo();
+
+	DrawScore();
 }
 
 #pragma region 関数: 外部参照関係
