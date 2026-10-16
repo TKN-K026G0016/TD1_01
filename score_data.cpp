@@ -25,7 +25,7 @@ int GetHighScore(void) {
 }
 
 void AddScore(int point) {
-	nowScore = point;
+	nowScore += point;
 }
 
 void UpdateHighScore(void) {

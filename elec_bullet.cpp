@@ -4,6 +4,7 @@
 #include "enemy.h"
 #include "boss_enemy.h"
 #include "gem.h"
+#include "score_data.h"
 
 #include "vector2.h"
 #include "timer.h"
@@ -60,7 +61,7 @@ ElecShock elecShock[kElecShockLimit] = {};
 #pragma region データ: ShockCombo関係
 
 //現在のコンボ数
-static int comboIcon = 0;
+static int nowCombo = 0;
 //今回のゲームの最大コンボ数
 static int maxCombo = 0;
 //コンボ持続時間
@@ -73,6 +74,8 @@ constexpr int kRecoveryComboTimeCharged = 20;
 
 //コンボ中に得たスコアの合計
 int totalComboInCombo = 0;
+//スコア数による獲得スコアの倍率
+constexpr float kScoreMugByCombo = 0.01f;
 
 #pragma endregion
 
@@ -171,20 +174,21 @@ static void DrawElecShock(void) {
 #pragma region 関数: ショックコンボ
 
 static void InitShockCombo(void) {
-	comboIcon = 0;
+	nowCombo = 0;
 	maxCombo = 0;
 	comboTimer.count = 0;
 }
 
 static void UpdateShockCombo(void) {
 	//猶予時間がある際
-	if (comboIcon > 0) {
+	if (nowCombo > 0) {
 		comboTimer.count++;
 
 		//猶予時間が切れたら
 		if (comboTimer.count >= comboTimer.time) {
 			comboTimer.count = 0;
-			comboIcon = 0;
+			totalComboInCombo = 0;
+			nowCombo = 0;
 
 			//コンボの終了をUIに知らせる
 			TriggerEndCombo();
@@ -376,7 +380,7 @@ int GetElecShockLimit(void) {
 
 void AddShockCombo(ElecBulletType type) {
 	//コンボ増加
-	comboIcon++;
+	nowCombo++;
 
 	int recoveryComboTime = (type == ElecBulletType::Normal) ? kRecoveryComboTime : kRecoveryComboTimeCharged;
 	comboTimer.count -= recoveryComboTime;
@@ -386,11 +390,18 @@ void AddShockCombo(ElecBulletType type) {
 }
 
 int GetShockCombo(void) {
-	return comboIcon;
+	return nowCombo;
 }
 
 Timer GetComboTimer(void) {
 	return comboTimer;
+}
+
+void AddScoreByDefeatEnemy(int defeatPoint) {
+	int point = (defeatPoint + totalComboInCombo) * ToInt((1.0f + ToFloat(nowCombo) * kScoreMugByCombo));
+	AddScore(point);
+
+	totalComboInCombo += defeatPoint;
 }
 
 #pragma endregion

@@ -14,8 +14,14 @@ int GetNowScore(void);
 /// </summary>
 /// <returns>highScore</returns>
 int GetHighScore(void);
+
 /// <summary>
 /// スコアの加算処理
 /// </summary>
 /// <param name="point">取得スコア</param>
 void AddScore(int point);
+
+/// <summary>
+/// ハイスコア更新処理
+/// </summary>
+void UpdateHighScore(void);
