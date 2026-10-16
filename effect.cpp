@@ -1607,6 +1607,25 @@ void CreateBombExplosionEffect(Vector2 pos, float endSizeValue, unsigned int col
 		bombExplosionEffect[i].endSizeValue = endSizeValue;
 		bombExplosionEffect[i].color = color;
 		bombExplosionEffect[i].easingT = 0.0f;
+
+		//爆風の初期化
+		bombBlastEffect[i][0].pos.x = pos.x + static_cast<float>((rand() % 374) - 374);
+		bombBlastEffect[i][0].pos.y = pos.y + static_cast<float>((rand() % 374) - 374);
+
+		bombBlastEffect[i][1].pos.x = pos.x + static_cast<float>((rand() % 374));
+		bombBlastEffect[i][1].pos.y = pos.y + static_cast<float>((rand() % 374));
+
+		bombBlastEffect[i][2].pos.x = pos.x + static_cast<float>((rand() % 374));
+		bombBlastEffect[i][2].pos.y = pos.y + static_cast<float>((rand() % 374) - 374);
+
+		bombBlastEffect[i][3].pos.x = pos.x + static_cast<float>((rand() % 374) - 374);
+		bombBlastEffect[i][3].pos.y = pos.y + static_cast<float>((rand() % 374));
+		for (int j = 0; j < kBombBlastEffectNumber; j++)
+		{
+			bombBlastEffect[i][j].endSizeValue = endSizeValue;
+			bombBlastEffect[i][j].color = color;
+			bombBlastEffect[i][j].easingT = 0.0f;
+		}
 	}
 }
 
@@ -1614,6 +1633,11 @@ static void InitBombExplosionEffect(void) {
 	for (int i = 0; i < kBombExplosionEffectNumber; i++) {
 		bombExplosionEffect[i] = {};
 		bombExplosionEffect[i].texture = GetTexture(TextureType::EffectExplosion);
+		for (int j = 0; j < kBombBlastEffectNumber; j++)
+		{
+			bombBlastEffect[i][j] = {};
+			bombBlastEffect[i][j].texture = GetTexture(TextureType::EffectCircle);
+		}
 	}
 }
 
@@ -1638,6 +1662,27 @@ void UpdateBombExplosionEffect() {
 
 			bombExplosionEffect[i].alpha = UpdateValueByEasing(kAlphaMax, kAlphaMin, t, EasingMode::EaseOut);
 		}
+
+		for (int j = 0; j < kBombBlastEffectNumber; j++)
+		{
+			//イージング
+			bombBlastEffect[i][j].easingT += bombBlastEffect[i][j].easingSpeed;
+			if (bombBlastEffect[i][j].easingT >= 1.0f) {
+				bombBlastEffect[i][j].appear = false;
+				bombBlastEffect[i][j].easingT = 1.0f;
+			}
+
+			//拡大処理
+			bombBlastEffect[i][j].sizeValue = UpdateValueByEasing(bombBlastEffect[i][j].startSizeValue, bombBlastEffect[i][j].endSizeValue, bombBlastEffect[i][j].easingT, EasingMode::EaseOut);
+
+			//フェード処理
+			if (bombBlastEffect[i][j].easingT >= bombBlastEffect[i][j].startFadeEasingT) {
+				float t = (bombBlastEffect[i][j].easingT - bombBlastEffect[i][j].startFadeEasingT) / (1.0f - bombBlastEffect[i][j].startFadeEasingT);
+				if (t > 1.0f) t = 1.0f;
+
+				bombBlastEffect[i][j].alpha = UpdateValueByEasing(kAlphaMax, kAlphaMin, t, EasingMode::EaseOut);
+			}
+		}
 	}
 }
 
@@ -1651,7 +1696,15 @@ void DrawBombExplosionEffect() {
 		texture.color = (bombExplosionEffect[i].color & 0xFFFFFF00) | bombExplosionEffect[i].alpha;
 
 		DrawTextureObj(texture, bombExplosionEffect[i].pos, size);
+		for (int j = 0; j < kBombBlastEffectNumber; j++)
+		{
+			Vector2 size = { bombBlastEffect[i][j].sizeValue,bombBlastEffect[i][j].sizeValue};
 
+			Texture texture = bombBlastEffect[i][j].texture;
+			texture.color = (bombBlastEffect[i][j].color & 0xFFFFFF00) | bombBlastEffect[i][j].alpha;
+
+			DrawTextureObj(texture, bombBlastEffect[i][j].pos, size);
+		}
 	}
 }
 #pragma endregion
