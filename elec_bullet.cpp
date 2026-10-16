@@ -374,10 +374,16 @@ int GetElecShockLimit(void) {
 	return kElecShockLimit;
 }
 
-void AddShockCombo(void) {
+void AddShockCombo(ElecBulletType type) {
 	//コンボ増加
 	nowCombo++;
-	comboTimer.count = 0;
+
+	//コンボ持続時間の回復
+	if (type == ElecBulletType::Normal) {
+		comboTimer.count -= kRecoveryComboTime;
+	} else {
+		comboTimer.count -= kRecoveryComboTimeCharged;
+	}
 }
 
 int GetShockCombo(void) {

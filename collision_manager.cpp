@@ -321,7 +321,7 @@ static void CheckCollisionElecShockVSEnemy(void) {
 					DamageEnemySniper(enemy1[i], elecShock[j].pow, hitStopSwitch);
 
 					//コンボ
-					AddShockCombo();
+					AddShockCombo(elecShock[j].type);
 				}
 			}
 
@@ -353,7 +353,7 @@ static void CheckCollisionElecShockVSEnemy(void) {
 
 
 					//コンボ
-					AddShockCombo();
+					AddShockCombo(elecShock[j].type);
 				}
 			}
 		}
@@ -384,7 +384,7 @@ static void CheckCollisionElecShockVSEnemy(void) {
 
 					DamageEnemyBasic(enemyBasic[i], elecShock[j].pow, hitStopSwitch);
 					//コンボ
-					AddShockCombo();
+					AddShockCombo(elecShock[j].type);
 				}
 			}
 		}
@@ -412,7 +412,7 @@ static void CheckCollisionElecShockVSEnemy(void) {
 					DamageEnemySmall(enemySmall[i], elecShock[j].pow);
 
 					//コンボ
-					AddShockCombo();
+					AddShockCombo(elecShock[j].type);
 				}
 			}
 
@@ -442,7 +442,7 @@ static void CheckCollisionElecShockVSEnemy(void) {
 
 
 					//コンボ
-					AddShockCombo();
+					AddShockCombo(elecShock[j].type);
 				}
 			}
 
@@ -472,7 +472,7 @@ static void CheckCollisionElecShockVSEnemy(void) {
 
 
 					//コンボ
-					AddShockCombo();
+					AddShockCombo(elecShock[j].type);
 				}
 			}
 
@@ -508,7 +508,7 @@ void CheckCollisionElecShockVSBossEnemy(void) {
 				DamageBossEnemy(pow);
 
 				//コンボ
-				AddShockCombo();
+				AddShockCombo(elecShock[i].type);
 			}
 		}
 	}
