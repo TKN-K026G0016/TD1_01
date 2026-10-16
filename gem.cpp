@@ -1,5 +1,6 @@
 #include "gem.h"
 #include "player.h"
+#include "score_data.h"
 
 #include "vector2.h"
 #include "timer.h"
@@ -9,6 +10,8 @@
 
 #define _USE_MATH_DEFINES
 #include <math.h>
+
+constexpr int kGetGemScore = 50;
 
 constexpr int kGemLimit = 100;
 Gem gem[kGemLimit];
@@ -73,6 +76,7 @@ static void CheckHitVSPlayer(void) {
 			CreateJemEffect();
 			BreakGem(i);
 
+			AddScore(kGetGemScore);
 
 			RecoveryEnergy(gem[i].recoveryEnergy);
 		}
@@ -188,5 +192,7 @@ Gem* GetGemArray(void) {
 int GetGemLimit(void) {
 	return kGemLimit;
 }
+
+
 
 #pragma endregion
