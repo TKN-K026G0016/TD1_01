@@ -5,6 +5,7 @@
 #include "stage.h"
 #include "effect.h"
 #include "score_data.h"
+#include "se.h"
 
 #include "vector2.h"
 #include "timer.h"
@@ -678,10 +679,13 @@ static void UpdateScore(void) {
 
 		scoreIcon.showScore = UpdateValueByEasing(scoreIcon.startScore, scoreIcon.endScore, scoreIcon.easingT, EasingMode::EaseOut);
 
+		PlaySeContinuous(SeType::CountUpScore);
 
 	} else {
 		scoreIcon.showScore = nowScore;
 		scoreIcon.easingT = 0.0f;
+		
+		StopPlayingSe(SeType::CountUpScore);
 	}
 
 	for (int i = 0; i < kScoreNumbersLimit; i++) {

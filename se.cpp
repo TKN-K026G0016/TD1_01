@@ -21,6 +21,16 @@ void InitSe(void) {
 	SE temp[ToInt(SeType::Count)] = {
 		//Sample
 		{Novice::LoadAudio("./NoviceResources/fanfare.wav"), 1.0f},
+
+		//menu
+
+		//player
+
+		//enemy
+
+		//ui
+		{Novice::LoadAudio("./resources/sound/se/ui/countup_score.wav"), 1.0f},
+
 	};
 
 	memcpy(ses, temp, sizeof(ses));
@@ -36,7 +46,7 @@ void PlaySe(SeType type) {
 /// <param name="type">Seの種類</param>
 void PlaySeContinuous(SeType type) {
 	if (Novice::IsPlayingAudio(ses[ToInt(type)].pHandle) != 1) {
-		ses[ToInt(type)].pHandle = Novice::PlayAudio(ses[ToInt(type)].aHandle, true, ses[ToInt(type)].volume * seVolume);
+ 		ses[ToInt(type)].pHandle = Novice::PlayAudio(ses[ToInt(type)].aHandle, true, ses[ToInt(type)].volume * seVolume);
 	}
 }
 
