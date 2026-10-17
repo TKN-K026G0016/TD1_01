@@ -8,14 +8,43 @@
 
 #include <Novice.h>
 
-Vector2 titleLogoPos = kWindowCenter;
-Texture titleLogoTexture = {};
+#pragma region データ: 背景
 
-void InitTitle(void) {
-	titleLogoTexture = GetTexture(TextureType::TitleLogo);
+struct Background {
+	Vector2 pos = kWindowCenter;
+	Vector2 size = { 1280, 720 };
+
+	unsigned int color = 0x1A020AFF;
+
+	Texture texture = {};
+};
+Background background;
+
+#pragma endregion
+
+#pragma region 関数: 背景
+
+static void InitBackground(void) {
+	background = {};
+	background.texture = GetTexture(TextureType::White1x1);
 }
 
-void UpdateTitle(void) {
+static void UpdateBackground(void) {
+
+}
+
+static void DrawBackground(void) {
+	//背景
+	Texture texture = background.texture;
+	texture.color = background.color;
+	DrawTextureUI(texture, background.pos, background.size);
+}
+
+#pragma endregion
+
+#pragma region 関数: 項目決定
+
+static void Confirm(void) {
 	if (CheckInputAction(InputAction::Confirm)) {
 		if (GetNowModeFade() != ModeFade::Standby) {
 			return;
@@ -23,19 +52,26 @@ void UpdateTitle(void) {
 
 		ChangeModeFade(ModeFade::FadeOut);
 		ChangeFadeTarget(FadeTarget::Play);
-		PlaySe(SeType::Sample);
+		//PlaySe(SeType::Sample);
 	}
 }
 
+#pragma endregion
+
+void InitTitle(void) {
+	InitBackground();
+}
+
+void UpdateTitle(void) {
+	Confirm();
+
+
+	UpdateBackground();
+}
+
 void DrawTitle(void) {
+	DrawBackground();
 
-	DrawTextureUI(titleLogoTexture, titleLogoPos, { 800, 450 });
-
-#ifdef _DEBUG
-
-	Novice::ScreenPrintf(20, 20, "TitleScene");
-
-#endif // _DEBUG
 
 
 }
