@@ -61,7 +61,7 @@ float nowScoreStartPosOffset = 320;
 //Vector2 nowScoreStartPos = { 330, 300 };
 //最大コンボ
 ScoreNumber maxComboNumbers[kComboNumberLimit];
-float maxComboStartPosOffset = 233;
+float maxComboStartPosOffset = 210;
 //Vector2 maxComboStartPos = { 330, 240 };
 //ハイスコア
 ScoreNumber bestScoreNumbers[kScoreNumberLimit];
@@ -112,7 +112,7 @@ float scoreIconShowPosX = 110;
 float scoreIconPosY = 300;
 
 ScoreValueIcon maxComboIcon;
-float maxComboIconShowPosX = 195;
+float maxComboIconShowPosX = 220;
 float maxComboIconPosY = 220;
 
 ScoreValueIcon bestScoreIcon;
