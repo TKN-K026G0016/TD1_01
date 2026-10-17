@@ -6,6 +6,7 @@
 #include "gem.h"
 #include "effect.h"
 #include "boss_enemy.h"
+#include "play_ui.h"
 
 #include "vector2.h"
 #include "tool.h"
@@ -993,6 +994,8 @@ void PlayerDamage(Vector2 hitPos, float damage) {
 	}
 
 	CreatePlayerDamageEffect(player.pos);
+
+	TriggerGaugeShackByDamage();
 
 #pragma region ノックバック方向設定
 

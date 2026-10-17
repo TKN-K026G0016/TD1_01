@@ -22,6 +22,7 @@ void InitTexture(void) {
 		//===============
 		//Menu
 		//===============
+		{ Novice::LoadTexture("./resources/texture/ui/menu/menu_background.png"), { 1280, 720 }, {0, 0}, 0, 0, WHITE },
 		{ Novice::LoadTexture("./resources/texture/ui/menu/resume.png"), { 256, 64 }, {0, 0}, 0, 0, WHITE },
 		{ Novice::LoadTexture("./resources/texture/ui/menu/retry.png"), { 256, 64 }, {0, 0}, 0, 0, WHITE },
 		{ Novice::LoadTexture("./resources/texture/ui/menu/exit.png"), { 256, 64 }, {0, 0}, 0, 0, WHITE },

@@ -30,7 +30,8 @@ LifeIcon lifeIcon;
 
 #pragma region データ: エネルギーゲージ
 
-bool gaugeShackSwitch = true;
+static constexpr bool kGaugeShakeSwitch = true;
+Timer gaugeShakeDamageTimer = { 10, 10 };
 
 struct EnergyGaugeFrame {
 	Vector2 pos = { 640, 80 };
@@ -101,7 +102,7 @@ MiniEnergyGauge miniEnergyGauge;
 
 struct BossHpGaugeFrame {
 	Vector2 pos = { 640, 680 };
-	Vector2 size = { 768, 32 };
+	Vector2 size = { 720, 32 };
 
 	Texture texture = {};
 };
@@ -152,7 +153,7 @@ LaserPowRate laserPowRate;
 static constexpr bool kShowProgressGaugeSwitch = true;
 struct ProgressGauge {
 	Vector2 pos = { 640, 680 };
-	Vector2 size = { 768, 32 };
+	Vector2 size = { 720, 32 };
 
 	//ボスラウンドまでの時間
 	int bossRoundTime = 0;
@@ -393,8 +394,10 @@ static void UpdateEnergyGauge(void) {
 		UpdateAnimation(energyGaugeFrame.texture);
 		UpdateAnimation(miniEnergyGauge.frameTexture);
 
-		energyGaugeFrame.viewPos.x = energyGaugeFrame.pos.x + GetRand(-2, 2);
-		energyGaugeFrame.viewPos.y = energyGaugeFrame.pos.y + GetRand(-2, 2);
+		if (kGaugeShakeSwitch) {
+			energyGaugeFrame.viewPos.x = energyGaugeFrame.pos.x + GetRand(-2, 2);
+			energyGaugeFrame.viewPos.y = energyGaugeFrame.pos.y + GetRand(-2, 2);
+		}
 
 	} else {
 		energyGaugeFrame.texture.animNum = 0;
@@ -404,6 +407,17 @@ static void UpdateEnergyGauge(void) {
 		miniEnergyGauge.frameTexture.animChangeTimer.count = 0;
 
 		energyGaugeFrame.viewPos = energyGaugeFrame.pos;
+	}
+
+	//ダメージによる振動処理
+	if (gaugeShakeDamageTimer.count <= gaugeShakeDamageTimer.time) {
+		gaugeShakeDamageTimer.count++;
+
+		if (kGaugeShakeSwitch) {
+			energyGaugeFrame.viewPos.x = energyGaugeFrame.pos.x + GetRand(-4, 4);
+			energyGaugeFrame.viewPos.y = energyGaugeFrame.pos.y + GetRand(-4, 4);
+		}
+
 	}
 
 #pragma endregion
@@ -864,6 +878,10 @@ Vector2 GetBossHpGaugeEndPos(void) {
 void TriggerEndCombo(void) {
 	comboIcon.isShowPreCombo = true;
 	comboIcon.showPreComboTimer.count = 0;
+}
+
+void TriggerGaugeShackByDamage(void) {
+	gaugeShakeDamageTimer.count = 0;
 }
 
 #pragma endregion

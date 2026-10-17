@@ -21,3 +21,5 @@ Vector2 GetBossHpGaugeEndPos(void);
 void TriggerEndCombo(void);
 
 void TriggerDisplayEffect(void);
+
+void TriggerGaugeShackByDamage(void);
