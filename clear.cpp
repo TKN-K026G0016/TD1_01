@@ -6,6 +6,17 @@
 #include "texture.h"
 #include "common.h"
 
+#define _USE_MATH_DEFINES
+#include <math.h>
+
+enum class ModeClear {
+	IconFrameIn,
+	CountUpScore,
+	CheckBreakScore,
+	Select,
+};
+ModeClear nowMode = ModeClear::IconFrameIn;
+
 #pragma region データ: 選択関係
 
 enum class ModeClearSelect {
@@ -20,7 +31,32 @@ static bool onceSelect = false;
 
 #pragma endregion
 
-#pragma region データ: アイコン
+#pragma region データ: MenuBackground
+
+struct ClearMenuBackground {
+	Vector2 pos = {};
+	Vector2 size = { 1280, 720 };
+
+	//イージング関係
+	float easingT = 0.0f;
+	float easingSpeed = 0.1f;
+	EasingMode easingModeFrameIn = EasingMode::EaseOut;
+	EasingMode easingModeFrameOut = EasingMode::EaseOut;
+
+	//座標
+	Vector2 standbyPos = { 1300, kWindowCenter.y };
+	Vector2 showPos = kWindowCenter;
+
+	//透明度
+	int alpha = 200;
+
+	Texture texture = {};
+};
+ClearMenuBackground menuBackground;
+
+#pragma endregion
+
+#pragma region データ: ボタン
 
 struct Icon {
 	Vector2 pos = { 0, 0 };
@@ -29,10 +65,65 @@ struct Icon {
 	Texture texture = {};
 };
 static Icon retryIcon;
-static Vector2 retryIconPos = { 640, 200 };
+static Vector2 retryIconOffset = { 430, -140 };
 
 static Icon exitIcon;
-static Vector2 exitIconPos = { 640, 130 };
+static Vector2 exitIconOffset = { 460, -210 };
+
+struct ClearMenuCursor {
+	Vector2 pos = {};
+	Vector2 size = { 64, 64 };
+
+	Vector2 offset = { -160, 0 };
+
+	float rotateTheta = 0.0f;
+	float rotateSpeed = ToFloat(M_PI) / 30.0f;
+
+	Texture texture = {};
+};
+ClearMenuCursor clearMenuCursor;
+
+#pragma endregion
+
+#pragma region 関数: MenuBackground
+
+static void InitMenuBackground(void) {
+	menuBackground = {};
+	menuBackground.pos = menuBackground.standbyPos;
+	menuBackground.texture = GetTexture(TextureType::MenuBackground);
+}
+
+static void UpdateMenuBackground(void) {
+	//Pause入ってからの処理
+	if (!onceSelect) {
+		if (menuBackground.easingT < 1.0f) {
+			menuBackground.easingT += menuBackground.easingSpeed;
+			if (menuBackground.easingT > 1.0f) {
+				menuBackground.easingT = 1.0f;
+			}
+		}
+
+		menuBackground.pos = MoveByEasing(menuBackground.standbyPos, menuBackground.showPos, menuBackground.easingT, menuBackground.easingModeFrameIn);
+	}
+	//選択後の処理
+	else {
+		if (menuBackground.easingT > 0.0f) {
+			menuBackground.easingT -= menuBackground.easingSpeed;
+			if (menuBackground.easingT < 0.0f) {
+				menuBackground.easingT = 0.0f;
+			}
+		}
+
+		menuBackground.pos = MoveByEasing(menuBackground.standbyPos, menuBackground.showPos, menuBackground.easingT, menuBackground.easingModeFrameOut);
+	}
+}
+
+static void DrawMenuBackground(void) {
+	Texture texture = menuBackground.texture;
+	texture.color = (texture.color & 0xFFFFFF00) | menuBackground.alpha;
+
+	DrawTextureUI(texture, menuBackground.pos, menuBackground.size);
+}
 
 #pragma endregion
 
@@ -100,17 +191,24 @@ static void Confirm(void) {
 
 #pragma region 関数: アイコン関係
 
-static void InitIcon(void) {
+static void InitButton(void) {
 	if (retryIcon.texture.tHandle != -1) return;
 
-	retryIcon.pos = retryIconPos;
 	retryIcon.texture = GetTexture(TextureType::RetryIcon);
 
-	exitIcon.pos = exitIconPos;
 	exitIcon.texture = GetTexture(TextureType::ExitIcon);
+
+	clearMenuCursor.texture = GetTexture(TextureType::MenuCursor);
 }
 
-static void UpdateIcon(void) {
+static void UpdateButton(void) {
+
+	//retryIconの処理
+	retryIcon.pos = { menuBackground.pos.x + retryIconOffset.x, menuBackground.pos.y + retryIconOffset.y };
+	//exitIconの処理
+	exitIcon.pos = { menuBackground.pos.x + exitIconOffset.x, menuBackground.pos.y + exitIconOffset.y };
+
+#pragma region 点灯処理
 	//RetryIcon
 	if (nowSelect == ModeClearSelect::Retry) {
 		retryIcon.texture.animNum = 1;
@@ -124,28 +222,74 @@ static void UpdateIcon(void) {
 	} else {
 		exitIcon.texture.animNum = 0;
 	}
+#pragma endregion
 }
 
-static void DrawIcon(void) {
+static void UpdateCursor(void) {
+
+	Vector2 targetPos = {};
+	switch (nowSelect) {
+
+	case ModeClearSelect::Retry:
+		targetPos = { retryIcon.pos.x + clearMenuCursor.offset.x,retryIcon.pos.y + clearMenuCursor.offset.y };
+		break;
+
+	case ModeClearSelect::Exit:
+		targetPos = { exitIcon.pos.x + clearMenuCursor.offset.x,exitIcon.pos.y + clearMenuCursor.offset.y };
+		break;
+	}
+
+	clearMenuCursor.pos = targetPos;
+
+	//回転処理
+	clearMenuCursor.rotateTheta -= clearMenuCursor.rotateSpeed;
+
+}
+
+static void DrawButton(void) {
 	DrawTextureUI(retryIcon.texture, retryIcon.pos, retryIcon.size);
 
 	DrawTextureUI(exitIcon.texture, exitIcon.pos, exitIcon.size);
+
+	DrawTextureUI(clearMenuCursor.texture, clearMenuCursor.pos, clearMenuCursor.size);
 }
 
 #pragma endregion
 
 void InitClear(void) {
-	InitIcon();
+	InitMenuBackground();
+	InitButton();
 	InitSelect();
 }
 
 void UpdateClear(void) {
-	ChangeCursor();
-	Confirm();
+	switch (nowMode) {
+		case ModeClear::IconFrameIn:
 
-	UpdateIcon();
+
+			break;
+		case ModeClear::CountUpScore:
+
+
+			break;
+		case ModeClear::CheckBreakScore:
+
+
+			break;
+		case ModeClear::Select:
+			UpdateMenuBackground();
+
+			ChangeCursor();
+			Confirm();
+
+			break;
+	}
+
+	UpdateButton();
 }
 
 void DrawClear(void) {
-	DrawIcon();
+	DrawMenuBackground();
+
+	DrawButton();
 }
