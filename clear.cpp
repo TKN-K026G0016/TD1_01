@@ -1,6 +1,8 @@
 #include "clear.h"
 #include "input.h"
 #include "scene_manager.h"
+#include "score_data.h"
+#include "elec_bullet.h"
 
 #include "tool.h"
 #include "texture.h"
@@ -16,6 +18,74 @@ enum class ModeClear {
 	Select,
 };
 ModeClear nowMode = ModeClear::IconFrameIn;
+
+#pragma region データ: ステージクリアアイコン
+
+struct ClearIcon {
+	Vector2 pos = {};
+	Vector2 size = { 600, 150 };
+
+	//イージング関係
+	float easingT = 0.0f;
+	float easingSpeed = 0.1f;
+	EasingMode easingMode = EasingMode::EaseOut;
+
+	Vector2 standbyPos = { 350, 900 };
+	Vector2 showPos = { 350, 600 };
+
+	Texture texture = {};
+};
+ClearIcon clearIcon;
+
+#pragma endregion
+
+#pragma region データ: スコアなど
+
+static constexpr int kScoreNumberLimit = 9;
+static constexpr int kComboNumberLimit = 4;
+struct ScoreNumber {
+	Vector2 size = { 32, 64 };
+
+	Vector2 startPos = {};
+	Vector2 interval = { 32, 0 };
+
+	int animNum = 0;
+};
+//現在のスコア
+ScoreNumber nowScoreNumbers[kScoreNumberLimit];
+Vector2 nowScoreStartPos = { 220, 300 };
+//最大コンボ
+ScoreNumber maxComboNumbers[kComboNumberLimit];
+Vector2 maxComboStartPos = { 220, 270 };
+//ハイスコア
+ScoreNumber bestScoreNumbers[kScoreNumberLimit];
+Vector2 bestScoreStartPos = { 220, 200 };
+
+Texture clearScoreNumbersTexture = {};
+
+struct ClearScoreManager {
+	Vector2 pos = { 30, 30 };
+
+	//表示の数値
+	int showScore = 0;
+	//獲得数値
+	int nowScore = 0;
+
+	//表示するコンボ数
+	int showMaxCombo = 0;
+	int maxCombo = 0;
+
+	//ベストスコア
+	int bestScore = 0;
+
+	//イージング関係
+	float easingT = 0.0f;
+	float easingSpeed = 0.01f;
+	EasingMode easingMode = EasingMode::EaseIn;
+};
+ClearScoreManager scoreManager;
+
+#pragma endregion
 
 #pragma region データ: 選択関係
 
@@ -84,6 +154,70 @@ struct ClearMenuCursor {
 ClearMenuCursor clearMenuCursor;
 
 #pragma endregion
+
+
+#pragma region 関数: アイコン落下
+
+static void InitIcon(void) {
+	clearIcon = {};
+	clearIcon.pos = clearIcon.standbyPos;
+	clearIcon.texture = GetTexture(TextureType::ClearIcon);
+}
+
+static void UpdateIcon(void) {
+	clearIcon.easingT += clearIcon.easingSpeed;
+	if (clearIcon.easingT >= 1.0f) {
+		clearIcon.easingT = 1.0f;
+		nowMode = ModeClear::CountUpScore;
+	}
+
+	clearIcon.pos = MoveByEasing(clearIcon.standbyPos, clearIcon.showPos, clearIcon.easingT, clearIcon.easingMode);
+}
+
+static void DrawIcon(void) {
+	DrawTextureUI(clearIcon.texture, clearIcon.pos, clearIcon.size);
+}
+
+#pragma endregion
+
+#pragma region 関数: スコア関係
+
+static void InitScore(void) {
+	//データ初期化
+	for (int i = 0; i < kScoreNumberLimit; i++) {
+		nowScoreNumbers[i] = {};
+		bestScoreNumbers[i] = {};
+	}
+	for (int i = 0; i < kComboNumberLimit; i++) {
+		maxComboNumbers[i] = {};
+	}
+	clearScoreNumbersTexture = GetTexture(TextureType::ScoreNumbers);
+
+	//必要なデータ取得
+	scoreManager.nowScore = GetNowScore();
+	scoreManager.maxCombo = GetMaxCombo();
+	scoreManager.bestScore = GetHighScore();
+
+}
+
+static void UpdateScore(void) {
+	//<イージングの更新>
+
+}
+
+static void DrawScore(void) {
+
+	//スコア
+
+
+	//最大コンボ
+
+	//ハイスコア
+
+}
+
+#pragma endregion
+
 
 #pragma region 関数: MenuBackground
 
@@ -189,7 +323,7 @@ static void Confirm(void) {
 
 #pragma endregion
 
-#pragma region 関数: アイコン関係
+#pragma region 関数: ボタン関係
 
 static void InitButton(void) {
 	if (retryIcon.texture.tHandle != -1) return;
@@ -257,6 +391,7 @@ static void DrawButton(void) {
 #pragma endregion
 
 void InitClear(void) {
+	InitIcon();
 	InitMenuBackground();
 	InitButton();
 	InitSelect();
@@ -265,7 +400,7 @@ void InitClear(void) {
 void UpdateClear(void) {
 	switch (nowMode) {
 		case ModeClear::IconFrameIn:
-
+			UpdateIcon();
 
 			break;
 		case ModeClear::CountUpScore:
@@ -286,10 +421,13 @@ void UpdateClear(void) {
 	}
 
 	UpdateButton();
+	UpdateCursor();
 }
 
 void DrawClear(void) {
 	DrawMenuBackground();
+
+	DrawIcon();
 
 	DrawButton();
 }

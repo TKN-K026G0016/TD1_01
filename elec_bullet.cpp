@@ -193,8 +193,6 @@ static void UpdateShockCombo(void) {
 		//猶予時間が切れたら
 		if (comboTimer.count >= comboTimer.time) {
 			comboTimer.count = 0;
-			totalComboInCombo = 0;
-			nowCombo = 0;
 
 			//コンボの終了をUIに知らせる
 			TriggerEndCombo();
@@ -202,6 +200,14 @@ static void UpdateShockCombo(void) {
 			//コンボ中の得点を加算する
 			AddScore(scoreInCombo);
 			scoreInCombo = 0;
+
+			//最大コンボ数更新処理
+			if (nowCombo > maxCombo) {
+				maxCombo = nowCombo;
+			}
+			
+			totalComboInCombo = 0;
+			nowCombo = 0;
 		}
 	}
 }
@@ -405,6 +411,10 @@ int GetShockCombo(void) {
 	return nowCombo;
 }
 
+int GetMaxCombo(void) {
+	return maxCombo;
+}
+
 Timer GetComboTimer(void) {
 	return comboTimer;
 }
@@ -415,5 +425,7 @@ void AddScoreByDefeatEnemy(int defeatPoint) {
 
 	totalComboInCombo += defeatPoint;
 }
+
+
 
 #pragma endregion

@@ -152,6 +152,10 @@ void AddShockCombo(ElecBulletType type);
 /// </summary>
 int GetShockCombo(void);
 
+/// <summary>
+/// 最大コンボ数取得
+/// </summary>
+int GetMaxCombo(void);
 
 Timer GetComboTimer(void);
 
