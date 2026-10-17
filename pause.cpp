@@ -80,7 +80,7 @@ struct MenuCursor {
 	Vector2 offset = { -160, 0 };
 
 	float rotateTheta = 0.0f;
-	float rotateSpeed = ToFloat(M_PI) / 20.0f;
+	float rotateSpeed = ToFloat(M_PI) / 30.0f;
 
 	Texture texture = {};
 };
