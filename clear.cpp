@@ -3,6 +3,7 @@
 #include "scene_manager.h"
 #include "score_data.h"
 #include "elec_bullet.h"
+#include "title_background.h"
 
 #include "tool.h"
 #include "texture.h"
@@ -532,7 +533,7 @@ static void DrawButton(void) {
 
 	DrawTextureUI(exitIcon.texture, exitIcon.pos, exitIcon.size);
 
-	DrawTextureUI(clearMenuCursor.texture, clearMenuCursor.pos, clearMenuCursor.size);
+	DrawTextureRotateUI(clearMenuCursor.texture, clearMenuCursor.pos, clearMenuCursor.size, clearMenuCursor.rotateTheta);
 }
 
 #pragma endregion
@@ -543,6 +544,8 @@ void InitClear(void) {
 	InitMenuBackground();
 	InitButton();
 	InitSelect();
+
+	InitTitleBackground();
 }
 
 void UpdateClear(void) {
@@ -574,9 +577,13 @@ void UpdateClear(void) {
 	MoveScoreIcon();
 	UpdateButton();
 	UpdateCursor();
+
+	UpdateTitleBackground();
 }
 
 void DrawClear(void) {
+	DrawTitleBackground();
+
 	DrawMenuBackground();
 
 	DrawIcon();

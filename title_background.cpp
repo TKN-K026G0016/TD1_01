@@ -100,6 +100,11 @@ struct TitleShape {
 
 	int alpha = 20;
 
+	//残像の位置
+	Vector2 prePos[2] = {};
+	float preRotateTheta[2] = {};
+	int diffAlpha = 5;
+
 	unsigned int color = RED;
 
 	Texture texture = {};
@@ -214,6 +219,12 @@ static void UpdateTitleShape(void) {
 	for (int i = 0; i < kTitleShapeLimit; i++) {
 		if (!titleShape[i].isShoot) continue;
 
+		//残像のデータ更新
+		titleShape[i].prePos[1] = titleShape[i].prePos[0];
+		titleShape[i].prePos[0] = titleShape[i].pos;
+		titleShape[i].preRotateTheta[1] = titleShape[i].preRotateTheta[0];
+		titleShape[i].preRotateTheta[0] = titleShape[i].rotateTheta;
+
 		titleShape[i].pos.x += -titleShape[i].moveSpeed;
 		if (titleShape[i].pos.x <= titleShape[i].breakPosX) {
 			titleShape[i].isShoot = false;
@@ -243,6 +254,17 @@ static void DrawTitleShape(void) {
 		texture.color = (titleShape[i].color & 0xFFFFFF00) | titleShape[i].alpha;
 
 		DrawTextureRotateUI(texture, titleShape[i].pos, titleShape[i].size, titleShape[i].rotateTheta);
+
+#pragma region 残像
+	
+		for (int j = 0; j < 2; j++) {
+			texture.color = (titleShape[i].color & 0xFFFFFF00) | (titleShape[i].alpha - titleShape[i].diffAlpha * j);
+
+			DrawTextureRotateUI(texture, titleShape[i].prePos[j], titleShape[i].size, titleShape[i].preRotateTheta[j]);
+		}
+
+#pragma endregion
+
 	}
 }
 
