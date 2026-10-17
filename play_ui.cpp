@@ -770,7 +770,7 @@ static void DrawScore(void) {
 		//DrawTextureUI(scoreIcon.texture, scoreIcon.pos, scoreIcon.size);
 	}
 
-	Novice::ScreenPrintf(30, 30, "Score: %07d", GetNowScore());
+	//Novice::ScreenPrintf(30, 30, "Score: %07d", GetNowScore());
 }
 
 #pragma endregion
