@@ -179,7 +179,12 @@ void DrawScene(void) {
 	if (nowScene == Scene::Pause) {
 		DrawPlay();
 		DrawPause();
-	} else {
+	}
+	else if (nowScene == Scene::Gameover) {
+		DrawPlay();
+		DrawGameover();
+	}
+	else {
 		DrawFuncs[ToInt(nowScene)]();
 	}
 

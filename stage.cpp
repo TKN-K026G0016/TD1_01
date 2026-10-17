@@ -366,13 +366,12 @@ static void InitGoSceneTimer(void) {
 static void GoGameoverScene(void) {
 	//生存していたら、スキップ
 	if (GetPlayerIsAlive()) return;
-	//フェードアウトし始めたらスキップ
-	if (GetNowModeFade() != ModeFade::Standby) return;
+	////フェードアウトし始めたらスキップ
+	//if (GetNowModeFade() != ModeFade::Standby) return;
 
 	goToGameoverTimer.count++;
 	if (goToGameoverTimer.count >= goToGameoverTimer.time) {
-		ChangeModeFade(ModeFade::FadeOut);
-		ChangeFadeTarget(FadeTarget::Gameover);
+		ChangeScene(Scene::Gameover);
 	}
 }
 

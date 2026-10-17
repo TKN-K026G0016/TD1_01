@@ -36,6 +36,54 @@ static Vector2 exitIconPos = { 640, 130 };
 
 #pragma endregion
 
+#pragma region データ: カバーパネル
+
+struct CoverPanel {
+	Vector2 pos = kWindowCenter;
+	Vector2 size = { 1280, 720 };
+
+	//<イージング関係>
+	float easingT = 0.0f;
+	float easingSpeed = 0.01f;
+	EasingMode easingMode = EasingMode::EaseIn;
+
+	int alpha = 0;
+	int alphaMin = 0;
+	int alphaMax = 200;
+
+	unsigned int color = BLACK;
+
+	Texture texture = {};
+};
+CoverPanel gameoverCoverPanel = {};
+
+#pragma endregion
+
+
+static void InitCoverPanel(void) {
+	gameoverCoverPanel = {};
+
+	gameoverCoverPanel.texture = GetTexture(TextureType::White1x1);
+}
+
+static void UpdateCoverPanel(void) {
+	if (gameoverCoverPanel.easingT < 1.0f) {
+		gameoverCoverPanel.easingT += gameoverCoverPanel.easingSpeed;
+		if (gameoverCoverPanel.easingT >= 1.0f) {
+			gameoverCoverPanel.easingT = 1.0f;
+		}
+	}
+
+	gameoverCoverPanel.alpha = UpdateValueByEasing(gameoverCoverPanel.alphaMin, gameoverCoverPanel.alphaMax, gameoverCoverPanel.easingT, gameoverCoverPanel.easingMode);
+}
+
+static void DrawCoverPanel(void) {
+	Texture texture = gameoverCoverPanel.texture;
+	texture.color = (gameoverCoverPanel.color & 0xFFFFFF00) | gameoverCoverPanel.alpha;
+
+	DrawTextureUI(texture, gameoverCoverPanel.pos, gameoverCoverPanel.size);
+}
+
 #pragma region 関数: 選択関係
 
 static void InitSelect(void) {
@@ -137,10 +185,12 @@ static void DrawIcon(void) {
 
 void InitGameover(void) {
 	InitIcon();
+	InitCoverPanel();
 	InitSelect();
 }
 
 void UpdateGameover(void) {
+	UpdateCoverPanel();
 
 	ChangeCursor();
 	Confirm();
@@ -149,5 +199,7 @@ void UpdateGameover(void) {
 }
 
 void DrawGameover(void) {
+	DrawCoverPanel();
+
 	DrawIcon();
 }
