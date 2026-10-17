@@ -22,6 +22,11 @@ int GetHighScore(void);
 void AddScore(int point);
 
 /// <summary>
+/// 現在のスコアリセット
+/// </summary>
+void ResetNowScore(void);
+
+/// <summary>
 /// ハイスコア更新処理
 /// </summary>
 void UpdateHighScore(void);

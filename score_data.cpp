@@ -28,6 +28,10 @@ void AddScore(int point) {
 	nowScore += point;
 }
 
+void ResetNowScore(void) {
+	nowScore = 0;
+}
+
 void UpdateHighScore(void) {
 	highScore = nowScore;
 }

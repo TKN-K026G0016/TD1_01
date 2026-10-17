@@ -3,6 +3,7 @@
 #include "enemy.h"
 #include "boss_enemy.h"
 #include "scene_manager.h"
+#include "score_data.h"
 
 #include "texture.h"
 #include "vector2.h"
@@ -392,6 +393,8 @@ static void GoClearScene(void) {
 #pragma endregion
 
 void InitStage(void) {
+	ResetNowScore();
+
 	InitCamera();
 	InitBackGround();
 	InitGoSceneTimer();
