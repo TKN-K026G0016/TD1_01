@@ -84,6 +84,11 @@ struct ClearScoreManager {
 	float easingTCombo = 0.0f;
 	float easingSpeed = 0.01f;
 	EasingMode easingMode = EasingMode::EaseIn;
+
+	//スコア更新フラグ
+	bool breakScore = false;
+	//スコア更新時の待機時間
+	Timer waitBreakScoreTimer = { 200, 0 };
 };
 ClearScoreManager scoreManager;
 
@@ -212,9 +217,6 @@ static void UpdateScore(void) {
 
 	//スコアのカウントアップ演出
 	scoreManager.showScore = UpdateValueByEasing(0, scoreManager.nowScore, scoreManager.easingTScore, scoreManager.easingMode);
-
-
-
 }
 
 static void UpdateCombo(void) {
@@ -269,6 +271,35 @@ static void DrawScore(void) {
 
 #pragma endregion
 
+#pragma region 関数: ハイスコア更新処理
+
+static void CheckBreakScore(void) {
+	if (scoreManager.nowScore > scoreManager.bestScore && !scoreManager.breakScore) {
+		UpdateHighScore();
+
+		//演出実装
+
+		scoreManager.breakScore = true;
+	}
+
+	//スコア更新時
+	if (scoreManager.breakScore) {
+		scoreManager.waitBreakScoreTimer.count++;
+		if (scoreManager.waitBreakScoreTimer.count >= scoreManager.waitBreakScoreTimer.time) {
+			scoreManager.waitBreakScoreTimer.count = 0;
+
+			nowMode = ModeClear::Select;
+		}
+
+	}
+	//更新出来なかった場合
+	else {
+		nowMode = ModeClear::Select;
+	}
+	
+}
+
+#pragma endregion
 
 #pragma region 関数: MenuBackground
 
@@ -463,7 +494,7 @@ void UpdateClear(void) {
 
 			break;
 		case ModeClear::CheckBreakScore:
-
+			CheckBreakScore();
 
 			break;
 		case ModeClear::Select:
