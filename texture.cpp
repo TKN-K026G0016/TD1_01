@@ -33,6 +33,12 @@ void InitTexture(void) {
 		//===============
 		{ Novice::LoadTexture("./resources/sample/title_logo.png"), { 1529, 855 }, {0, 0}, 0, 0, WHITE },
 
+		{ Novice::LoadTexture("./resources/texture/ui/title/title_line.png"), { 1280, 2 }, {0, 0}, 0, 0, WHITE },
+		{ Novice::LoadTexture("./resources/texture/ui/title/title_effect.png"), { 1280, 720 }, {0, 0}, 0, 0, WHITE },
+		{ Novice::LoadTexture("./resources/texture/ui/title/title_triangle.png"), { 128, 128 }, {0, 0}, 0, 0, WHITE },
+		{ Novice::LoadTexture("./resources/texture/ui/title/title_box.png"), { 128, 128 }, {0, 0}, 0, 0, WHITE },
+		{ Novice::LoadTexture("./resources/texture/ui/title/title_circle.png"), { 128, 128 }, {0, 0}, 0, 0, WHITE },
+
 		//===============
 		//Play
 		//===============

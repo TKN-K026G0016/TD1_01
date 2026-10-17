@@ -41,6 +41,12 @@ enum class TextureType {
 	//===============
 	TitleLogo,
 
+	TitleLine,
+	TitleEffect,
+	TitleTriangle,
+	TitleBox,
+	TitleCircle,
+
 	//===============
 	//Play
 	//===============

@@ -270,7 +270,7 @@ struct DisplayEffect {
 
 	//イージング
 	float easingT = 0.0f;
-	float easingSpeed = 0.03f;
+	float easingSpeed = 0.02f;
 
 	//サイズ関係
 	Vector2 size = {};
@@ -278,7 +278,7 @@ struct DisplayEffect {
 	Vector2 maxSize = { 1440, 810 };
 
 	//透明度関係
-	int alpha = 80;
+	int alpha = 50;
 	int alphaMax = 50;
 	int alphaMin = 10;
 
