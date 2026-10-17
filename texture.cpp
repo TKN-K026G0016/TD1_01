@@ -127,6 +127,9 @@ void InitTexture(void) {
 		//Clear
 		//===============
 		{ Novice::LoadTexture("./resources/texture/ui/clear/clear_icon.png"), { 680, 150 }, {0, 0}, 0, 0, WHITE },
+		{ Novice::LoadTexture("./resources/texture/ui/clear/score_icon.png"), { 512, 64 }, {0, 0}, 0, 0, WHITE },
+		{ Novice::LoadTexture("./resources/texture/ui/clear/max_combo_icon.png"), { 512, 64 }, {0, 0}, 0, 0, WHITE },
+		{ Novice::LoadTexture("./resources/texture/ui/clear/best_score_icon.png"), { 512, 64 }, {0, 0}, 0, 0, WHITE },
 
 		//===============
 		//Gameover

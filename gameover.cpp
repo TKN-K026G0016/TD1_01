@@ -137,10 +137,10 @@ struct Icon {
 	Texture texture = {};
 };
 static Icon retryIcon;
-static Vector2 retryIconOffset = { 430, -140};
+static Vector2 retryIconOffset = { 460, -210};
 
 static Icon exitIcon;
-static Vector2 exitIconOffset = { 460, -210 };
+static Vector2 exitIconOffset = { 480, -280 };
 
 struct GameoverMenuCursor {
 	Vector2 pos = {};

@@ -50,19 +50,22 @@ struct ScoreNumber {
 	Vector2 startPos = {};
 	Vector2 interval = { 32, 0 };
 
+	float offsetY = -5;
+
 	int animNum = 0;
 };
 //現在のスコア
 ScoreNumber nowScoreNumbers[kScoreNumberLimit];
-float nowScoreStartPosOffset = 150;
+float nowScoreStartPosOffset = 320;
+
 //Vector2 nowScoreStartPos = { 330, 300 };
 //最大コンボ
 ScoreNumber maxComboNumbers[kComboNumberLimit];
-float maxComboStartPosOffset = 150;
+float maxComboStartPosOffset = 233;
 //Vector2 maxComboStartPos = { 330, 240 };
 //ハイスコア
 ScoreNumber bestScoreNumbers[kScoreNumberLimit];
-float bestScoreStartPosOffset = 150;
+float bestScoreStartPosOffset = 250;
 //Vector2 bestScoreStartPos = { 330, 120 };
 
 Texture clearScoreNumbersTexture = {};
@@ -97,7 +100,7 @@ ClearScoreManager scoreManager;
 
 struct ScoreValueIcon {
 	Vector2 pos = {};
-	Vector2 size = { 256, 64 };
+	Vector2 size = { 512, 64 };
 
 	float standbyPosX = -200;
 	float showPosX =  250 ;
@@ -105,11 +108,16 @@ struct ScoreValueIcon {
 	Texture texture = {};
 };
 ScoreValueIcon scoreIcon;
+float scoreIconShowPosX = 110;
 float scoreIconPosY = 300;
+
 ScoreValueIcon maxComboIcon;
-float maxComboIconPosY = 240;
+float maxComboIconShowPosX = 195;
+float maxComboIconPosY = 220;
+
 ScoreValueIcon bestScoreIcon;
-float bestScoreIconPosY = 120;
+float bestScoreIconShowPosX = 180;
+float bestScoreIconPosY = 110;
 
 #pragma endregion
 
@@ -161,10 +169,10 @@ struct Icon {
 	Texture texture = {};
 };
 static Icon retryIcon;
-static Vector2 retryIconOffset = { 430, -140 };
+static Vector2 retryIconOffset = { 460, -210 };
 
 static Icon exitIcon;
-static Vector2 exitIconOffset = { 460, -210 };
+static Vector2 exitIconOffset = { 480, -280 };
 
 struct ClearMenuCursor {
 	Vector2 pos = {};
@@ -224,14 +232,17 @@ static void InitScore(void) {
 	clearScoreNumbersTexture = GetTexture(TextureType::ScoreNumbers);
 
 	//アイコンのテクスチャ取得
-	scoreIcon.texture = GetTexture(TextureType::White1x1);
-	maxComboIcon.texture = GetTexture(TextureType::White1x1);
-	bestScoreIcon.texture = GetTexture(TextureType::White1x1);
+	scoreIcon.texture = GetTexture(TextureType::ClearScoreIcon);
+	maxComboIcon.texture = GetTexture(TextureType::ClearMaxComboIcon);
+	bestScoreIcon.texture = GetTexture(TextureType::ClearBestScoreIcon);
 
 	//アイコンの座標を決定
 	scoreIcon.pos.y = scoreIconPosY;
+	scoreIcon.showPosX = scoreIconShowPosX;
 	maxComboIcon.pos.y = maxComboIconPosY;
+	maxComboIcon.showPosX = maxComboIconShowPosX;
 	bestScoreIcon.pos.y = bestScoreIconPosY;
+	bestScoreIcon.showPosX = bestScoreIconShowPosX;
 
 	//必要なデータ取得
 	scoreManager.nowScore = GetNowScore();
@@ -248,11 +259,11 @@ static void MoveScoreIcon(void) {
 
 	//numberのstartPos変更
 	for (int i = 0; i < kScoreNumberLimit; i++) {
-		nowScoreNumbers[i].startPos = { scoreIcon.pos.x + nowScoreStartPosOffset,  scoreIcon.pos.y };
-		bestScoreNumbers[i].startPos = { bestScoreIcon.pos.x + bestScoreStartPosOffset,  bestScoreIcon.pos.y };
+		nowScoreNumbers[i].startPos = { scoreIcon.pos.x + nowScoreStartPosOffset,  scoreIcon.pos.y + nowScoreNumbers[i].offsetY };
+		bestScoreNumbers[i].startPos = { bestScoreIcon.pos.x + bestScoreStartPosOffset,  bestScoreIcon.pos.y + bestScoreNumbers[i].offsetY };
 	}
 	for (int i = 0; i < kComboNumberLimit; i++) {
-		maxComboNumbers[i].startPos = { maxComboIcon.pos.x + maxComboStartPosOffset,  maxComboIcon.pos.y };
+		maxComboNumbers[i].startPos = { maxComboIcon.pos.x + maxComboStartPosOffset,  maxComboIcon.pos.y + maxComboNumbers[i].offsetY };
 	}
 }
 
