@@ -1,5 +1,6 @@
 #include "title_player.h"
 #include "elec_bullet.h"
+#include "effect.h"
 
 #include "vector2.h"
 #include "timer.h"
@@ -45,6 +46,11 @@ constexpr float kShootDisLength = 15.0f;
 //チャージタイマー
 static Timer chargeElecBulletTimer = { 40, 0 };
 
+//チャージの破片表示を開始する時間
+constexpr int kStartCreateChargeChipTime = 7;
+  
+static Timer createChargeOrbTimer = { 10, 0 };
+static Timer createChargeChipTimer = { 10, 0 };
 
 #pragma endregion
 
@@ -131,6 +137,27 @@ static void ShootElecBullet(void) {
 
 }
 
+static void CreateChargeOrbEffect(void) {
+
+	if (chargeElecBulletTimer.count > kStartCreateChargeChipTime) {
+
+		createChargeChipTimer.count++;
+		if (createChargeChipTimer.count >= createChargeChipTimer.time) {
+			createChargeChipTimer.count = 0;
+			CreateChargeChipEffect();
+		}
+	}
+
+	if (chargeElecBulletTimer.count >= chargeElecBulletTimer.time) {
+
+		createChargeOrbTimer.count++;
+		if (createChargeOrbTimer.count >= createChargeOrbTimer.time) {
+			createChargeOrbTimer.count = 0;
+			CreateChargeOrbEffect(shootPos);
+		}
+	}
+}
+
 void InitTitlePlayer(void) {
 	player = {};
 	player.texture = GetTexture(TextureType::Player);
@@ -143,8 +170,17 @@ void UpdateTitlePlayer(void) {
 	ClampPlayerPos();
 
 	ShootElecBullet();
+	CreateChargeOrbEffect();
 }
 
 void DrawTitlePlayer(void) {
 	DrawTextureRotateUI(player.texture, player.pos, player.size, player.rotateTheta);
+}
+
+Vector2 GetTitlePlayerPos() {
+	return player.pos;
+}
+
+Vector2 GetTitlePlayerShootPos() {
+	return shootPos;
 }

@@ -4,6 +4,7 @@
 #include "title_background.h"
 #include "title_player.h"
 #include "elec_bullet.h"
+#include "effect.h"
 
 #include "texture.h"
 #include "se.h"
@@ -44,11 +45,13 @@ void InitTitle(void) {
 	InitTitleBackground();
 	InitTitlePlayer();
 	InitElecBullet();
+	InitEffect();
 }
 
 void UpdateTitle(void) {
 	UpdateTitlePlayer();
 	UpdateElecBullet();
+	UpdateEffect();
 
 	Confirm();
 
@@ -58,6 +61,7 @@ void UpdateTitle(void) {
 void DrawTitle(void) {
 	DrawTitleBackground();
 	DrawElecBullet();
+	DrawEffect();
 
 	DrawTitlePlayer();
 }
