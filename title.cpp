@@ -23,6 +23,18 @@ enum class ModeTitle {
 };
 ModeTitle nowMode = ModeTitle::MovePlayer;
 
+#pragma region データ: ロゴ
+
+struct Logo {
+	Vector2 pos = { 640, 580 };
+	Vector2 size = { 640, 256 };
+
+	Texture texture = {};
+};
+static Logo logo;
+
+#pragma endregion
+
 #pragma region 関数: 項目決定
 
 static void Confirm(void) {
@@ -41,11 +53,30 @@ static void Confirm(void) {
 
 #pragma endregion
 
+#pragma region ロゴ関係
+
+static void InitLogo(void) {
+	logo = {};
+	logo.texture = GetTexture(TextureType::TitleLogo);
+}
+
+static void UpdateLogo(void) {
+
+}
+
+static void DrawLogo(void) {
+	DrawTextureUI(logo.texture, logo.pos, logo.size);
+}
+
+#pragma endregion
+
 void InitTitle(void) {
 	InitTitleBackground();
 	InitTitlePlayer();
 	InitElecBullet();
 	InitEffect();
+
+	InitLogo();
 }
 
 void UpdateTitle(void) {
@@ -54,6 +85,7 @@ void UpdateTitle(void) {
 	UpdateEffect();
 
 	Confirm();
+	UpdateLogo();
 
 	UpdateTitleBackground();
 }
@@ -62,6 +94,8 @@ void DrawTitle(void) {
 	DrawTitleBackground();
 	DrawElecBullet();
 	DrawEffect();
+
+	DrawLogo();
 
 	DrawTitlePlayer();
 }

@@ -12,7 +12,7 @@
 #include <math.h>
 
 struct TitlePlayer {
-	Vector2 pos = { 600, 600 };
+	Vector2 pos = { 640, 100 };
 	Vector2 size = { 32, 32 };
 
 
