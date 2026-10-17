@@ -54,13 +54,16 @@ struct ScoreNumber {
 };
 //現在のスコア
 ScoreNumber nowScoreNumbers[kScoreNumberLimit];
-Vector2 nowScoreStartPos = { 220, 300 };
+float nowScoreStartPosOffset = 150;
+//Vector2 nowScoreStartPos = { 330, 300 };
 //最大コンボ
 ScoreNumber maxComboNumbers[kComboNumberLimit];
-Vector2 maxComboStartPos = { 220, 270 };
+float maxComboStartPosOffset = 150;
+//Vector2 maxComboStartPos = { 330, 240 };
 //ハイスコア
 ScoreNumber bestScoreNumbers[kScoreNumberLimit];
-Vector2 bestScoreStartPos = { 220, 200 };
+float bestScoreStartPosOffset = 150;
+//Vector2 bestScoreStartPos = { 330, 120 };
 
 Texture clearScoreNumbersTexture = {};
 
@@ -91,6 +94,22 @@ struct ClearScoreManager {
 	Timer waitBreakScoreTimer = { 200, 0 };
 };
 ClearScoreManager scoreManager;
+
+struct ScoreValueIcon {
+	Vector2 pos = {};
+	Vector2 size = { 256, 64 };
+
+	float standbyPosX = -200;
+	float showPosX =  250 ;
+
+	Texture texture = {};
+};
+ScoreValueIcon scoreIcon;
+float scoreIconPosY = 300;
+ScoreValueIcon maxComboIcon;
+float maxComboIconPosY = 240;
+ScoreValueIcon bestScoreIcon;
+float bestScoreIconPosY = 120;
 
 #pragma endregion
 
@@ -193,18 +212,48 @@ static void InitScore(void) {
 	//データ初期化
 	for (int i = 0; i < kScoreNumberLimit; i++) {
 		nowScoreNumbers[i] = {};
+		//nowScoreNumbers[i].startPos = nowScoreStartPos;
+
 		bestScoreNumbers[i] = {};
+		//bestScoreNumbers[i].startPos = bestScoreStartPos;
 	}
 	for (int i = 0; i < kComboNumberLimit; i++) {
 		maxComboNumbers[i] = {};
+		//maxComboNumbers[i].startPos = maxComboStartPos;
 	}
 	clearScoreNumbersTexture = GetTexture(TextureType::ScoreNumbers);
+
+	//アイコンのテクスチャ取得
+	scoreIcon.texture = GetTexture(TextureType::White1x1);
+	maxComboIcon.texture = GetTexture(TextureType::White1x1);
+	bestScoreIcon.texture = GetTexture(TextureType::White1x1);
+
+	//アイコンの座標を決定
+	scoreIcon.pos.y = scoreIconPosY;
+	maxComboIcon.pos.y = maxComboIconPosY;
+	bestScoreIcon.pos.y = bestScoreIconPosY;
 
 	//必要なデータ取得
 	scoreManager.nowScore = GetNowScore();
 	scoreManager.maxCombo = GetMaxCombo();
 	scoreManager.bestScore = GetHighScore();
 
+}
+
+static void MoveScoreIcon(void) {
+	//アイコンの移動処理
+	scoreIcon.pos.x = UpdateValueByEasing(scoreIcon.standbyPosX, scoreIcon.showPosX, clearIcon.easingT, clearIcon.easingMode);
+	maxComboIcon.pos.x = UpdateValueByEasing(maxComboIcon.standbyPosX, maxComboIcon.showPosX, clearIcon.easingT, clearIcon.easingMode);
+	bestScoreIcon.pos.x = UpdateValueByEasing(bestScoreIcon.standbyPosX, bestScoreIcon.showPosX, clearIcon.easingT, clearIcon.easingMode);
+
+	//numberのstartPos変更
+	for (int i = 0; i < kScoreNumberLimit; i++) {
+		nowScoreNumbers[i].startPos = { scoreIcon.pos.x + nowScoreStartPosOffset,  scoreIcon.pos.y };
+		bestScoreNumbers[i].startPos = { bestScoreIcon.pos.x + bestScoreStartPosOffset,  bestScoreIcon.pos.y };
+	}
+	for (int i = 0; i < kComboNumberLimit; i++) {
+		maxComboNumbers[i].startPos = { maxComboIcon.pos.x + maxComboStartPosOffset,  maxComboIcon.pos.y };
+	}
 }
 
 static void UpdateScore(void) {
@@ -231,6 +280,11 @@ static void UpdateCombo(void) {
 }
 
 static void DrawScore(void) {
+	//アイコンの描画
+	DrawTextureUI(scoreIcon.texture, scoreIcon.pos, scoreIcon.size);
+	DrawTextureUI(maxComboIcon.texture, maxComboIcon.pos, maxComboIcon.size);
+	DrawTextureUI(bestScoreIcon.texture, bestScoreIcon.pos, bestScoreIcon.size);
+
 
 	//スコア
 	for (int i = 0; i < kScoreNumberLimit; i++) {
@@ -506,6 +560,7 @@ void UpdateClear(void) {
 			break;
 	}
 
+	MoveScoreIcon();
 	UpdateButton();
 	UpdateCursor();
 }
