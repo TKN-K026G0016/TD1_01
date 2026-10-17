@@ -32,7 +32,7 @@ struct CoverPanel {
 
 	//<イージング関係>
 	float easingT = 0.0f;
-	float easingSpeed = 0.03f;
+	float easingSpeed = 0.02f;
 	EasingMode easingMode = EasingMode::EaseIn;
 
 	int alpha = 0;
@@ -137,10 +137,10 @@ struct Icon {
 	Texture texture = {};
 };
 static Icon retryIcon;
-static Vector2 retryIconOffset = { 460, -210};
+static Vector2 retryIconOffset = { 430, -210};
 
 static Icon exitIcon;
-static Vector2 exitIconOffset = { 480, -280 };
+static Vector2 exitIconOffset = { 500, -280 };
 
 struct GameoverMenuCursor {
 	Vector2 pos = {};

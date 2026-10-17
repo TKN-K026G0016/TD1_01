@@ -67,11 +67,11 @@ Vector2 iconViewPos = { 300, 600 };
 static Vector2 selectIconSize = { 256, 64 };
 
 static Icon resumeIcon;
-static Vector2 resumeIconOffset = { 430, -140 };
+static Vector2 resumeIconOffset = { 390, -140 };
 static Icon retryIcon;
-static Vector2 retryIconOffset = { 460, -210 };
+static Vector2 retryIconOffset = { 430, -210 };
 static Icon exitIcon;
-static Vector2 exitIconOffset = { 480, -280 };
+static Vector2 exitIconOffset = { 500, -280 };
 
 struct MenuCursor {
 	Vector2 pos = {};
