@@ -230,4 +230,8 @@ void ChangeFadeTarget(FadeTarget target) {
 	fadePanel.fadeTarget = target;
 }
 
+Scene GetNowScene(void) {
+	return nowScene;
+}
+
 #pragma endregion

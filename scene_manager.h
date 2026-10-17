@@ -75,3 +75,5 @@ void ChangeModeFade(ModeFade mode);
 /// </summary>
 /// <param name="target">フェード先のシーン</param>
 void ChangeFadeTarget(FadeTarget target);
+
+Scene GetNowScene(void);

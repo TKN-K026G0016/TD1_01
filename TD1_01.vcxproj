@@ -194,6 +194,7 @@ xcopy C:\KamataEngine\DirectXGame\Resources "$(OutDirFullPath)NoviceResources" /
     <ClCompile Include="timer.cpp" />
     <ClCompile Include="title.cpp" />
     <ClCompile Include="title_background.cpp" />
+    <ClCompile Include="title_player.cpp" />
     <ClCompile Include="tool.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -250,6 +251,7 @@ xcopy C:\KamataEngine\DirectXGame\Resources "$(OutDirFullPath)NoviceResources" /
     <ClInclude Include="timer.h" />
     <ClInclude Include="title.h" />
     <ClInclude Include="title_background.h" />
+    <ClInclude Include="title_player.h" />
     <ClInclude Include="tool.h" />
     <ClInclude Include="vector2.h" />
   </ItemGroup>

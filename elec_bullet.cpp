@@ -5,6 +5,7 @@
 #include "boss_enemy.h"
 #include "gem.h"
 #include "score_data.h"
+#include "scene_manager.h"
 
 #include "vector2.h"
 #include "timer.h"
@@ -12,6 +13,8 @@
 #include "texture.h"
 
 #include <math.h>
+
+static Scene nowScene = Scene::Play;
 
 #pragma region データ: ElecBullet
 //レベルごとの性能
@@ -134,14 +137,26 @@ static void DrawBullet(void) {
 	for (int i = 0; i < kElecBulletLimit; i++) {
 		if (!elecBullet[i].isShoot) continue;
 
-		//残像の描画
-		for (int j = 1; j > -1; j--) {
-			Texture texture = elecBullet[i].texture;
-			texture.color = (texture.color & 0xFFFFFF00) | elecBullet[i].afterImageAlpha[j];
-			DrawTextureRotateObj(texture, elecBullet[i].prePos[j], elecBullet[i].size, elecBullet[i].moveTheta);
-		}
+		if (nowScene == Scene::Play) {
 
-		DrawTextureRotateObj(elecBullet[i].texture, elecBullet[i].pos, elecBullet[i].size, elecBullet[i].moveTheta);
+			//残像の描画
+			for (int j = 1; j > -1; j--) {
+				Texture texture = elecBullet[i].texture;
+				texture.color = (texture.color & 0xFFFFFF00) | elecBullet[i].afterImageAlpha[j];
+				DrawTextureRotateObj(texture, elecBullet[i].prePos[j], elecBullet[i].size, elecBullet[i].moveTheta);
+			}
+
+			DrawTextureRotateObj(elecBullet[i].texture, elecBullet[i].pos, elecBullet[i].size, elecBullet[i].moveTheta);
+		} else {
+			//残像の描画
+			for (int j = 1; j > -1; j--) {
+				Texture texture = elecBullet[i].texture;
+				texture.color = (texture.color & 0xFFFFFF00) | elecBullet[i].afterImageAlpha[j];
+				DrawTextureRotateUI(texture, elecBullet[i].prePos[j], elecBullet[i].size, elecBullet[i].moveTheta);
+			}
+
+			DrawTextureRotateUI(elecBullet[i].texture, elecBullet[i].pos, elecBullet[i].size, elecBullet[i].moveTheta);
+		}
 	}
 }
 
@@ -215,6 +230,8 @@ static void UpdateShockCombo(void) {
 #pragma endregion
 
 void InitElecBullet(void) {
+	nowScene = GetNowScene();
+
 	InitBullet();
 	InitElecShock();
 

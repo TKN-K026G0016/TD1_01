@@ -2,6 +2,8 @@
 #include "input.h"
 #include "scene_manager.h"
 #include "title_background.h"
+#include "title_player.h"
+#include "elec_bullet.h"
 
 #include "texture.h"
 #include "se.h"
@@ -13,10 +15,18 @@
 #define _USE_MATH_DEFINES
 #include <math.h>
 
+enum class ModeTitle {
+	MovePlayer,
+	TriggerLightUp,
+	WaitInput,
+};
+ModeTitle nowMode = ModeTitle::MovePlayer;
 
 #pragma region 関数: 項目決定
 
 static void Confirm(void) {
+	if (nowMode != ModeTitle::WaitInput) return;
+
 	if (CheckInputAction(InputAction::Confirm)) {
 		if (GetNowModeFade() != ModeFade::Standby) {
 			return;
@@ -32,9 +42,14 @@ static void Confirm(void) {
 
 void InitTitle(void) {
 	InitTitleBackground();
+	InitTitlePlayer();
+	InitElecBullet();
 }
 
 void UpdateTitle(void) {
+	UpdateTitlePlayer();
+	UpdateElecBullet();
+
 	Confirm();
 
 	UpdateTitleBackground();
@@ -42,6 +57,7 @@ void UpdateTitle(void) {
 
 void DrawTitle(void) {
 	DrawTitleBackground();
+	DrawElecBullet();
 
-
+	DrawTitlePlayer();
 }
