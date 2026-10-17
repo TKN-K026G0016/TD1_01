@@ -14,6 +14,7 @@
 enum class ModeClear {
 	IconFrameIn,
 	CountUpScore,
+	CountUpCombo,
 	CheckBreakScore,
 	Select,
 };
@@ -79,7 +80,8 @@ struct ClearScoreManager {
 	int bestScore = 0;
 
 	//イージング関係
-	float easingT = 0.0f;
+	float easingTScore = 0.0f;
+	float easingTCombo = 0.0f;
 	float easingSpeed = 0.01f;
 	EasingMode easingMode = EasingMode::EaseIn;
 };
@@ -202,18 +204,67 @@ static void InitScore(void) {
 
 static void UpdateScore(void) {
 	//<イージングの更新>
+	scoreManager.easingTScore += scoreManager.easingSpeed;
+	if (scoreManager.easingTScore >= 1.0f) {
+		scoreManager.easingTScore = 1.0f;
+		nowMode = ModeClear::CountUpCombo;
+	}
 
+	//スコアのカウントアップ演出
+	scoreManager.showScore = UpdateValueByEasing(0, scoreManager.nowScore, scoreManager.easingTScore, scoreManager.easingMode);
+
+
+
+}
+
+static void UpdateCombo(void) {
+	scoreManager.easingTCombo += scoreManager.easingSpeed;
+	if (scoreManager.easingTCombo >= 1.0f) {
+		scoreManager.easingTCombo = 1.0f;
+		nowMode = ModeClear::CheckBreakScore;
+	}
+
+	//コンボのカウント処理
+	scoreManager.showMaxCombo = UpdateValueByEasing(0, scoreManager.maxCombo, scoreManager.easingTCombo, scoreManager.easingMode);
 }
 
 static void DrawScore(void) {
 
 	//スコア
+	for (int i = 0; i < kScoreNumberLimit; i++) {
+		nowScoreNumbers[i].animNum = GetValueAtDigit(scoreManager.showScore, i);
 
+		Vector2 pos = { nowScoreNumbers[i].startPos.x + nowScoreNumbers[i].interval.x * (kScoreNumberLimit - i - 1), nowScoreNumbers[i].startPos.y };
+
+		Texture texture = clearScoreNumbersTexture;
+		texture.animNum = nowScoreNumbers[i].animNum;
+
+		DrawTextureUI(texture, pos, nowScoreNumbers[i].size);
+	}
 
 	//最大コンボ
+	for (int i = 0; i < kComboNumberLimit; i++) {
+		maxComboNumbers[i].animNum = GetValueAtDigit(scoreManager.maxCombo, i);
+
+		Vector2 pos = { maxComboNumbers[i].startPos.x + maxComboNumbers[i].interval.x * (kScoreNumberLimit - i - 1), maxComboNumbers[i].startPos.y };
+
+		Texture texture = clearScoreNumbersTexture;
+		texture.animNum = maxComboNumbers[i].animNum;
+
+		DrawTextureUI(texture, pos, maxComboNumbers[i].size);
+	}
 
 	//ハイスコア
+	for (int i = 0; i < kScoreNumberLimit; i++) {
+		bestScoreNumbers[i].animNum = GetValueAtDigit(scoreManager.bestScore, i);
 
+		Vector2 pos = { bestScoreNumbers[i].startPos.x + bestScoreNumbers[i].interval.x * (kScoreNumberLimit - i - 1), bestScoreNumbers[i].startPos.y };
+
+		Texture texture = clearScoreNumbersTexture;
+		texture.animNum = bestScoreNumbers[i].animNum;
+
+		DrawTextureUI(texture, pos, bestScoreNumbers[i].size);
+	}
 }
 
 #pragma endregion
@@ -392,6 +443,7 @@ static void DrawButton(void) {
 
 void InitClear(void) {
 	InitIcon();
+	InitScore();
 	InitMenuBackground();
 	InitButton();
 	InitSelect();
@@ -404,7 +456,10 @@ void UpdateClear(void) {
 
 			break;
 		case ModeClear::CountUpScore:
-
+			UpdateScore();
+			break;
+		case ModeClear::CountUpCombo:
+			UpdateCombo();
 
 			break;
 		case ModeClear::CheckBreakScore:
@@ -428,6 +483,6 @@ void DrawClear(void) {
 	DrawMenuBackground();
 
 	DrawIcon();
-
+	DrawScore();
 	DrawButton();
 }
