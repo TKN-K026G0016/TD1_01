@@ -29,8 +29,8 @@ struct MenuBackground {
 
 	//イージング関係
 	float easingT = 0.0f;
-	float easingSpeed = 0.08f;
-	EasingMode easingModeFrameIn = EasingMode::EaseIn;
+	float easingSpeed = 0.1f;
+	EasingMode easingModeFrameIn = EasingMode::EaseOut;
 	EasingMode easingModeFrameOut = EasingMode::EaseOut;
 
 	//座標
@@ -56,18 +56,19 @@ struct Icon {
 };
 //ポーズアイコン
 Icon pauseIcon;
-static Vector2 pauseIconPos = { 640, 600 };
-static Vector2 pauseIconSize = { 512, 128 };
+static Vector2 pauseIconSize = { 600, 150 };
+Vector2 iconStandbyPos = { -150, 600 };
+Vector2 iconViewPos = { 300, 600 };
 
 //セレクトアイコンのサイズ
 static Vector2 selectIconSize = { 256, 64 };
 
 static Icon resumeIcon;
-static Vector2 resumeIconPos = { 640, 200 };
+static Vector2 resumeIconOffset = { 430, -140 };
 static Icon retryIcon;
-static Vector2 retryIconPos = { 640, 130 };
+static Vector2 retryIconOffset = { 430, -210 };
 static Icon exitIcon;
-static Vector2 exitIconPos = { 640, 60 };
+static Vector2 exitIconOffset = { 430, -280 };
 
 #pragma endregion
 
@@ -242,24 +243,32 @@ static void ChangeScene(void) {
 static void InitIcon(void) {
 	if (pauseIcon.texture.tHandle != -1) return;
 
-	pauseIcon.pos = pauseIconPos;
 	pauseIcon.size = pauseIconSize;
 	pauseIcon.texture = GetTexture(TextureType::PauseIcon);
 
-	resumeIcon.pos = resumeIconPos;
 	resumeIcon.size = selectIconSize;
 	resumeIcon.texture = GetTexture(TextureType::ResumeIcon);
 
-	retryIcon.pos = retryIconPos;
 	retryIcon.size = selectIconSize;
 	retryIcon.texture = GetTexture(TextureType::RetryIcon);
 
-	exitIcon.pos = exitIconPos;
 	exitIcon.size = selectIconSize;
 	exitIcon.texture = GetTexture(TextureType::ExitIcon);
 }
 
 static void UpdateIcon(void) {
+
+	//PauseIconの処理
+	pauseIcon.pos = MoveByEasing(iconStandbyPos, iconViewPos, menuBackground.easingT, EasingMode::EaseOut);
+
+	//resumeIconの処理
+	resumeIcon.pos = { menuBackground.pos.x + resumeIconOffset.x, menuBackground.pos.y + resumeIconOffset.y };
+	//retryIconの処理
+	retryIcon.pos = { menuBackground.pos.x + retryIconOffset.x, menuBackground.pos.y + retryIconOffset.y };
+	//exitIconの処理
+	exitIcon.pos = { menuBackground.pos.x + exitIconOffset.x, menuBackground.pos.y + exitIconOffset.y };
+
+#pragma region 点灯処理
 	//resumeIcon
 	if (nowSelect == ModePauseSelect::Resume) {
 		resumeIcon.texture.animNum = 1;
@@ -280,6 +289,9 @@ static void UpdateIcon(void) {
 	} else {
 		exitIcon.texture.animNum = 0;
 	}
+
+#pragma endregion
+
 }
 
 static void DrawIcon(void) {
