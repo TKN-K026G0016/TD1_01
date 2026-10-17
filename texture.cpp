@@ -23,9 +23,10 @@ void InitTexture(void) {
 		//Menu
 		//===============
 		{ Novice::LoadTexture("./resources/texture/ui/menu/menu_background.png"), { 1280, 720 }, {0, 0}, 0, 0, WHITE },
-		{ Novice::LoadTexture("./resources/texture/ui/menu/resume.png"), { 256, 64 }, {0, 0}, 0, 0, WHITE },
-		{ Novice::LoadTexture("./resources/texture/ui/menu/retry.png"), { 256, 64 }, {0, 0}, 0, 0, WHITE },
-		{ Novice::LoadTexture("./resources/texture/ui/menu/exit.png"), { 256, 64 }, {0, 0}, 0, 0, WHITE },
+		{ Novice::LoadTexture("./resources/texture/ui/menu/resume_button.png"), { 256, 64 }, {0, 0}, 0, 0, WHITE },
+		{ Novice::LoadTexture("./resources/texture/ui/menu/retry_button.png"), { 256, 64 }, {0, 0}, 0, 0, WHITE },
+		{ Novice::LoadTexture("./resources/texture/ui/menu/exit_button.png"), { 256, 64 }, {0, 0}, 0, 0, WHITE },
+		{ Novice::LoadTexture("./resources/texture/ui/menu/menu_cursor.png"), { 64, 64 }, {0, 0}, 0, 0, WHITE },
 
 		//===============
 		//Title
@@ -120,16 +121,17 @@ void InitTexture(void) {
 		//===============
 		//Pause
 		//===============
-		{ Novice::LoadTexture("./resources/texture/ui/pause/pause_icon.png"), { 512, 128 }, {0, 0}, 0, 0, WHITE },
+		{ Novice::LoadTexture("./resources/texture/ui/pause/pause_icon.png"), { 600, 150 }, {0, 0}, 0, 0, WHITE },
 
 		//===============
 		//Clear
 		//===============
+		{ Novice::LoadTexture("./resources/texture/ui/clear/clear_icon.png"), { 680, 150 }, {0, 0}, 0, 0, WHITE },
 
 		//===============
 		//Gameover
 		//===============
-
+		{ Novice::LoadTexture("./resources/texture/ui/gameover/gameover_icon.png"), { 600, 150 }, {0, 0}, 0, 0, WHITE },
 	};
 
 	memcpy(textures, temp, sizeof(textures));

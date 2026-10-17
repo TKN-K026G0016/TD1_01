@@ -34,7 +34,7 @@ enum class TextureType {
 	ResumeIcon,
 	RetryIcon,
 	ExitIcon,
-
+	MenuCursor,
 
 	//===============
 	//Title
@@ -135,10 +135,12 @@ enum class TextureType {
 	//===============
 	//Clear
 	//===============
+	ClearIcon,
 
 	//===============
 	//Gameover
 	//===============
+	GameoverIcon,
 
 	Count
 };

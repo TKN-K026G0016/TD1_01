@@ -6,6 +6,9 @@
 #include "tool.h"
 #include "common.h"
 
+#define _USE_MATH_DEFINES
+#include <math.h>
+
 #pragma region データ: 選択関係
 
 enum class ModePauseSelect {
@@ -57,7 +60,7 @@ struct Icon {
 //ポーズアイコン
 Icon pauseIcon;
 static Vector2 pauseIconSize = { 600, 150 };
-Vector2 iconStandbyPos = { -150, 600 };
+Vector2 iconStandbyPos = { -200, 600 };
 Vector2 iconViewPos = { 300, 600 };
 
 //セレクトアイコンのサイズ
@@ -66,9 +69,22 @@ static Vector2 selectIconSize = { 256, 64 };
 static Icon resumeIcon;
 static Vector2 resumeIconOffset = { 430, -140 };
 static Icon retryIcon;
-static Vector2 retryIconOffset = { 430, -210 };
+static Vector2 retryIconOffset = { 460, -210 };
 static Icon exitIcon;
-static Vector2 exitIconOffset = { 430, -280 };
+static Vector2 exitIconOffset = { 480, -280 };
+
+struct MenuCursor {
+	Vector2 pos = {};
+	Vector2 size = { 64, 64 };
+
+	Vector2 offset = { -160, 0 };
+
+	float rotateTheta = 0.0f;
+	float rotateSpeed = ToFloat(M_PI) / 20.0f;
+
+	Texture texture = {};
+};
+MenuCursor menuCursor;
 
 #pragma endregion
 
@@ -254,6 +270,8 @@ static void InitIcon(void) {
 
 	exitIcon.size = selectIconSize;
 	exitIcon.texture = GetTexture(TextureType::ExitIcon);
+
+	menuCursor.texture = GetTexture(TextureType::MenuCursor);
 }
 
 static void UpdateIcon(void) {
@@ -294,6 +312,30 @@ static void UpdateIcon(void) {
 
 }
 
+static void UpdateCursor(void) {
+
+	Vector2 targetPos = {};
+	switch (nowSelect) {
+	case ModePauseSelect::Resume:
+		targetPos = { resumeIcon.pos.x + menuCursor.offset.x,resumeIcon.pos.y + menuCursor.offset.y };
+		break;
+
+	case ModePauseSelect::Retry:
+		targetPos = { retryIcon.pos.x + menuCursor.offset.x,retryIcon.pos.y + menuCursor.offset.y };
+		break;
+
+	case ModePauseSelect::Exit:
+		targetPos = { exitIcon.pos.x + menuCursor.offset.x,exitIcon.pos.y + menuCursor.offset.y };
+		break;
+	}
+
+	menuCursor.pos = targetPos;
+
+	//回転処理
+	menuCursor.rotateTheta -= menuCursor.rotateSpeed;
+
+}
+
 static void DrawIcon(void) {
 	//PauseIcon
 	DrawTextureUI(pauseIcon.texture, pauseIcon.pos, pauseIcon.size);
@@ -306,6 +348,10 @@ static void DrawIcon(void) {
 
 	//exitIcon
 	DrawTextureUI(exitIcon.texture, exitIcon.pos, exitIcon.size);
+}
+
+static void DrawCursor(void) {
+	DrawTextureRotateUI(menuCursor.texture, menuCursor.pos, menuCursor.size, menuCursor.rotateTheta);
 }
 
 #pragma endregion
@@ -325,6 +371,7 @@ void UpdatePause(void) {
 
 	UpdateMenuBackground();
 	UpdateIcon();
+	UpdateCursor();
 
 	ChangeScene();
 }
@@ -334,4 +381,5 @@ void DrawPause(void) {
 	DrawMenuBackground();
 
 	DrawIcon();
+	DrawCursor();
 }
