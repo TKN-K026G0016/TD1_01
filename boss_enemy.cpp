@@ -430,6 +430,7 @@ static void MoveAfterDead(void) {
 			createPos.x = bossEnemy.pos.x + ToFloat(GetRand(-createExploseRange.x / 2, createExploseRange.x / 2));
 			createPos.y = bossEnemy.pos.y + ToFloat(GetRand(-createExploseRange.y / 2, createExploseRange.y / 2));
 			CreateExplodeEffect(createPos, WHITE);
+			CreateFlashPanel();
 		}
 	}
 

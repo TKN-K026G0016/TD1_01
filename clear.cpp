@@ -4,6 +4,7 @@
 #include "score_data.h"
 #include "elec_bullet.h"
 #include "title_background.h"
+#include "effect.h"
 
 #include "tool.h"
 #include "texture.h"
@@ -200,6 +201,10 @@ static void InitIcon(void) {
 }
 
 static void UpdateIcon(void) {
+	if (CheckInputAction(InputAction::Confirm)) {
+		clearIcon.easingT = 1.0f;
+	}
+
 	clearIcon.easingT += clearIcon.easingSpeed;
 	if (clearIcon.easingT >= 1.0f) {
 		clearIcon.easingT = 1.0f;
@@ -254,6 +259,8 @@ static void InitScore(void) {
 }
 
 static void MoveScoreIcon(void) {
+
+
 	//アイコンの移動処理
 	scoreIcon.pos.x = UpdateValueByEasing(scoreIcon.standbyPosX, scoreIcon.showPosX, clearIcon.easingT, clearIcon.easingMode);
 	maxComboIcon.pos.x = UpdateValueByEasing(maxComboIcon.standbyPosX, maxComboIcon.showPosX, clearIcon.easingT, clearIcon.easingMode);
@@ -270,6 +277,10 @@ static void MoveScoreIcon(void) {
 }
 
 static void UpdateScore(void) {
+	if (CheckInputAction(InputAction::Confirm)) {
+		scoreManager.easingTScore = 1.0f;
+	}
+
 	//<イージングの更新>
 	scoreManager.easingTScore += scoreManager.easingSpeed;
 	if (scoreManager.easingTScore >= 1.0f) {
@@ -282,6 +293,10 @@ static void UpdateScore(void) {
 }
 
 static void UpdateCombo(void) {
+	if (CheckInputAction(InputAction::Confirm)) {
+		scoreManager.easingTCombo = 1.0f;
+	}
+
 	scoreManager.easingTCombo += scoreManager.easingSpeed;
 	if (scoreManager.easingTCombo >= 1.0f) {
 		scoreManager.easingTCombo = 1.0f;
@@ -345,6 +360,7 @@ static void CheckBreakScore(void) {
 		UpdateHighScore();
 
 		//演出実装
+		CreateFlashPanel();
 
 		scoreManager.breakScore = true;
 	}
@@ -356,6 +372,8 @@ static void CheckBreakScore(void) {
 			scoreManager.waitBreakScoreTimer.count = 0;
 
 			nowMode = ModeClear::Select;
+
+			scoreManager.bestScore = GetHighScore();
 		}
 
 	}
@@ -592,4 +610,6 @@ void DrawClear(void) {
 	DrawIcon();
 	DrawScore();
 	DrawButton();
+
+	DrawEffect();
 }

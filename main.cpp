@@ -4,10 +4,11 @@
 #include "se.h"
 #include "bgm.h"
 #include "tool.h"
+#include "score_data.h"
 #include "common.h"
 #include "scene_manager.h"
 
-const char kWindowTitle[] = "LC1A_14_タカノハヤト_UltimateLaser";
+const char kWindowTitle[] = "LC1A_14_タカノハヤト_EleChained!";
 
 // Windowsアプリでのエントリーポイント(main関数)
 int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) 
@@ -29,6 +30,7 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int)
 	InitSe();
 	InitBgm();
 	InitScene();
+	InitScoreData();
 
 	///
 	/// ↑初期化処理ここまで
