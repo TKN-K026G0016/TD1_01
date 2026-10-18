@@ -118,6 +118,15 @@ DataShootLaser dataShootLaser;
 
 #pragma endregion
 
+#pragma region データ: 撃破演出
+Timer createExploseTimer = { 30, 0 };
+int createExploseTimerMax = 30;
+int createExploseTimerMin =4;
+
+Vector2i createExploseRange = { 300, 300 };
+
+#pragma endregion
+
 Vector2 playerPos;
 
 #pragma region 関数: 行動パターン関係
@@ -414,13 +423,40 @@ static void MoveAfterDead(void) {
 	if (bossEnemy.deadTimer.count >= bossEnemy.deadTimer.time) {
 		bossEnemy.deadTimer.count = 0;
 		bossEnemy.isAlive = false;
+
+		//最後に5発爆発
+		for (int i = 0; i < 8; i++) {
+			Vector2 createPos;
+			createPos.x = bossEnemy.pos.x + ToFloat(GetRand(-createExploseRange.x / 2, createExploseRange.x / 2));
+			createPos.y = bossEnemy.pos.y + ToFloat(GetRand(-createExploseRange.y / 2, createExploseRange.y / 2));
+			CreateExplodeEffect(createPos, WHITE);
+		}
 	}
+
+	//爆発演出
+	createExploseTimer.count++;
+	if (createExploseTimer.count >= createExploseTimer.time) {
+		createExploseTimer.count = 0;
+		if (createExploseTimer.time > createExploseTimerMin) {
+			createExploseTimer.time-= 5;
+			if (createExploseTimer.time < createExploseTimerMin) {
+				createExploseTimer.time = createExploseTimerMin;
+			}
+		}
+
+		Vector2 createPos;
+		createPos.x = bossEnemy.pos.x + ToFloat(GetRand(-createExploseRange.x / 2, createExploseRange.x / 2));
+		createPos.y = bossEnemy.pos.y + ToFloat(GetRand(-createExploseRange.y / 2, createExploseRange.y / 2));
+		CreateExplodeEffect(createPos, WHITE);
+	}
+
 }
 
 #pragma endregion
 
 void InitBossEnemy(void) {
 	bossEnemy = {};
+	createExploseTimer.time = createExploseTimerMax;
 
 	//ステージの中心座標を取得(shootLaser時のため)
 	Vector2 movablePos[2];
@@ -433,6 +469,8 @@ void InitBossEnemy(void) {
 		bossBomb[i].texture = GetTexture(TextureType::BossBomb);
 		bossBomb[i].burstTexture = GetTexture(TextureType::BossBomBurstRange);
 	}
+
+	//SpawnBoss({ 500, 500 });
 
 }
 

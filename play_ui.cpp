@@ -649,8 +649,6 @@ static void DrawPowRate(void) {
 
 static void InitProgressGauge(void) {
 	if (!kShowProgressGaugeSwitch) return;
-	//ボスが出たら出現しない
-	if (GetBossEnemyIsAlive()) return;
 
 	progressGauge.frameTexture = GetTexture(TextureType::ProgressGauge);
 	progressGaugeIcon.texture = GetTexture(TextureType::ProgressGaugeIcon);

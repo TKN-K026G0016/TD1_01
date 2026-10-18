@@ -103,7 +103,7 @@ struct ScoreValueIcon {
 	Vector2 pos = {};
 	Vector2 size = { 512, 64 };
 
-	float standbyPosX = -200;
+	float standbyPosX = -900;
 	float showPosX =  250 ;
 
 	Texture texture = {};
@@ -218,6 +218,7 @@ static void DrawIcon(void) {
 #pragma region 関数: スコア関係
 
 static void InitScore(void) {
+
 	//データ初期化
 	for (int i = 0; i < kScoreNumberLimit; i++) {
 		nowScoreNumbers[i] = {};
@@ -312,7 +313,7 @@ static void DrawScore(void) {
 
 	//最大コンボ
 	for (int i = 0; i < kComboNumberLimit; i++) {
-		maxComboNumbers[i].animNum = GetValueAtDigit(scoreManager.maxCombo, i);
+		maxComboNumbers[i].animNum = GetValueAtDigit(scoreManager.showMaxCombo, i);
 
 		Vector2 pos = { maxComboNumbers[i].startPos.x + maxComboNumbers[i].interval.x * (kScoreNumberLimit - i - 1), maxComboNumbers[i].startPos.y };
 
@@ -539,6 +540,8 @@ static void DrawButton(void) {
 #pragma endregion
 
 void InitClear(void) {
+	nowMode = ModeClear::IconFrameIn;
+
 	InitIcon();
 	InitScore();
 	InitMenuBackground();

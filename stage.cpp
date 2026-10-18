@@ -463,10 +463,10 @@ static void UpdateWarningBoss(void) {
 }
 
 static void GoClearScene(void) {
-	if (nowRound != Round::RoundBoss) return;
+	/*if (nowRound != Round::RoundBoss) return;*/
 
 	//生存していたらスキップ
-	if(GetBossEnemyIsAlive()) return;
+	if(GetBossEnemyIsAlive() || !GetBossEnemyIsDead()) return;
 
 	//フェードアウトし始めたらスキップ
 	if (GetNowModeFade() != ModeFade::Standby) return;
