@@ -40,7 +40,8 @@ enum class TextureType {
 	//Title
 	//===============
 	TitleLogo,
-	TitleInst,
+	TitleInstShot,
+	TitleInstStart,
 
 	TitleLine,
 	TitleEffect,

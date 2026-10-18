@@ -50,7 +50,25 @@ Vector2 spawnShockPos[5] = {
 	{700, 480},
 };
 
+struct TitleInst {
+	Vector2 pos = { 640, 200 };
+	Vector2 size = { 640, 64 };
 
+	//<イージング>
+	float easingT = 0.0f;
+	float easingSpeed = 0.01f;
+	EasingMode easingMode = EasingMode::EaseInOut;
+	float isFadeIn = true;
+
+	//透明度
+	int alpha = 0;
+	int alphaMin = 0;
+	int alphaMax = 170;
+
+	Texture texture = {};
+};
+TitleInst instShot;
+TitleInst instStart;
 
 #pragma endregion
 
@@ -89,6 +107,7 @@ FlashPanel flashPanel;
 
 #pragma endregion
 
+
 #pragma region 関数: 項目決定
 
 static void Confirm(void) {
@@ -107,7 +126,7 @@ static void Confirm(void) {
 
 #pragma endregion
 
-#pragma region ロゴ関係
+#pragma region ロゴ・インスト関係
 
 static void InitLogo(void) {
 	logo = {};
@@ -166,6 +185,48 @@ static void DrawLogo(void) {
 	}
 
 	DrawTextureUI(texture, showPos, logo.size);
+}
+
+static void InitInst(void) {
+	instShot = {};
+	instShot.texture = GetTexture(TextureType::TitleInstShot);
+
+	instStart = {};
+	instStart.texture = GetTexture(TextureType::TitleInstStart);
+}
+
+static void UpdateInst(void) {
+	if (instShot.isFadeIn) {
+		instShot.easingT += instShot.easingSpeed;
+		if (instShot.easingT >= 1.0f) {
+			instShot.easingT = 1.0f;
+			instShot.isFadeIn = false;
+		}
+	} else {
+		instShot.easingT -= instShot.easingSpeed;
+		if (instShot.easingT < 0.0f) {
+			instShot.easingT = 0.0f;
+			instShot.isFadeIn = true;
+		}
+	}
+
+
+}
+
+static void DrawInst(void) {
+	if (nowMode == ModeTitle::MovePlayer) {
+		Texture texture = instShot.texture;
+		texture.color = (texture.color & 0xFFFFFF00) | instShot.alpha;
+
+		DrawTextureUI(texture, instShot.pos, instShot.size);
+	}
+
+	if (nowMode == ModeTitle::WaitInput) {
+		Texture texture = instStart.texture;
+		texture.color = (texture.color & 0xFFFFFF00) | instStart.alpha;
+
+		DrawTextureUI(texture, instStart.pos, instStart.size);
+	}
 }
 
 #pragma endregion
