@@ -453,3 +453,4 @@ void DrawTitle(void) {
 	DrawFlashPanel();
 	DrawEffect();
 }
+
