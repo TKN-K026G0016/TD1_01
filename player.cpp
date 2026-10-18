@@ -227,6 +227,32 @@ Timer createSmokeTimer = { 15, 0 };
 Timer createChargeOrbTimer = { 10, 0 };
 Timer createChargeChipTimer = { 10, 0 };
 
+//開始演出処理
+struct StartEffectManager {
+
+	//開始演出の状態
+	ModeStartEffect nowMode = ModeStartEffect::WaitPlayerSpawn;
+
+	//イージング関係
+	float easingT = 0.0f;
+	float easingSpeed = 0.05f;
+	EasingMode easingMode = EasingMode::EaseIn;
+
+	//回転速度
+	float rotateSpeed = ToFloat(M_PI) / 20.0f;
+
+	//サイズ
+	float sizeValue = 0;
+	float sizeValueMax = 500;
+	float sizeValueMin = player.size.x;
+
+	//不透明度
+	int alpha = 0;
+	int alphaMin = 0;
+	int alphaMax = 255;
+};
+StartEffectManager startEffectManager;
+
 #pragma endregion
 
 /// <summary>
@@ -651,10 +677,11 @@ static void ShootElecBullet(void) {
 }
 
 /// <summary>
-/// エネルギーの消費処理
+/// エネルギーの常時消費処理
 /// </summary>
 static void ConsumptionEnergy(void) {
 	if (!player.isAlive) return;
+	if (startEffectManager.nowMode != ModeStartEffect::Standby) return;
 
 	if (player.nowState != PlayerState::Normal) return;
 
@@ -774,6 +801,27 @@ static void CreateChargeOrbEffect(void) {
 	}
 }
 
+static void UpdateStartEffect(void) {
+	startEffectManager.nowMode = GetNowModeStart();
+
+	if (startEffectManager.nowMode != ModeStartEffect::WaitPlayerSpawn) return;
+
+	if (startEffectManager.easingT >= 1.0f) return;
+
+	startEffectManager.easingT += startEffectManager.easingSpeed;
+	if (startEffectManager.easingT >= 1.0f) {
+		startEffectManager.easingT = 1.0f;
+	}
+
+	player.rotateTheta += startEffectManager.rotateSpeed;
+
+	//サイズ変更
+	startEffectManager.sizeValue = UpdateValueByEasing(startEffectManager.sizeValueMax, startEffectManager.sizeValueMin, startEffectManager.easingT, startEffectManager.easingMode);
+
+	//フェード処理
+	startEffectManager.alpha = UpdateValueByEasing(startEffectManager.alphaMin, startEffectManager.alphaMax, startEffectManager.easingT, startEffectManager.easingMode);
+}
+
 #pragma endregion
 
 #pragma region 関数: 死亡判定など
@@ -856,25 +904,12 @@ static void CheckDeadPlayer(void) {
 
 #pragma endregion
 
-#pragma region 関数: デバッグ
-
-static void ReplenishmentEnergy(void) {
-#ifdef _DEBUG
-
-	//if (CheckInputAction(InputAction::Lock)) {
-	//	player.remainEnergy += 0.9f;
-	//}
-
-#endif // _DEBUG
-
-}
-
-#pragma endregion
 
 void InitPlayer(void) {
 	player = {};
 	player.texture = GetTexture(TextureType::Player);
 	player.remainEnergy = kFirstEnergy;
+	startEffectManager = {};
 
 	//chargeOrb.texture = GetTexture(TextureType::ChargeOrb);
 
@@ -906,14 +941,25 @@ void UpdatePlayer(void) {
 	UpdateInvinciblePlayer();
 	CheckDeadPlayer();
 
-	ReplenishmentEnergy();
+	UpdateStartEffect();
 }
 
 void DrawPlayer(void) {
 	if (!player.isAlive || isInvisible) return;
 
-	//本体の描画
-	DrawTextureRotateObj(player.texture, player.pos, player.size, player.rotateTheta);
+	//通常時
+	if (startEffectManager.nowMode != ModeStartEffect::WaitPlayerSpawn) {
+		DrawTextureRotateObj(player.texture, player.pos, player.size, player.rotateTheta);
+	}
+	//開始演出
+	else {
+		Vector2 size = { startEffectManager.sizeValue, startEffectManager.sizeValue };
+
+		Texture texture = player.texture;
+		texture.color = (texture.color & 0xFFFFFF00) | startEffectManager.alpha;
+
+		DrawTextureRotateObj(texture, player.pos, size, player.rotateTheta);
+	}
 
 	DrawLockOnSign();
 

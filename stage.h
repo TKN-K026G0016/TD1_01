@@ -2,6 +2,17 @@
 #include "vector2.h"
 #include "timer.h"
 
+enum class ModeStartEffect {
+	//プレイヤーの生成を待つ処理
+	WaitPlayerSpawn,
+	//Readyの表示
+	Ready,
+	//Goの表示
+	Go,
+
+	Standby
+};
+
 void InitStage(void);
 void UpdateStage(void);
 void DrawStage(void);
@@ -35,3 +46,5 @@ TimeData GetGameTimeData(void);
 /// ボスラウンド開始時間を取得
 /// </summary>
 TimeData GetBossRoundTimeData(void);
+
+ModeStartEffect GetNowModeStart(void);

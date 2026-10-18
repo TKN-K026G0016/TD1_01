@@ -126,6 +126,9 @@ enum class TextureType {
 
 	DisplayEffect,
 
+	ReadyTelop,
+	GoTelop,
+
 	//effect
 	EffectSquare,
 	EffectSquareMini,

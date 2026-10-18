@@ -1775,11 +1775,11 @@ void InitEffect() {
 	InitElecLineEffect();
 	InitBombExplosionEffect();
 	
-	CreateBombExplosionEffect({100,100}, 768,WHITE);
+	/*CreateBombExplosionEffect({100,100}, 768,WHITE);*/
 
 #ifdef _DEBUG
 
-	CreateJemEffect();
+	/*CreateJemEffect();*/
 
 	//CreateGageEffect();
 

@@ -292,6 +292,18 @@ Texture displayEffectTexture = {};
 
 #pragma endregion
 
+#pragma region データ: 開始演出
+
+struct StartTelop {
+	Vector2 pos = { 640, 550 };
+	Vector2 size = { 512, 128 };
+};
+StartTelop startTelop;
+Texture readyTexture = {};
+Texture goTexture = {};
+
+#pragma endregion
+
 #pragma region 関数: ライフアイコン
 
 static void InitLifeIcon(void) {
@@ -826,6 +838,32 @@ void TriggerDisplayEffect(void) {
 
 #pragma endregion
 
+#pragma region 関数: 開始演出
+
+static void InitStartTelop(void) {
+	startTelop = {};
+	readyTexture = GetTexture(TextureType::ReadyTelop);
+	goTexture = GetTexture(TextureType::GoTelop);
+}
+
+static void UpdateStartTelop(void) {
+
+}
+
+static void DrawStartTelop(void) {
+	ModeStartEffect nowMode = GetNowModeStart();
+
+	if (nowMode == ModeStartEffect::WaitPlayerSpawn || nowMode == ModeStartEffect::Standby) return;
+
+	Texture texture;
+	texture = (nowMode == ModeStartEffect::Ready) ? readyTexture : goTexture;
+
+	DrawTextureUI(texture, startTelop.pos, startTelop.size);
+}
+
+#pragma endregion
+
+
 void InitPlayUI(void) {
 	InitLifeIcon();
 	InitEnergyGauge();
@@ -834,6 +872,7 @@ void InitPlayUI(void) {
 	InitShockCombo();
 	InitScore();
 	InitDisplayEffect();
+	InitStartTelop();
 }
 
 void UpdatePlayUI(void) {
@@ -844,6 +883,7 @@ void UpdatePlayUI(void) {
 	UpdateShockCombo();
 	UpdateScore();
 	UpdateDisplayEffect();
+	UpdateStartTelop();
 }
 
 void DrawPlayUI(void) {
@@ -855,6 +895,7 @@ void DrawPlayUI(void) {
 	DrawPowRate();
 	DrawProgressGauge();
 	DrawShockCombo();
+	DrawStartTelop();
 
 	DrawScore();
 }

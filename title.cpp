@@ -414,6 +414,8 @@ static void DrawFlashPanel(void) {
 #pragma endregion
 
 void InitTitle(void) {
+	nowMode = ModeTitle::MovePlayer;
+
 	InitTitleBackground();
 
 	InitTitlePlayer();
