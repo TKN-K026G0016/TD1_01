@@ -56,9 +56,12 @@ struct TitleInst {
 
 	//<イージング>
 	float easingT = 0.0f;
-	float easingSpeed = 0.01f;
+	float easingSpeedShot = 0.01f;
+	float easingSpeedStart = 0.03f;
 	EasingMode easingMode = EasingMode::EaseInOut;
 	float isFadeIn = true;
+
+	Timer waitEasingTimer = { 120, 0 };
 
 	//透明度
 	int alpha = 0;
@@ -196,22 +199,56 @@ static void InitInst(void) {
 }
 
 static void UpdateInst(void) {
-	if (instShot.isFadeIn) {
-		instShot.easingT += instShot.easingSpeed;
-		if (instShot.easingT >= 1.0f) {
-			instShot.easingT = 1.0f;
-			instShot.isFadeIn = false;
-		}
-	} else {
-		instShot.easingT -= instShot.easingSpeed;
-		if (instShot.easingT < 0.0f) {
-			instShot.easingT = 0.0f;
-			instShot.isFadeIn = true;
-		}
+
+	if (instShot.waitEasingTimer.count < instShot.waitEasingTimer.time) {
+		instShot.waitEasingTimer.count++;
+
+		return;
 	}
 
-	instShot.alpha = UpdateValueByEasing(instShot.alphaMin, instShot.alphaMax, instShot.easingT, instShot.easingMode);
-	instStart.alpha = UpdateValueByEasing(instShot.alphaMin, instShot.alphaMax, instShot.easingT, instShot.easingMode);
+#pragma region instShotの処理
+	if (nowMode == ModeTitle::MovePlayer) {
+
+		if (instShot.isFadeIn) {
+			instShot.easingT += instShot.easingSpeedShot;
+			if (instShot.easingT >= 1.0f) {
+				instShot.easingT = 1.0f;
+				instShot.isFadeIn = false;
+			}
+		} else {
+			instShot.easingT -= instShot.easingSpeedShot;
+			if (instShot.easingT < 0.0f) {
+				instShot.easingT = 0.0f;
+				instShot.isFadeIn = true;
+			}
+		}
+
+		instShot.alpha = UpdateValueByEasing(instShot.alphaMin, instShot.alphaMax, instShot.easingT, instShot.easingMode);
+	}
+
+#pragma endregion
+
+#pragma region instStartの処理
+
+	if (nowMode == ModeTitle::WaitInput) {
+		if (instStart.isFadeIn) {
+			instStart.easingT += instStart.easingSpeedStart;
+			if (instStart.easingT >= 1.0f) {
+				instStart.easingT = 1.0f;
+				instStart.isFadeIn = false;
+			}
+		} else {
+			instStart.easingT -= instStart.easingSpeedStart;
+			if (instStart.easingT < 0.0f) {
+				instStart.easingT = 0.0f;
+				instStart.isFadeIn = true;
+			}
+		}
+
+		instStart.alpha = UpdateValueByEasing(instStart.alphaMin, instStart.alphaMax, instStart.easingT, instStart.easingMode);
+	}
+
+#pragma endregion
 }
 
 static void DrawInst(void) {

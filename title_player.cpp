@@ -12,7 +12,7 @@
 #include <math.h>
 
 struct TitlePlayer {
-	Vector2 pos = { 640, 100 };
+	Vector2 pos = { 640, -200 };
 	Vector2 size = { 32, 32 };
 
 
@@ -27,11 +27,15 @@ struct TitlePlayer {
 	//<回転関係>
 	float rotateTheta = ToFloat(M_PI) / 2.0f;
 
-	//<射撃関係>
-	//射撃スパン
-	Timer shootTimer = { 2, 0 };
-	//エネルギー残量
-	float remainEnergy = 0.0f;
+	//最初の移動を開始するまでの時間
+	Timer waitMoveStartTimer = { 60, 0 };
+
+	//最初の移動演出
+	float easingT = 0.0f;
+	float easingSpeed = 0.01f;
+	EasingMode easingMode = EasingMode::EaseOut;
+	Vector2 startPos = { 640, -200 };
+	Vector2 endPos = { 640, 100 };
 
 	Texture texture = {};
 };
@@ -74,6 +78,8 @@ static void CheckInput(void) {
 }
 
 static void MovePlayer(void) {
+	if (player.easingT < 1.0f) return;
+
 	Vector2 moveVec = player.inputVec;
 	float moveVecLength = sqrtf(moveVec.x * moveVec.x + moveVec.y * moveVec.y);
 	if (moveVecLength != 0) {
@@ -87,6 +93,8 @@ static void MovePlayer(void) {
 }
 
 static void ClampPlayerPos(void) {
+	if (player.easingT < 1.0f) return;
+
 	//横
 	if (player.pos.x < 0.0f) {
 		player.pos.x = 0.0f;
@@ -158,8 +166,22 @@ static void CreateChargeOrbEffect(void) {
 	}
 }
 
+static void MovePlayerFirst(void) {
+	if (player.easingT >= 1.0f) return;
+
+	player.waitMoveStartTimer.count++;
+	if (player.waitMoveStartTimer.count < player.waitMoveStartTimer.time) return;
+	
+	player.easingT += player.easingSpeed;
+	if (player.easingT >= 1.0f) {
+		player.easingT = 1.0f;
+	}
+	player.pos = MoveByEasing(player.startPos, player.endPos, player.easingT, player.easingMode);
+}
+
 void InitTitlePlayer(void) {
 	player = {};
+	player.pos = player.startPos;
 	player.texture = GetTexture(TextureType::Player);
 }
 
@@ -171,6 +193,8 @@ void UpdateTitlePlayer(void) {
 
 	ShootElecBullet();
 	CreateChargeOrbEffect();
+
+	MovePlayerFirst();
 }
 
 void DrawTitlePlayer(void) {
