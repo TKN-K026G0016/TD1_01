@@ -172,7 +172,7 @@ Timer goTelopTimer = { 30, 0 };
 Timer goToGameoverTimer = { 150, 0 };
 
 //boss死亡後、クリアへ向かうまでの時間
-Timer goToClearTimer = { 120, 0 };
+Timer goToClearTimer = { 180, 0 };
 
 #pragma region データ: ボス警告
 
