@@ -304,6 +304,34 @@ Texture goTexture = {};
 
 #pragma endregion
 
+#pragma region データ: ボス警告演出
+
+struct WarningBossTelop {
+	Vector2 pos = { 640, 590 };
+	Vector2 size = { 512, 128 };
+
+	//振動関係
+	Timer shakeTimer = { 10, 0 };
+	int shakeDuration = 3;
+
+	//イージング関係
+	float easingT = 0.0f;
+	float easingSpeed = 0.03f;
+	bool isFadeIn = true;
+	EasingMode easingMode = EasingMode::EaseInOut;
+
+	//透明度関係
+	int alpha = 0;
+	int alphaMin = 0;
+	int alphaMax = 190;
+
+	Texture texture = {};
+};
+WarningBossTelop bossTelop;
+
+#pragma endregion
+
+
 #pragma region 関数: ライフアイコン
 
 static void InitLifeIcon(void) {
@@ -761,7 +789,7 @@ static void UpdateScore(void) {
 	} else {
 		scoreIcon.showScore = nowScore;
 		scoreIcon.easingT = 0.0f;
-		
+
 	}
 
 	for (int i = 0; i < kScoreNumbersLimit; i++) {
@@ -771,7 +799,7 @@ static void UpdateScore(void) {
 
 static void DrawScore(void) {
 	for (int i = 0; i < kScoreNumbersLimit; i++) {
-		Vector2 pos = { scoreNumbers[i].startPos.x + scoreNumbers[i].interval.x *(kScoreNumbersLimit - i -1), scoreNumbers[i].startPos.y };
+		Vector2 pos = { scoreNumbers[i].startPos.x + scoreNumbers[i].interval.x * (kScoreNumbersLimit - i - 1), scoreNumbers[i].startPos.y };
 
 		Texture texture = scoreNumbersTexture;
 		texture.animNum = scoreNumbers[i].animNum;
@@ -863,6 +891,49 @@ static void DrawStartTelop(void) {
 
 #pragma endregion
 
+#pragma region 関数: ボス警告演出
+
+static void InitBossTelop(void) {
+	bossTelop = {};
+	bossTelop.texture = GetTexture(TextureType::WarnBossTelop);
+}
+
+static void UpdateBossTelop(void) {
+
+	//媒介変数の更新
+	if (bossTelop.isFadeIn && GetIsWarningBoss()) {
+		bossTelop.easingT += bossTelop.easingSpeed;
+		if (bossTelop.easingT >= 1.0f) {
+			bossTelop.easingT = 1.0f;
+			bossTelop.isFadeIn = false;
+		}
+	} else {
+		bossTelop.easingT -= bossTelop.easingSpeed;
+		if (bossTelop.easingT <= 0.0f) {
+			bossTelop.easingT = 0.0f;
+			bossTelop.isFadeIn = true;
+		}
+	}
+
+	//フェード処理
+	bossTelop.alpha = UpdateValueByEasing(bossTelop.alphaMin, bossTelop.alphaMax, bossTelop.easingT, bossTelop.easingMode);
+}
+
+static void DrawBossTelop(void) {
+	if (!GetIsWarningBoss() && bossTelop.alpha <= 0) return;
+
+	//振動処理
+	Vector2 showPos;
+	showPos.x = bossTelop.pos.x + ToFloat(GetRand(-bossTelop.shakeDuration, bossTelop.shakeDuration));
+	showPos.y = bossTelop.pos.y + ToFloat(GetRand(-bossTelop.shakeDuration, bossTelop.shakeDuration));
+
+	Texture texture = bossTelop.texture;
+	texture.color = (texture.color & 0xFFFFFF00) | bossTelop.alpha;
+
+	DrawTextureUI(texture, showPos, bossTelop.size);
+}
+
+#pragma endregion
 
 void InitPlayUI(void) {
 	InitLifeIcon();
@@ -873,6 +944,7 @@ void InitPlayUI(void) {
 	InitScore();
 	InitDisplayEffect();
 	InitStartTelop();
+	InitBossTelop();
 }
 
 void UpdatePlayUI(void) {
@@ -884,6 +956,7 @@ void UpdatePlayUI(void) {
 	UpdateScore();
 	UpdateDisplayEffect();
 	UpdateStartTelop();
+	UpdateBossTelop();
 }
 
 void DrawPlayUI(void) {
@@ -896,6 +969,7 @@ void DrawPlayUI(void) {
 	DrawProgressGauge();
 	DrawShockCombo();
 	DrawStartTelop();
+	DrawBossTelop();
 
 	DrawScore();
 }

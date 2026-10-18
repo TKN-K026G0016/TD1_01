@@ -4,6 +4,7 @@
 #include "boss_enemy.h"
 #include "scene_manager.h"
 #include "score_data.h"
+#include "effect.h"
 
 #include "texture.h"
 #include "vector2.h"
@@ -172,6 +173,12 @@ Timer goToGameoverTimer = { 150, 0 };
 //boss死亡後、クリアへ向かうまでの時間
 Timer goToClearTimer = { 120, 0 };
 
+#pragma region データ: ボス警告
+
+static bool isWarningBoss = false;
+Timer warnBossTimer = { 180, 0 };
+
+#pragma endregion
 
 #pragma endregion
 
@@ -287,11 +294,8 @@ static void ChangeRound(void) {
 	if (totalGameTime >= totalNextRoundTime) {
 		nowRound = static_cast<Round>(nextRound);
 
-		//ボス生成
-		if (nowRound == Round::RoundBoss) {
-			SpawnBoss({ 1200, 720 });
-		}
-
+		//ボスの警告演出
+		isWarningBoss = true;
 	}
 
 #pragma endregion
@@ -431,6 +435,27 @@ static void GoGameoverScene(void) {
 	}
 }
 
+static void InitWarningBoss(void) {
+	warnBossTimer.count = 0;
+	isWarningBoss = false;
+}
+
+static void UpdateWarningBoss(void) {
+	if (!isWarningBoss) return;
+
+	warnBossTimer.count++;
+	if (warnBossTimer.count >= warnBossTimer.time) {
+		warnBossTimer.count = 0;
+		isWarningBoss = false;
+
+		//ボスの生成処理
+		SpawnBoss({ 1200, 720 });
+
+		CreateFlashPanel();
+	}
+
+}
+
 static void GoClearScene(void) {
 	////生存していたらスキップ
 	//if(GetBossEnemyIsAlive()) return;
@@ -457,6 +482,7 @@ void InitStage(void) {
 	InitRound();
 
 	InitStartEffect();
+	InitWarningBoss();
 }
 
 void UpdateStage(void) {
@@ -472,6 +498,7 @@ void UpdateStage(void) {
 	UpdateStartEffect();
 	GoGameoverScene();
 	GoClearScene();
+	UpdateWarningBoss();
 }
 
 void DrawStage(void) {
@@ -513,6 +540,10 @@ TimeData GetBossRoundTimeData(void) {
 
 ModeStartEffect GetNowModeStart(void) {
 	return nowModeStart;
+}
+
+bool GetIsWarningBoss(void) {
+	return isWarningBoss;
 }
 
 #pragma endregion

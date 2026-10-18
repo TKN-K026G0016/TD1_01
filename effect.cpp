@@ -8,6 +8,7 @@
 #include "timer.h"
 #include "tool.h"
 #include "scene_manager.h"
+#include "common.h"
 
 #include <Novice.h>
 #define _USE_MATH_DEFINES
@@ -508,6 +509,30 @@ struct BombBlastEffect {
 BombBlastEffect bombBlastEffect[kBombExplosionEffectNumber][kBombBlastEffectNumber] = {};
 #pragma endregion
 
+#pragma region データ: フラッシュパネル
+
+struct FlashPanel {
+	Vector2 pos = kWindowCenter;
+	Vector2 size = { 1280, 720 };
+
+	bool isShoot = false;
+
+	//<イージング>
+	float easingT = 0.0f;
+	float easingSpeed = 0.05f;
+	float startFadeOutEasingT = 0.1f;
+	EasingMode easingMode = EasingMode::EaseOut;
+
+	//透明度
+	int alpha = 0;
+	int alphaMin = 0;
+	int alphaMax = 255;
+
+	Texture texture = {};
+};
+static FlashPanel flashPanel;
+
+#pragma endregion
 
 #pragma region 関数: ジェム取得effect
 
@@ -1754,6 +1779,52 @@ void DrawBombExplosionEffect() {
 }
 #pragma endregion
 
+#pragma region 関数: フラッシュパネル
+
+static void InitFlashPanel(void) {
+	flashPanel = {};
+	flashPanel.texture = GetTexture(TextureType::White1x1);
+}
+
+static void UpdateFlashPanel(void) {
+	if (!flashPanel.isShoot) return;
+
+	flashPanel.easingT += flashPanel.easingSpeed;
+	if (flashPanel.easingT >= 1.0f) {
+		flashPanel.easingT = 1.0f;
+		flashPanel.isShoot = false;
+	}
+
+	if (flashPanel.easingT < flashPanel.startFadeOutEasingT) {
+		float t = (flashPanel.easingT - flashPanel.startFadeOutEasingT) / (1.0f - flashPanel.startFadeOutEasingT);
+		if (t > 1.0f) t = 1.0f;
+
+		flashPanel.alpha = UpdateValueByEasing(flashPanel.alphaMin, flashPanel.alphaMax, t, flashPanel.easingMode);
+	} else {
+		float t = (flashPanel.easingT - flashPanel.startFadeOutEasingT) / (1.0f - flashPanel.startFadeOutEasingT);
+		if (t > 1.0f) t = 1.0f;
+
+		flashPanel.alpha = UpdateValueByEasing(flashPanel.alphaMax, flashPanel.alphaMin, t, flashPanel.easingMode);
+	}
+
+}
+
+static void DrawFlashPanel(void) {
+	if (!flashPanel.isShoot) return;
+
+	Texture texture = flashPanel.texture;
+	texture.color = (texture.color & 0xFFFFFF00) | flashPanel.alpha;
+
+	DrawTextureUI(texture, flashPanel.pos, flashPanel.size);
+}
+
+void CreateFlashPanel(void) {
+	flashPanel.isShoot = true;
+	flashPanel.easingT = 0.0f;
+}
+
+#pragma endregion
+
 void InitEffect() {
 	nowScene = GetNowScene();
 
@@ -1780,6 +1851,7 @@ void InitEffect() {
 	InitPlayerFootprintsEffect();
 	InitElecLineEffect();
 	InitBombExplosionEffect();
+	InitFlashPanel();
 	
 	/*CreateBombExplosionEffect({100,100}, 768,WHITE);*/
 
@@ -1810,6 +1882,7 @@ void UpdateEffect() {
 	UpdatePlayerFootprintsEffect();
 	UpdateElecLineEffect();
 	UpdateBombExplosionEffect();
+	UpdateFlashPanel();
 }
 void DrawEffect() {
 	DrawGetEffect();
@@ -1831,6 +1904,8 @@ void DrawEffect() {
 void DrawEffectAsUI() {
 	DrawSmokeEffectAsUI();
 	DrawGageEffect();
+
+	DrawFlashPanel();
 }
 
 unsigned int GetPlayerColor(void) {

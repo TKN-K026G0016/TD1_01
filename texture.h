@@ -128,6 +128,8 @@ enum class TextureType {
 
 	ReadyTelop,
 	GoTelop,
+	
+	WarnBossTelop,
 
 	//effect
 	EffectSquare,

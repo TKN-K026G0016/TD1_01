@@ -91,4 +91,6 @@ void CreateEnemyDamageEffect(Vector2 pos);
 void CreatePlayerFootprintsEffect(Vector2 pos);
 void CreateBombExplosionEffect(Vector2 pos, float endSizeValue, unsigned int color);
 
+void CreateFlashPanel(void);
+
 unsigned int GetPlayerColor(void);
