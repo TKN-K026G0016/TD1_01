@@ -210,7 +210,8 @@ static void UpdateInst(void) {
 		}
 	}
 
-
+	instShot.alpha = UpdateValueByEasing(instShot.alphaMin, instShot.alphaMax, instShot.easingT, instShot.easingMode);
+	instStart.alpha = UpdateValueByEasing(instShot.alphaMin, instShot.alphaMax, instShot.easingT, instShot.easingMode);
 }
 
 static void DrawInst(void) {
@@ -218,12 +219,26 @@ static void DrawInst(void) {
 		Texture texture = instShot.texture;
 		texture.color = (texture.color & 0xFFFFFF00) | instShot.alpha;
 
+		//コントローラの接続チェック
+		if (GetIsConnectGamePad()) {
+			texture.animNum = 0;
+		} else {
+			texture.animNum = 1;
+		}
+		
 		DrawTextureUI(texture, instShot.pos, instShot.size);
 	}
 
 	if (nowMode == ModeTitle::WaitInput) {
 		Texture texture = instStart.texture;
 		texture.color = (texture.color & 0xFFFFFF00) | instStart.alpha;
+
+		//コントローラの接続チェック
+		if (GetIsConnectGamePad()) {
+			texture.animNum = 0;
+		} else {
+			texture.animNum = 1;
+		}
 
 		DrawTextureUI(texture, instStart.pos, instStart.size);
 	}
@@ -297,6 +312,7 @@ void InitTitle(void) {
 	InitEffect();
 
 	InitLogo();
+	InitInst();
 	InitFlashPanel();
 	InitBlackPanel();
 }
@@ -308,6 +324,7 @@ void UpdateTitle(void) {
 
 	Confirm();
 	UpdateLogo();
+	UpdateInst();
 	UpdateFlashPanel();
 
 	UpdateTitleBackground();
@@ -322,6 +339,7 @@ void DrawTitle(void) {
 	DrawTitlePlayer();
 
 	DrawLogo();
+	DrawInst();
 
 	DrawFlashPanel();
 	DrawEffect();
