@@ -33,11 +33,24 @@ struct Logo {
 	Vector2 hitSize = { 640, 200 };
 	Vector2 hitVertex[4] = {};
 
-	bool isLightUp = false;
+	//振動関係
+	int shakeDuration = 1;
+	Timer shakeTimer = { 10, 0 };
+	
+	unsigned int lightOutColor = 0x222222FF;
 
 	Texture texture = {};
 };
 static Logo logo;
+Vector2 spawnShockPos[5] = {
+	{logo.pos},
+	{340, 500},
+	{700, 630},
+	{450, 590},
+	{700, 480},
+};
+
+
 
 #pragma endregion
 
@@ -49,7 +62,7 @@ struct BlackPanel {
 
 	bool isShow = true;
 
-	unsigned int color = 0x000000CC;
+	unsigned int color = 0x000000DD;
 
 	Texture texture = {};
 };
@@ -111,8 +124,17 @@ static void CheckCollisionVSElecBullet(void) {
 
 		if (CheckCollisionBoxVSCircle(elecBullet[j].pos, elecBullet[j].hitRadius, logo.hitVertex[0], logo.hitVertex[3])) {
 			BreakElecBullet(j);
+
 			//ホウデンの生成
-			SpawnElecShock(logo.pos, elecBullet[j].type, ElecShockOriginType::None, -1, ElecShockOriginType::None, -1);
+			for (int i = 0; i < 5; i++) {
+				SpawnElecShock(spawnShockPos[i], elecBullet[j].type, ElecShockOriginType::None, -1, ElecShockOriginType::None, -1);
+
+				Vector2 createPos = logo.pos;
+				createPos.x += ToFloat(GetRand(ToInt(-logo.size.x), ToInt(logo.size.x)));
+				createPos.y += ToFloat(GetRand(ToInt(-logo.size.y), ToInt(logo.size.y)));
+
+				SpawnElecShock(createPos, elecBullet[j].type, ElecShockOriginType::None, -1, ElecShockOriginType::None, -1);
+			}
 
 			//モード切替
 			nowMode = ModeTitle::TriggerLightUp;
@@ -125,10 +147,25 @@ static void UpdateLogo(void) {
 	CheckCollisionVSElecBullet();
 }
 
-
-
 static void DrawLogo(void) {
-	DrawTextureUI(logo.texture, logo.pos, logo.size);
+	Vector2 showPos = logo.pos;
+	if (nowMode != ModeTitle::MovePlayer) {
+		logo.shakeTimer.count++;
+		if (logo.shakeTimer.count >= logo.shakeTimer.time) {
+			logo.shakeTimer.count = 0;
+
+			showPos.x += GetRand(-logo.shakeDuration, logo.shakeDuration);
+			showPos.y += GetRand(-logo.shakeDuration, logo.shakeDuration);
+		}
+	}
+
+	//colorの変更
+	Texture texture = logo.texture;
+	if (nowMode == ModeTitle::MovePlayer) {
+		texture.color = logo.lightOutColor;
+	}
+
+	DrawTextureUI(texture, showPos, logo.size);
 }
 
 #pragma endregion
@@ -220,11 +257,11 @@ void DrawTitle(void) {
 	DrawBlackPanel();
 
 	DrawElecBullet();
-	DrawEffect();
-
+	
 	DrawTitlePlayer();
 
 	DrawLogo();
 
 	DrawFlashPanel();
+	DrawEffect();
 }
