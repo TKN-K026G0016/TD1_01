@@ -50,6 +50,32 @@ Vector2 spawnShockPos[5] = {
 	{700, 480},
 };
 
+struct TitleLogoAfterimage {
+	Vector2 size = { };
+
+	//残像の振動
+	int shakeDuration = 2;
+	Timer shakeTimer = { 10, 0 };
+
+	unsigned int color = 0x04C1E8FF;
+
+	//イージング関係
+	float easingT = 0.0f;
+	float easingSpeed = 0.01f;
+	bool isFadeIn = true;
+	EasingMode easingMode = EasingMode::EaseInOut;
+
+	//サイズ関係
+	Vector2 startSize = logo.size;
+	Vector2 endSize = { logo.size.x + 40, logo.size.y + 40 };
+
+	//透明度関係
+	int alpha = 0;
+	int alphaMin = 0;
+	int alphaMax = 140;
+};
+TitleLogoAfterimage logoAfterimage;
+
 struct TitleInst {
 	Vector2 pos = { 640, 200 };
 	Vector2 size = { 640, 64 };
@@ -165,8 +191,52 @@ static void CheckCollisionVSElecBullet(void) {
 	}
 }
 
+static void UpdateLogoAfterimage(void) {
+	if (nowMode != ModeTitle::WaitInput) return;
+
+	if (logoAfterimage.isFadeIn) {
+		logoAfterimage.easingT += logoAfterimage.easingSpeed;
+		if (logoAfterimage.easingT >= 1.0f) {
+			logoAfterimage.easingT = 1.0f;
+			logoAfterimage.isFadeIn = false;
+		}
+	} else {
+		logoAfterimage.easingT -= logoAfterimage.easingSpeed;
+		if (logoAfterimage.easingT <= 0.0f) {
+			logoAfterimage.easingT = 0.0f;
+			logoAfterimage.isFadeIn = true;
+		}
+	}
+
+	//サイズ関係
+	logoAfterimage.size = MoveByEasing(logoAfterimage.startSize, logoAfterimage.endSize, logoAfterimage.easingT, logoAfterimage.easingMode);
+
+	//透明度の処理
+	logoAfterimage.alpha = UpdateValueByEasing(logoAfterimage.alphaMin, logoAfterimage.alphaMax, logoAfterimage.easingT, logoAfterimage.easingMode);
+}
+
 static void UpdateLogo(void) {
 	CheckCollisionVSElecBullet();
+
+	UpdateLogoAfterimage();
+}
+
+static void DrawLogoAfterimage(void) {
+	if (nowMode != ModeTitle::WaitInput) return;
+
+	Vector2 showPos = logo.pos;
+	logoAfterimage.shakeTimer.count++;
+	if (logoAfterimage.shakeTimer.count >= logoAfterimage.shakeTimer.time) {
+		logoAfterimage.shakeTimer.count = 0;
+
+		showPos.x += GetRand(-logoAfterimage.shakeDuration, logoAfterimage.shakeDuration);
+		showPos.y += GetRand(-logoAfterimage.shakeDuration, logoAfterimage.shakeDuration);
+	}
+
+	Texture texture = logo.texture;
+	texture.color = (logoAfterimage.color & 0xFFFFFF00) | logoAfterimage.alpha;
+
+	DrawTextureUI(texture, showPos, logoAfterimage.size);
 }
 
 static void DrawLogo(void) {
@@ -186,6 +256,8 @@ static void DrawLogo(void) {
 	if (nowMode == ModeTitle::MovePlayer) {
 		texture.color = logo.lightOutColor;
 	}
+
+	DrawLogoAfterimage();
 
 	DrawTextureUI(texture, showPos, logo.size);
 }
