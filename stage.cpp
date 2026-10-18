@@ -5,6 +5,7 @@
 #include "scene_manager.h"
 #include "score_data.h"
 #include "effect.h"
+#include "play_ui.h"
 
 #include "texture.h"
 #include "vector2.h"
@@ -176,7 +177,7 @@ Timer goToClearTimer = { 120, 0 };
 #pragma region データ: ボス警告
 
 static bool isWarningBoss = false;
-Timer warnBossTimer = { 180, 0 };
+Timer warnBossTimer = { 300, 0 };
 
 #pragma endregion
 
@@ -294,8 +295,12 @@ static void ChangeRound(void) {
 	if (totalGameTime >= totalNextRoundTime) {
 		nowRound = static_cast<Round>(nextRound);
 
-		//ボスの警告演出
-		isWarningBoss = true;
+		//ボスラウンドに入ったら
+		if (nowRound == Round::RoundBoss) {
+			//ボスの警告演出
+			isWarningBoss = true;
+			TriggerDangerDisplayEffect();
+		}
 	}
 
 #pragma endregion
@@ -450,24 +455,26 @@ static void UpdateWarningBoss(void) {
 
 		//ボスの生成処理
 		SpawnBoss({ 1200, 720 });
-
+		CancelDangerDisplayEffect();
 		CreateFlashPanel();
 	}
 
 }
 
 static void GoClearScene(void) {
-	////生存していたらスキップ
-	//if(GetBossEnemyIsAlive()) return;
+	if (nowRound != Round::RoundBoss) return;
 
-	////フェードアウトし始めたらスキップ
-	//if (GetNowModeFade() != ModeFade::Standby) return;
+	//生存していたらスキップ
+	if(GetBossEnemyIsAlive()) return;
 
-	//goToClearTimer.count++;
-	//if (goToClearTimer.count >= goToClearTimer.time) {
-	//	ChangeModeFade(ModeFade::FadeOut);
-	//	ChangeFadeTarget(FadeTarget::Clear);
-	//}
+	//フェードアウトし始めたらスキップ
+	if (GetNowModeFade() != ModeFade::Standby) return;
+
+	goToClearTimer.count++;
+	if (goToClearTimer.count >= goToClearTimer.time) {
+		ChangeModeFade(ModeFade::FadeOut);
+		ChangeFadeTarget(FadeTarget::Clear);
+	}
 }
 
 #pragma endregion

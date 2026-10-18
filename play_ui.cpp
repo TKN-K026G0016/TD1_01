@@ -288,6 +288,33 @@ struct DisplayEffect {
 	unsigned int color = GetPlayerColor();
 };
 DisplayEffect displayEffect = {};
+
+struct DangerDisplayEffect {
+	Vector2 pos = kWindowCenter;
+
+	bool isShoot = false;
+
+	//イージング
+	float easingT = 0.0f;
+	float easingSpeed = 0.02f;
+
+	//サイズ関係
+	Vector2 size = {};
+	Vector2 minSize = { 1280, 720 };
+	Vector2 maxSize = { 1440, 810 };
+
+	//透明度関係
+	int alpha = 50;
+	int alphaMax = 50;
+	int alphaMin = 10;
+
+	//縮小中フラグ
+	bool isScaleDown = true;
+
+	unsigned int color = GetEnemyColor();
+};
+DangerDisplayEffect dangerDisplayEffect = {};
+
 Texture displayEffectTexture = {};
 
 #pragma endregion
@@ -430,14 +457,18 @@ static void UpdateEnergyGauge(void) {
 #pragma region 点滅処理&振動
 
 	//警告表示のラインを下回るor故障状態時
-	if (remainEnergy <= energyGaugeFrame.warnDeadEnergy /*|| GetPlayerNowState() != PlayerState::Normal*/) {
+	if (remainEnergy <= energyGaugeFrame.warnDeadEnergy) {
 		UpdateAnimation(energyGaugeFrame.texture);
 		UpdateAnimation(miniEnergyGauge.frameTexture);
 
+		//振動処理
 		if (kGaugeShakeSwitch) {
 			energyGaugeFrame.viewPos.x = energyGaugeFrame.pos.x + GetRand(-2, 2);
 			energyGaugeFrame.viewPos.y = energyGaugeFrame.pos.y + GetRand(-2, 2);
 		}
+
+		//displayEFfect
+		TriggerDangerDisplayEffect();
 
 	} else {
 		energyGaugeFrame.texture.animNum = 0;
@@ -447,6 +478,8 @@ static void UpdateEnergyGauge(void) {
 		miniEnergyGauge.frameTexture.animChangeTimer.count = 0;
 
 		energyGaugeFrame.viewPos = energyGaugeFrame.pos;
+
+		CancelDangerDisplayEffect();
 	}
 
 	//ダメージによる振動処理
@@ -823,13 +856,12 @@ static void InitDisplayEffect(void) {
 }
 
 static void UpdateDisplayEffect(void) {
-	if (!displayEffect.isShoot) return;
 
 	//イージング処理
-	if (displayEffect.isScaleDown) {
+	if (displayEffect.isScaleDown && displayEffect.isShoot) {
 		displayEffect.easingT += displayEffect.easingSpeed;
 		if (displayEffect.easingT >= 1.0f) {
-			displayEffect.easingT = 1.0f;
+  			displayEffect.easingT = 1.0f;
 			displayEffect.isScaleDown = false;
 		}
 	} else {
@@ -847,7 +879,7 @@ static void UpdateDisplayEffect(void) {
 }
 
 static void DrawDisplayEffect(void) {
-	if (!displayEffect.isShoot) return;
+	if (!displayEffect.isShoot && displayEffect.alpha <= displayEffect.alphaMin) return;
 
 	Texture texture = displayEffectTexture;
 	texture.color = (displayEffect.color & 0xFFFFFF00) | displayEffect.alpha;
@@ -862,6 +894,59 @@ void TriggerDisplayEffect(void) {
 	displayEffect.easingT = 0.0f;
 	displayEffect.isScaleDown = true;
 
+}
+
+static void InitDangerDisplayEffect(void) {
+	dangerDisplayEffect = {};
+	displayEffectTexture = GetTexture(TextureType::DisplayEffect);
+}
+
+static void UpdateDangerDisplayEffect(void) {
+
+	//イージング処理
+	if (dangerDisplayEffect.isScaleDown && dangerDisplayEffect.isShoot) {
+		dangerDisplayEffect.easingT += dangerDisplayEffect.easingSpeed;
+		if (dangerDisplayEffect.easingT >= 1.0f) {
+			dangerDisplayEffect.easingT = 1.0f;
+			dangerDisplayEffect.isScaleDown = false;
+		}
+	} 
+	else {
+		dangerDisplayEffect.easingT -= dangerDisplayEffect.easingSpeed;
+		if (dangerDisplayEffect.easingT <= 0.0f) {
+			dangerDisplayEffect.easingT = 0.0f;
+			dangerDisplayEffect.isScaleDown = true;
+		}
+	}
+
+	//拡大処理
+	dangerDisplayEffect.size = MoveByEasing(dangerDisplayEffect.maxSize, dangerDisplayEffect.minSize, dangerDisplayEffect.easingT, EasingMode::EaseIn);
+	//透明度の処理
+	dangerDisplayEffect.alpha = UpdateValueByEasing(dangerDisplayEffect.alphaMin, dangerDisplayEffect.alphaMax, dangerDisplayEffect.easingT, EasingMode::EaseIn);
+}
+
+static void DrawDangerDisplayEffect(void) {
+	if (!dangerDisplayEffect.isShoot && dangerDisplayEffect.alpha <= dangerDisplayEffect.alphaMin) return;
+
+	Texture texture = displayEffectTexture;
+	texture.color = (dangerDisplayEffect.color & 0xFFFFFF00) | dangerDisplayEffect.alpha;
+
+	DrawTextureUI(texture, dangerDisplayEffect.pos, dangerDisplayEffect.size);
+}
+
+void TriggerDangerDisplayEffect(void) {
+	if (dangerDisplayEffect.isShoot) return;
+
+	dangerDisplayEffect.isShoot = true;
+	dangerDisplayEffect.easingT = 0.0f;
+	dangerDisplayEffect.isScaleDown = true;
+
+}
+
+void CancelDangerDisplayEffect(void) {
+	if (!dangerDisplayEffect.isShoot) return;
+
+	dangerDisplayEffect.isShoot = false;
 }
 
 #pragma endregion
@@ -912,6 +997,8 @@ static void UpdateBossTelop(void) {
 		if (bossTelop.easingT <= 0.0f) {
 			bossTelop.easingT = 0.0f;
 			bossTelop.isFadeIn = true;
+
+
 		}
 	}
 
@@ -943,6 +1030,7 @@ void InitPlayUI(void) {
 	InitShockCombo();
 	InitScore();
 	InitDisplayEffect();
+	InitDangerDisplayEffect();
 	InitStartTelop();
 	InitBossTelop();
 }
@@ -955,12 +1043,14 @@ void UpdatePlayUI(void) {
 	UpdateShockCombo();
 	UpdateScore();
 	UpdateDisplayEffect();
+	UpdateDangerDisplayEffect();
 	UpdateStartTelop();
 	UpdateBossTelop();
 }
 
 void DrawPlayUI(void) {
 	DrawDisplayEffect();
+	DrawDangerDisplayEffect();
 
 	DrawLifeIcon();
 	DrawEnergyGauge();

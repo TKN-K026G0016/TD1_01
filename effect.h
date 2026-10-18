@@ -94,3 +94,5 @@ void CreateBombExplosionEffect(Vector2 pos, float endSizeValue, unsigned int col
 void CreateFlashPanel(void);
 
 unsigned int GetPlayerColor(void);
+
+unsigned int GetEnemyColor(void);

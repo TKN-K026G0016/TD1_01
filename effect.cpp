@@ -1911,3 +1911,7 @@ void DrawEffectAsUI() {
 unsigned int GetPlayerColor(void) {
 	return kPlayerColor;
 }
+
+unsigned int GetEnemyColor(void) {
+	return kEnemyColor;
+}

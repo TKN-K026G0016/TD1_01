@@ -899,6 +899,7 @@ static void CheckDeadPlayer(void) {
 		player.hp = 0;
 
 		player.isAlive = false;
+		chargeElecBulletTimer.count = 0;
 
 		//爆発エフェクト生成
 		for (int i = 0; i < deadEffectManager.exploseCount; i++) {
