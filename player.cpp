@@ -253,6 +253,12 @@ struct StartEffectManager {
 };
 StartEffectManager startEffectManager;
 
+struct DeadEffectManager {
+	int exploseCount = 6;
+	int createExploseRange = 100;
+};
+DeadEffectManager deadEffectManager;
+
 #pragma endregion
 
 /// <summary>
@@ -886,18 +892,21 @@ static void UpdateInvinciblePlayer(void) {
 /// 死亡判定の処理
 /// </summary>
 static void CheckDeadPlayer(void) {
+	if (!player.isAlive) return;
 
-	if (kLifeGaugeSwitch) {
-		if (player.remainEnergy <= 0) {
-			player.remainEnergy = 0;
+	if (player.remainEnergy <= 0 || player.hp <= 0) {
+		player.remainEnergy = 0;
+		player.hp = 0;
 
-			player.isAlive = false;
-		}
-	} else {
-		if (player.hp <= 0) {
-			player.hp = 0;
+		player.isAlive = false;
 
-			player.isAlive = false;
+		//爆発エフェクト生成
+		for (int i = 0; i < deadEffectManager.exploseCount; i++) {
+			Vector2 createPos;
+			createPos.x = player.pos.x + ToFloat(GetRand(-deadEffectManager.createExploseRange / 2, deadEffectManager.createExploseRange / 2));
+			createPos.y = player.pos.y + ToFloat(GetRand(-deadEffectManager.createExploseRange / 2, deadEffectManager.createExploseRange / 2));
+
+			CreateExplodeEffect(createPos, GetPlayerColor());
 		}
 	}
 }

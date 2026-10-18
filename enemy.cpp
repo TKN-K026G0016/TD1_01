@@ -218,7 +218,7 @@ static void DeadEnemySniper(int index) {
 	enemySniper[index].isAlive = false;
 	enemySniper[index].hp = enemySniper[index].hpMax;
 
-	CreateExplodeEffect(enemySniper[index].pos);
+	CreateExplodeEffect(enemySniper[index].pos, WHITE);
 
 	nowEnemySniperIsAliveCount--;
 
@@ -335,7 +335,7 @@ static void DeadEnemyGuardian(int index) {
 	enemyGuardian[index].isAlive = false;
 	enemyGuardian[index].hp = enemyGuardian[index].hpMax;
 
-	CreateExplodeEffect(enemyGuardian[index].pos);
+	CreateExplodeEffect(enemyGuardian[index].pos, WHITE);
 
 	AddScoreByDefeatEnemy(kEnemyGuardianDefeatScore);
 }
@@ -497,7 +497,7 @@ static void DeadEnemyBasic(int index) {
 	enemyBasic[index].isAlive = false;
 	enemyBasic[index].hp = enemyBasic[index].hpMax;
 
-	CreateExplodeEffect(enemyBasic[index].pos);
+	CreateExplodeEffect(enemyBasic[index].pos, WHITE);
 
 	AddScoreByDefeatEnemy(kEnemyBasicDefeatScore);
 
@@ -611,7 +611,7 @@ static void DeadEnemyM(int index) {
 	enemyM[index].isAlive = false;
 	enemyM[index].hp = enemyM[index].hpMax;
 
-	CreateExplodeEffect(enemyM[index].pos);
+	CreateExplodeEffect(enemyM[index].pos, WHITE);
 
 	AddScoreByDefeatEnemy(kEnemyMDefeatScore);
 }
@@ -733,7 +733,7 @@ static void DeadEnemySmall(int index) {
 	enemySmall[index].isAlive = false;
 	enemySmall[index].hp = enemySmall[index].hpMax;
 
-	CreateExplodeEffect(enemySmall[index].pos);
+	CreateExplodeEffect(enemySmall[index].pos, WHITE);
 
 	AddScoreByDefeatEnemy(kEnemySmallDefeatScore);
 	
@@ -840,7 +840,7 @@ static void DeadEnemyBomb(int index) {
 	enemyBomb[index].isAlive = false;
 	enemyBomb[index].hp = enemyBomb[index].hpMax;
 
-	CreateExplodeEffect(enemyBomb[index].pos);
+	CreateExplodeEffect(enemyBomb[index].pos, WHITE);
 }
 
 static void BurstEnemyBomb(void) {

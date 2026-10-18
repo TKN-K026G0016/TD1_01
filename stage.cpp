@@ -167,7 +167,7 @@ Timer readyTelopTimer = { 100, 0 };
 Timer goTelopTimer = { 30, 0 };
 
 //プレイヤー死亡後、ゲームオーバーへ向かうまでの時間
-Timer goToGameoverTimer = { 120, 0 };
+Timer goToGameoverTimer = { 150, 0 };
 
 //boss死亡後、クリアへ向かうまでの時間
 Timer goToClearTimer = { 120, 0 };
@@ -426,6 +426,7 @@ static void GoGameoverScene(void) {
 
 	goToGameoverTimer.count++;
 	if (goToGameoverTimer.count >= goToGameoverTimer.time) {
+		goToGameoverTimer.count = 0;
 		ChangeScene(Scene::Gameover);
 	}
 }

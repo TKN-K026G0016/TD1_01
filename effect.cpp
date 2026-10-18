@@ -306,6 +306,8 @@ struct ExplodeEffect {
 
 	bool isShoot = false;
 
+	unsigned int color = WHITE;
+
 	Texture texture = {};
 };
 ExplodeEffect explodeEffect[kExplodeEffectLimit];
@@ -1146,20 +1148,24 @@ static void DrawExplodeEffect(void) {
 	for (int i = 0; i < kExplodeEffectLimit; i++) {
 		if (!explodeEffect[i].isShoot) continue;
 
+		Texture texture = explodeEffect[i].texture;
+		texture.color = explodeEffect[i].color;
+
 		if (nowScene == Scene::Play) {
-			DrawTextureObj(explodeEffect[i].texture, explodeEffect[i].pos, explodeEffect[i].size);
+			DrawTextureObj(texture, explodeEffect[i].pos, explodeEffect[i].size);
 		} else {
-			DrawTextureUI(explodeEffect[i].texture, explodeEffect[i].pos, explodeEffect[i].size);
+			DrawTextureUI(texture, explodeEffect[i].pos, explodeEffect[i].size);
 		}
 	}
 }
 
-void CreateExplodeEffect(Vector2 pos) {
+void CreateExplodeEffect(Vector2 pos, unsigned int color) {
 	for (int i = 0; i < kExplodeEffectLimit; i++) {
 		if (explodeEffect[i].isShoot) continue;
 
 		explodeEffect[i].isShoot = true;
 		explodeEffect[i].pos = pos;
+		explodeEffect[i].color = color;
 
 		break;
 	}
