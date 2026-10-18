@@ -363,6 +363,7 @@ Vector2 CreatePosOutCameraZone(void) {
 /// <param name=""></param>
 static void SpawnEnemyByRound(void) {
 	if (nowModeStart != ModeStartEffect::Standby) return;
+	if (GetBossEnemyIsDead()) return;
 
 	int round = ToInt(nowRound);
 	for (int i = 0; i < kMaxSpawner; i++) {

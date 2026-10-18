@@ -953,6 +953,59 @@ static void DrawEnemyBomb(void) {
 
 #pragma endregion
 
+#pragma region Enemy全滅処理
+
+
+void DeadAllEnemy(void) {
+	//ボスが死亡したら
+	if(!GetBossEnemyIsDead()) return;
+	// Sniper
+	for (int i = 0; i < kEnemysniperLimit; i++) {
+		if (enemySniper[i].isAlive) {
+			DeadEnemySniper(i);
+		}
+	}
+
+	// Guardian
+	for (int i = 0; i < kEnemyGuardianLimit; i++) {
+		if (enemyGuardian[i].isAlive) {
+			DeadEnemyGuardian(i);
+		}
+	}
+
+	// Basic
+	for (int i = 0; i < kEnemyBasicLimit; i++) {
+		if (enemyBasic[i].isAlive) {
+			DeadEnemyBasic(i);
+		}
+	}
+
+	// M
+	for (int i = 0; i < kEnemyMLimit; i++) {
+		if (enemyM[i].isAlive) {
+			DeadEnemyM(i);
+		}
+	}
+
+	// Small
+	for (int i = 0; i < kEnemySmallLimit; i++) {
+		if (enemySmall[i].isAlive) {
+			DeadEnemySmall(i);
+		}
+	}
+
+	// Bomb
+	for (int i = 0; i < kEnemyBombLimit; i++) {
+		if (enemyBomb[i].isAlive) {
+			DeadEnemyBomb(i);
+		}
+	}
+
+	return; // ★ 全滅後は敵処理をスキップ
+
+}
+
+#pragma endregion
 
 void InitEnemy(void) {
 	InitEnemySniper();
@@ -966,6 +1019,8 @@ void InitEnemy(void) {
 }
 
 void UpdateEnemy(void) {
+	DeadAllEnemy();
+
 	//enemySniper
 	CheckDeadEnemySniper();
 	MoveEnemySniper();

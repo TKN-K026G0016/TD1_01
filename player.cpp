@@ -705,6 +705,7 @@ static void ConsumptionEnergy(void) {
 /// <param name=""></param>
 static void CheckFailedMaintenance(void) {
 	if (!player.isAlive) return;
+	if (GetBossEnemyIsDead()) return;
 
 	if (kLifeGaugeSwitch) return;
 
@@ -893,6 +894,7 @@ static void UpdateInvinciblePlayer(void) {
 /// </summary>
 static void CheckDeadPlayer(void) {
 	if (!player.isAlive) return;
+	if (GetBossEnemyIsDead()) return;
 
 	if (player.remainEnergy <= 0 || player.hp <= 0) {
 		player.remainEnergy = 0;
