@@ -56,6 +56,9 @@ struct EnergyGaugeFrame {
 	//ゲージエフェクトの生成スパン
 	Timer createGaugeEffectTimer = { 3, 0 };
 
+	////警告音SEのスパン
+	//Timer alarmSeTimer = { 60, 0 };
+
 	Texture texture = {};
 };
 EnergyGaugeFrame energyGaugeFrame;
@@ -467,6 +470,13 @@ static void UpdateEnergyGauge(void) {
 			energyGaugeFrame.viewPos.y = energyGaugeFrame.pos.y + GetRand(-2, 2);
 		}
 
+		////alramSE
+		//energyGaugeFrame.alarmSeTimer.count++;
+		//if (energyGaugeFrame.alarmSeTimer.count >= energyGaugeFrame.alarmSeTimer.time) {
+		//	energyGaugeFrame.alarmSeTimer.count = 0;
+		//	PlaySe(SeType::GaugeAlarm);
+		//}
+
 		//displayEFfect
 		TriggerDangerDisplayEffect();
 
@@ -478,6 +488,8 @@ static void UpdateEnergyGauge(void) {
 		miniEnergyGauge.frameTexture.animChangeTimer.count = 0;
 
 		energyGaugeFrame.viewPos = energyGaugeFrame.pos;
+
+		//energyGaugeFrame.alarmSeTimer.count = 0;
 
 		CancelDangerDisplayEffect();
 	}
@@ -907,6 +919,14 @@ static void UpdateDangerDisplayEffect(void) {
 		if (dangerDisplayEffect.easingT >= 1.0f) {
 			dangerDisplayEffect.easingT = 1.0f;
 			dangerDisplayEffect.isScaleDown = false;
+
+			if (!GetIsWarningBoss()) {
+				//ゲージ警告SE
+				PlaySe(SeType::GaugeAlarm);
+			} else {
+				//ボス警告演出
+				PlaySe(SeType::WarningBossAlarm);
+			}
 		}
 	} 
 	else {
@@ -989,6 +1009,9 @@ static void UpdateBossTelop(void) {
 		if (bossTelop.easingT >= 1.0f) {
 			bossTelop.easingT = 1.0f;
 			bossTelop.isFadeIn = false;
+
+			/*PlaySe(SeType::WarningBossAlarm);*/
+
 		}
 	} else {
 		bossTelop.easingT -= bossTelop.easingSpeed;
