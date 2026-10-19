@@ -148,6 +148,14 @@ void InitTexture(void) {
 		//Gameover
 		//===============
 		{ Novice::LoadTexture("./resources/texture/ui/gameover/gameover_icon.png"), { 600, 150 }, {0, 0}, 0, 0, WHITE },
+
+		//===============
+		//Guide
+		//===============
+		{ Novice::LoadTexture("./resources/texture/ui/guide/controller_guide.png"), { 2048, 512 }, {0, 0}, 1, 0, WHITE },
+		{ Novice::LoadTexture("./resources/texture/ui/guide/gauge_guide.png"), { 1024, 512 }, {0, 0}, 0, 0, WHITE },
+
+
 	};
 
 	memcpy(textures, temp, sizeof(textures));

@@ -98,6 +98,9 @@
     <Filter Include="scene\title\title_player">
       <UniqueIdentifier>{42e94264-0abe-4cef-9bc3-ebcdbff696fa}</UniqueIdentifier>
     </Filter>
+    <Filter Include="scene\guide">
+      <UniqueIdentifier>{234fa49d-3055-448d-887c-d86b21075d4b}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp" />
@@ -181,6 +184,9 @@
     </ClCompile>
     <ClCompile Include="title_player.cpp">
       <Filter>scene\title\title_player</Filter>
+    </ClCompile>
+    <ClCompile Include="guide.cpp">
+      <Filter>scene\guide</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -345,6 +351,9 @@
     </ClInclude>
     <ClInclude Include="title_player.h">
       <Filter>scene\title\title_player</Filter>
+    </ClInclude>
+    <ClInclude Include="guide.h">
+      <Filter>scene\guide</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

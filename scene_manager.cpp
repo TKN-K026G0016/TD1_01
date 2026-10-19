@@ -8,6 +8,7 @@
 #include "pause.h"
 #include "clear.h"
 #include "gameover.h"
+#include "guide.h"
 
 #pragma region データ: シーン関係
 
@@ -18,6 +19,7 @@ static constexpr void (*InitFuncs[ToInt(Scene::Count)])(void) = {
 	InitPause,
 	InitClear,
 	InitGameover,
+	InitGuide,
 };
 
 // アップデート関数の配列
@@ -27,6 +29,7 @@ static constexpr void (*UpdateFuncs[ToInt(Scene::Count)])(void) = {
 	UpdatePause,
 	UpdateClear,
 	UpdateGameover,
+	UpdateGuide,
 };
 
 // 描画関数の配列
@@ -36,10 +39,11 @@ static constexpr void (*DrawFuncs[ToInt(Scene::Count)])(void) = {
 	DrawPause,
 	DrawClear,
 	DrawGameover,
+	DrawGuide,
 };
 
 //現在のシーン
-static Scene nowScene = Scene::Clear;
+static Scene nowScene = Scene::Guide;
 
 #pragma endregion
 

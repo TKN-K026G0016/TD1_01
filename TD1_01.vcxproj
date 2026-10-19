@@ -179,6 +179,7 @@ xcopy C:\KamataEngine\DirectXGame\Resources "$(OutDirFullPath)NoviceResources" /
     <ClCompile Include="enemy_bullet.cpp" />
     <ClCompile Include="gameover.cpp" />
     <ClCompile Include="gem.cpp" />
+    <ClCompile Include="guide.cpp" />
     <ClCompile Include="input.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="pause.cpp" />
@@ -236,6 +237,7 @@ xcopy C:\KamataEngine\DirectXGame\Resources "$(OutDirFullPath)NoviceResources" /
     <ClInclude Include="elec_bullet.h" />
     <ClInclude Include="gameover.h" />
     <ClInclude Include="gem.h" />
+    <ClInclude Include="guide.h" />
     <ClInclude Include="input.h" />
     <ClInclude Include="matrix.h" />
     <ClInclude Include="pause.h" />
