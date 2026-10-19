@@ -48,10 +48,10 @@ void InitSe(void) {
 		{Novice::LoadAudio("./resources/sound/se/player/get_gem.wav"), 1.0f},
 
 		//enemy
-		{Novice::LoadAudio("./resources/sound/se/enemy/shoot_enemy_laser.wav"), 1.0f},
+		{Novice::LoadAudio("./resources/sound/se/enemy/shoot_enemy_laser.wav"), 0.4f},
 		{Novice::LoadAudio("./resources/sound/se/enemy/explose_enemy_bomb.wav"), 1.0f},
 
-		{Novice::LoadAudio("./resources/sound/se/enemy/damage_enemy.wav"), 1.0f},
+		{Novice::LoadAudio("./resources/sound/se/enemy/damage_enemy.wav"), 0.1f},
 		{Novice::LoadAudio("./resources/sound/se/enemy/dead_enemy.wav"), 1.0f},
 
 		//ui

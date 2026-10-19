@@ -9,6 +9,7 @@
 #include "tool.h"
 #include "scene_manager.h"
 #include "common.h"
+#include "se.h"
 
 #include <Novice.h>
 #define _USE_MATH_DEFINES
@@ -1191,6 +1192,8 @@ void CreateExplodeEffect(Vector2 pos, unsigned int color) {
 		explodeEffect[i].isShoot = true;
 		explodeEffect[i].pos = pos;
 		explodeEffect[i].color = color;
+
+		PlaySe(SeType::DeadEnemy);
 
 		break;
 	}
