@@ -1,6 +1,7 @@
 #include "gem.h"
 #include "player.h"
 #include "score_data.h"
+#include "se.h"
 
 #include "vector2.h"
 #include "timer.h"
@@ -79,6 +80,9 @@ static void CheckHitVSPlayer(void) {
 			AddScore(kGetGemScore);
 
 			RecoveryEnergy(gem[i].recoveryEnergy);
+
+			//SEの再生
+			PlaySe(SeType::GetGem);
 		}
 	}
 

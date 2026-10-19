@@ -16,6 +16,10 @@ enum class SeType {
 	//menu
 
 	//player
+	ShootElecBullet,
+	SpawnElecShock,
+
+	GetGem,
 
 	//enemy
 

@@ -375,7 +375,9 @@ static void SpawnEnemyByRound(void) {
 		if (data.timer.count >= data.timer.time) {
 			data.timer.count = 0;
 
-			Vector2 spawnPos = CreatePosOutCameraZone();
+			Vector2 spawnPos;
+			
+			spawnPos = CreatePosOutCameraZone();
 			SpawnEnemy(spawnPos, data.type);
 		}
 	}

@@ -7,6 +7,7 @@
 #include "effect.h"
 #include "boss_enemy.h"
 #include "play_ui.h"
+#include "se.h"
 
 #include "vector2.h"
 #include "tool.h"
@@ -662,18 +663,20 @@ static void ShootElecBullet(void) {
 	else {
 		if (chargeElecBulletTimer.count <= 0) return;
 
-		////射撃位置設定
-		//shootPos.x = player.pos.x + kShootDisLength * cosf(player.rotateTheta);
-		//shootPos.y = player.pos.y + kShootDisLength * sinf(player.rotateTheta);
-
 		//通常弾
 		if (chargeElecBulletTimer.count < chargeElecBulletTimer.time) {
 			ShootElecBullet(shootPos, player.rotateTheta, ElecBulletType::Normal);
 			player.remainEnergy -= consumptionShootNormal;
+
+			//SEの再生
+			PlaySe(SeType::ShootElecBullet);
 		}
 		//チャージ弾
 		else {
 			ShootElecBullet(shootPos, player.rotateTheta, ElecBulletType::Charge);
+
+			//SEの再生
+			PlaySe(SeType::ShootElecBullet);
 		}
 
 		chargeElecBulletTimer.count = 0;

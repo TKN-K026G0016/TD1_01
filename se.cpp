@@ -25,6 +25,10 @@ void InitSe(void) {
 		//menu
 
 		//player
+		{Novice::LoadAudio("./resources/sound/se/player/shoot_sound.wav"), 0.7f},
+		{Novice::LoadAudio("./resources/sound/se/player/elec_sound.wav"), 0.4f},
+
+	{	Novice::LoadAudio("./resources/sound/se/player/get_gem_sound.wav"), 1.0f},
 
 		//enemy
 
