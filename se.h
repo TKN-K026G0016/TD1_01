@@ -14,15 +14,60 @@
 enum class SeType {
 	Sample,
 	//menu
+	Confirm,
+	Cancel,
+	MoveCursor,
+	Pause,
+	
+	ResetHighScore,
+
+	StageClearJingle,
+	BreakScoreJingle,
+
+	GameoverJingle,
 
 	//player
+	ShootElecBullet,
+	ShootElecBulletCharge,
+	SpawnElecShock,
+	SpawnElecShockCharge,
+	Charge,
+
+	DamagePlayer,
+	DeadPlayer,
+
+	GetGem,
 
 	//enemy
+	ShootEnemyLaser,
+	ExploseEnemyBomb,
+
+	DamageEnemy,
+	DeadEnemy,
 
 	//ui
+	GaugeAlarm,
+	WarningBossAlarm,
+
+	Ready,
+	Go,
+
+	Combo1,
+	Combo2,
+	Combo3,
+	Combo4,
+	Combo5,
+	Combo6,
+	Combo7,
+	Combo8,
+	Combo9,
+	Combo10,
+
+	ComboJingle10,
+	ComboJingle100,
+	ComboJingle1000,
+
 	CountUpScore,
-
-
 	Count
 };
 

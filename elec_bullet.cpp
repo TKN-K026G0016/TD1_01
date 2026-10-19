@@ -6,6 +6,7 @@
 #include "gem.h"
 #include "score_data.h"
 #include "scene_manager.h"
+#include "se.h"
 
 #include "vector2.h"
 #include "timer.h"
@@ -307,8 +308,13 @@ void SpawnElecShock(Vector2 pos, ElecBulletType type, ElecShockOriginType origin
 		//エフェクトの生成
 		if (type == ElecBulletType::Normal) {
 			CreateElecShockEffect(pos);
+			//Se
+			PlaySe(SeType::SpawnElecShock);
+
 		} else if(type == ElecBulletType::Charge){
 			CreateElecShockChargedEffect(pos);
+			//Se
+			PlaySe(SeType::SpawnElecShockCharge);
 		}
 
 		//ラインエフェクトの生成
