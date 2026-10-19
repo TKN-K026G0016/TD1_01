@@ -173,6 +173,7 @@ xcopy C:\KamataEngine\DirectXGame\Resources "$(OutDirFullPath)NoviceResources" /
     <ClCompile Include="C:\KamataEngine\Adapter\Novice.cpp" />
     <ClCompile Include="clear.cpp" />
     <ClCompile Include="collision_manager.cpp" />
+    <ClCompile Include="credits.cpp" />
     <ClCompile Include="effect.cpp" />
     <ClCompile Include="elec_bullet.cpp" />
     <ClCompile Include="enemy.cpp" />
@@ -187,6 +188,7 @@ xcopy C:\KamataEngine\DirectXGame\Resources "$(OutDirFullPath)NoviceResources" /
     <ClCompile Include="player.cpp" />
     <ClCompile Include="player_laser.cpp" />
     <ClCompile Include="play_ui.cpp" />
+    <ClCompile Include="reset_score.cpp" />
     <ClCompile Include="scene_manager.cpp" />
     <ClCompile Include="score_data.cpp" />
     <ClCompile Include="se.cpp" />
@@ -231,6 +233,7 @@ xcopy C:\KamataEngine\DirectXGame\Resources "$(OutDirFullPath)NoviceResources" /
     <ClInclude Include="clear.h" />
     <ClInclude Include="collision_manager.h" />
     <ClInclude Include="common.h" />
+    <ClInclude Include="credits.h" />
     <ClInclude Include="effect.h" />
     <ClInclude Include="enemy.h" />
     <ClInclude Include="enemy_bullet.h" />
@@ -245,6 +248,7 @@ xcopy C:\KamataEngine\DirectXGame\Resources "$(OutDirFullPath)NoviceResources" /
     <ClInclude Include="player.h" />
     <ClInclude Include="player_laser.h" />
     <ClInclude Include="play_ui.h" />
+    <ClInclude Include="reset_score.h" />
     <ClInclude Include="scene_manager.h" />
     <ClInclude Include="score_data.h" />
     <ClInclude Include="se.h" />

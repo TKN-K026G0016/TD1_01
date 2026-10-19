@@ -13,6 +13,10 @@ enum class Scene {
 	Gameover,
 	//ガイド画面
 	Guide,
+	//クレジット画面
+	Credits,
+	//スコア初期化画面
+	ResetScore,
 
 	Count
 };

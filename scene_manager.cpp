@@ -9,6 +9,8 @@
 #include "clear.h"
 #include "gameover.h"
 #include "guide.h"
+#include "credits.h"
+#include "reset_score.h"
 
 #pragma region データ: シーン関係
 
@@ -20,6 +22,8 @@ static constexpr void (*InitFuncs[ToInt(Scene::Count)])(void) = {
 	InitClear,
 	InitGameover,
 	InitGuide,
+	InitCredits,
+	InitResetScore,
 };
 
 // アップデート関数の配列
@@ -30,6 +34,8 @@ static constexpr void (*UpdateFuncs[ToInt(Scene::Count)])(void) = {
 	UpdateClear,
 	UpdateGameover,
 	UpdateGuide,
+	UpdateCredits,
+	UpdateResetScore,
 };
 
 // 描画関数の配列
@@ -40,6 +46,8 @@ static constexpr void (*DrawFuncs[ToInt(Scene::Count)])(void) = {
 	DrawClear,
 	DrawGameover,
 	DrawGuide,
+	DrawCredits,
+	DrawResetScore,
 };
 
 //現在のシーン
@@ -190,6 +198,14 @@ void DrawScene(void) {
 	else if (nowScene == Scene::Gameover) {
 		DrawPlay();
 		DrawGameover();
+	}
+	else if (nowScene == Scene::Credits) {
+		DrawTitle();
+		DrawCredits();
+	}
+	else if (nowScene == Scene::ResetScore) {
+		DrawTitle();
+		DrawResetScore();
 	}
 	else {
 		DrawFuncs[ToInt(nowScene)]();

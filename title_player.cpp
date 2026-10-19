@@ -29,7 +29,7 @@ struct TitlePlayer {
 	float rotateTheta = ToFloat(M_PI) / 2.0f;
 
 	//最初の移動を開始するまでの時間
-	Timer waitMoveStartTimer = { 60, 0 };
+	Timer waitMoveStartTimer = { 10, 0 };
 
 	//最初の移動演出
 	float easingT = 0.0f;
