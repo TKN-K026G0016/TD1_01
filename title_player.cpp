@@ -1,6 +1,7 @@
 #include "title_player.h"
 #include "elec_bullet.h"
 #include "effect.h"
+#include "se.h"
 
 #include "vector2.h"
 #include "timer.h"
@@ -28,7 +29,7 @@ struct TitlePlayer {
 	float rotateTheta = ToFloat(M_PI) / 2.0f;
 
 	//最初の移動を開始するまでの時間
-	Timer waitMoveStartTimer = { 60, 0 };
+	Timer waitMoveStartTimer = { 10, 0 };
 
 	//最初の移動演出
 	float easingT = 0.0f;
@@ -133,10 +134,14 @@ static void ShootElecBullet(void) {
 		//通常弾
 		if (chargeElecBulletTimer.count < chargeElecBulletTimer.time) {
 			ShootElecBullet(shootPos, player.rotateTheta, ElecBulletType::Normal);
+
+			PlaySe(SeType::ShootElecBullet);
 		}
 		//チャージ弾
 		else {
 			ShootElecBullet(shootPos, player.rotateTheta, ElecBulletType::Charge);
+			
+			PlaySe(SeType::ShootElecBulletCharge);
 		}
 
 		chargeElecBulletTimer.count = 0;
@@ -154,6 +159,11 @@ static void CreateChargeOrbEffect(void) {
 			createChargeChipTimer.count = 0;
 			CreateChargeChipEffect();
 		}
+
+		PlaySeContinuous(SeType::Charge);
+	}
+	else {
+		StopPlayingSe(SeType::Charge);
 	}
 
 	if (chargeElecBulletTimer.count >= chargeElecBulletTimer.time) {

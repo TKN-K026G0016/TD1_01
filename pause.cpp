@@ -1,6 +1,7 @@
 #include "pause.h"
 #include "input.h"
 #include "scene_manager.h"
+#include "se.h"
 
 #include "texture.h"
 #include "tool.h"
@@ -177,6 +178,8 @@ static void InputResume(void) {
 	if (CheckInputAction(InputAction::Pause)) {
 		onceSelect = true;
 		nowSelect = ModePauseSelect::Resume;
+
+		PlaySe(SeType::Pause);
 	}
 }
 
@@ -196,6 +199,9 @@ static void ChangeCursor(void) {
 			selectNum = ToInt(ModePauseSelect::Count) - 1;
 		}
 
+		PlaySe(SeType::MoveCursor);
+
+
 	} else if (CheckInputAction(InputAction::SelectDown)) {
 		selectNum++;
 
@@ -203,6 +209,8 @@ static void ChangeCursor(void) {
 		if (selectNum >= ToInt(ModePauseSelect::Count)) {
 			selectNum = 0;
 		}
+
+		PlaySe(SeType::MoveCursor);
 	}
 
 	//変更を適用
@@ -217,6 +225,8 @@ static void Confirm(void) {
 
 	if (CheckInputAction(InputAction::Confirm)) {
 		onceSelect = true;
+
+		PlaySe(SeType::Confirm);
 	}
 }
 
@@ -357,6 +367,8 @@ static void DrawCursor(void) {
 #pragma endregion
 
 void InitPause(void) {
+	PlaySe(SeType::Pause);
+
 	InitSelect();
 	InitIcon();
 	InitCoverPanel();

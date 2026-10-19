@@ -5,6 +5,7 @@
 #include "enemy_bullet.h"
 #include "enemy.h"
 #include "effect.h"
+#include "se.h"
 
 #include "vector2.h"
 #include "tool.h"
@@ -312,6 +313,7 @@ void MoveAttack3(void) {
 			if (data.shootLaserTimer.count >= data.shootLaserTimer.time && data.shootTimer.count < data.shootTimer.time - 60) {
 				data.shootLaserTimer.count = 0;
 				ShootEnemyLaser(bossEnemy.pos, bossEnemy.rotateTheta, 0.0f);
+				PlaySe(SeType::ShootEnemyLaser);
 			}
 
 

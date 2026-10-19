@@ -7,6 +7,7 @@
 #include "effect.h"
 #include "boss_enemy.h"
 #include "play_ui.h"
+#include "se.h"
 
 #include "vector2.h"
 #include "tool.h"
@@ -662,18 +663,20 @@ static void ShootElecBullet(void) {
 	else {
 		if (chargeElecBulletTimer.count <= 0) return;
 
-		////射撃位置設定
-		//shootPos.x = player.pos.x + kShootDisLength * cosf(player.rotateTheta);
-		//shootPos.y = player.pos.y + kShootDisLength * sinf(player.rotateTheta);
-
 		//通常弾
 		if (chargeElecBulletTimer.count < chargeElecBulletTimer.time) {
 			ShootElecBullet(shootPos, player.rotateTheta, ElecBulletType::Normal);
 			player.remainEnergy -= consumptionShootNormal;
+
+			//SEの再生
+			PlaySe(SeType::ShootElecBullet);
 		}
 		//チャージ弾
 		else {
 			ShootElecBullet(shootPos, player.rotateTheta, ElecBulletType::Charge);
+
+			//SEの再生
+			PlaySe(SeType::ShootElecBulletCharge);
 		}
 
 		chargeElecBulletTimer.count = 0;
@@ -796,6 +799,12 @@ static void CreateChargeOrbEffect(void) {
 			createChargeChipTimer.count = 0;
 			CreateChargeChipEffect();
 		}
+
+		//チャージSE
+		PlaySeContinuous(SeType::Charge);
+
+	} else {
+		StopPlayingSe(SeType::Charge);
 	}
 
 	if (chargeElecBulletTimer.count >= chargeElecBulletTimer.time) {
@@ -911,6 +920,10 @@ static void CheckDeadPlayer(void) {
 
 			CreateExplodeEffect(createPos, GetPlayerColor());
 		}
+
+		//SE
+		PlaySe(SeType::DeadPlayer);
+
 	}
 }
 
@@ -1034,24 +1047,18 @@ PlayerLaserLevel GetPlayerNowLaserLevel(void) {
 void PlayerDamage(Vector2 hitPos, float damage) {
 	if (!player.isAlive || player.isInvincible) return;
 
-
-	if (kLifeGaugeSwitch) {
-		//エネルギーを減らす
-		player.remainEnergy -= damage;
-		if (player.remainEnergy > 0.0f) {
-			player.isInvincible = true;
-		}
-	} else {
-		//体力減らす
-		player.hp--;
-
-		if (player.hp > 0) {
-			//無敵開始
-			player.isInvincible = true;
-		}
+	//エネルギーを減らす
+	player.remainEnergy -= damage;
+	if (player.remainEnergy > 0.0f) {
+		player.isInvincible = true;
 	}
 
+
 	CreatePlayerDamageEffect(player.pos);
+
+	if (player.hp > 0) {
+		PlaySe(SeType::DamagePlayer);
+	}
 
 	TriggerGaugeShackByDamage();
 

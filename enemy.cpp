@@ -6,6 +6,7 @@
 #include "gem.h"
 #include "boss_enemy.h"
 #include "effect.h"
+#include "se.h"
 
 #include "vector2.h"
 #include "timer.h"
@@ -877,6 +878,7 @@ static void BurstEnemyBomb(void) {
 					}
 				}
 				DeadEnemyBomb(i);
+				PlaySe(SeType::ExploseEnemyBomb);
 			}
 		}
 	}
@@ -1410,6 +1412,7 @@ void DamageEnemyShooter(EnemyShooter& enemy, int pow, bool hitStopSwitch) {
 
 	//ダメージエフェクト
 	CreateEnemyDamageEffect(enemy.pos);
+	PlaySe(SeType::DamageEnemy);
 }
 
 EnemyGuardian* GetEnemyGuardianArray(void) {
@@ -1429,6 +1432,8 @@ void DamageEnemyGuardian(EnemyGuardian& enemy, int pow) {
 
 	//ダメージエフェクト
 	CreateEnemyDamageEffect(enemy.pos);
+
+	PlaySe(SeType::DamageEnemy);
 }
 
 EnemyBasic* GetEnemyBasicArray(void) {
@@ -1454,6 +1459,8 @@ void DamageEnemyBasic(EnemyBasic& enemy, int pow, bool hitStopSwitch) {
 
 	//ダメージエフェクト
 	CreateEnemyDamageEffect(enemy.pos);
+
+	PlaySe(SeType::DamageEnemy);
 }
 
 EnemyM* GetEnemyMArray(void) {
@@ -1473,6 +1480,8 @@ void DamageEnemyM(EnemyM& enemy, int pow) {
 
 	//ダメージエフェクト
 	CreateEnemyDamageEffect(enemy.pos);
+
+	PlaySe(SeType::DamageEnemy);
 }
 
 EnemySmall* GetEnemySmallArray(void) {
@@ -1492,6 +1501,8 @@ void DamageEnemySmall(EnemySmall& enemy, int pow) {
 
 	//ダメージエフェクト
 	CreateEnemyDamageEffect(enemy.pos);
+
+	PlaySe(SeType::DamageEnemy);
 }
 
 EnemyBomb* GetEnemyBombArray(void) {
@@ -1511,6 +1522,7 @@ void DamageEnemyBomb(EnemyBomb& enemy, int pow) {
 
 	//ダメージエフェクト
 	CreateEnemyDamageEffect(enemy.pos);
+	PlaySe(SeType::DamageEnemy);
 }
 
 EnemySniper* GetEnemySniperArray(void) {
@@ -1536,5 +1548,7 @@ void DamageEnemySniper(EnemySniper& enemy, int pow, bool hitStopSwitch) {
 
 	//ダメージエフェクト
 	CreateEnemyDamageEffect(enemy.pos);
+
+	PlaySe(SeType::DamageEnemy);
 }
 #pragma endregion

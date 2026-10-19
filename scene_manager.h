@@ -11,6 +11,12 @@ enum class Scene {
 	Clear,
 	//ゲームオーバー画面
 	Gameover,
+	//ガイド画面
+	Guide,
+	//クレジット画面
+	Credits,
+	//スコア初期化画面
+	ResetScore,
 
 	Count
 };
@@ -29,6 +35,7 @@ enum class FadeTarget {
 	Play,
 	Clear,
 	Gameover,
+	Guide,
 };
 
 /// <summary>

@@ -6,6 +6,7 @@
 #include "score_data.h"
 #include "effect.h"
 #include "play_ui.h"
+#include "se.h"
 
 #include "texture.h"
 #include "vector2.h"
@@ -376,7 +377,9 @@ static void SpawnEnemyByRound(void) {
 		if (data.timer.count >= data.timer.time) {
 			data.timer.count = 0;
 
-			Vector2 spawnPos = CreatePosOutCameraZone();
+			Vector2 spawnPos;
+			
+			spawnPos = CreatePosOutCameraZone();
 			SpawnEnemy(spawnPos, data.type);
 		}
 	}
@@ -398,6 +401,8 @@ static void UpdateStartEffect(void) {
 		if (waitPlayerTimer.count >= waitPlayerTimer.time) {
 			waitPlayerTimer.count = 0;
 			nowModeStart = ModeStartEffect::Ready;
+
+			PlaySe(SeType::Ready);
 		}
 
 		break;
@@ -407,6 +412,8 @@ static void UpdateStartEffect(void) {
 		if (readyTelopTimer.count >= readyTelopTimer.time) {
 			readyTelopTimer.count = 0;
 			nowModeStart = ModeStartEffect::Go;
+
+			PlaySe(SeType::Go);
 		}
 
 		break;

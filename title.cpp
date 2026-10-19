@@ -36,7 +36,10 @@ struct Logo {
 	//振動関係
 	int shakeDuration = 1;
 	Timer shakeTimer = { 10, 0 };
-	
+	//<ヒット演出>
+	int shakeDurationHit = 8;
+	Timer hitTimer = { 20, 0 };
+
 	unsigned int lightOutColor = 0x222222FF;
 
 	Texture texture = {};
@@ -101,6 +104,32 @@ TitleInst instStart;
 
 #pragma endregion
 
+#pragma region データ: その他ボタン
+
+struct Button {
+	Vector2 pos = { };
+	Vector2 size = { 80, 80 };
+
+	float hitRadius = 64.0f;
+
+	//振動関係
+	int shakeDuration = 1;
+	Timer shakeTimer = { 10, 0 };
+	//<ヒット演出>
+	int shakeDurationHit = 8;
+	Timer hitTimer = { 20, 0 };
+
+	unsigned int lightOutColor = 0x222222FF;
+
+	Texture texture = {};
+};
+Button creditsButton;
+Vector2 creditsPos = { 80, 640 };
+Button resetButton;
+Vector2 resetPos = { 1200, 640 };
+
+#pragma endregion
+
 #pragma region データ: 演出
 
 struct BlackPanel {
@@ -139,17 +168,21 @@ FlashPanel flashPanel;
 
 #pragma region 関数: 項目決定
 
-static void Confirm(void) {
-	if (nowMode != ModeTitle::WaitInput) return;
+static void ChangeMode(void) {
+	//モード切替
+	if (nowMode == ModeTitle::MovePlayer) {
+		nowMode = ModeTitle::TriggerLightUp;
 
-	if (CheckInputAction(InputAction::Confirm)) {
-		if (GetNowModeFade() != ModeFade::Standby) {
-			return;
-		}
+		PlaySe(SeType::DeadEnemy);
 
+	}
+	//シーン切り替え
+	else {
+		if (GetNowModeFade() != ModeFade::Standby) return;
 		ChangeModeFade(ModeFade::FadeOut);
-		ChangeFadeTarget(FadeTarget::Play);
-		//PlaySe(SeType::Sample);
+		ChangeFadeTarget(FadeTarget::Guide);
+
+		PlaySe(SeType::Confirm);
 	}
 }
 
@@ -183,10 +216,12 @@ static void CheckCollisionVSElecBullet(void) {
 
 				SpawnElecShock(createPos, elecBullet[j].type, ElecShockOriginType::None, -1, ElecShockOriginType::None, -1);
 			}
+			
+			//hitTimerを起動
+			logo.hitTimer.count = logo.hitTimer.time;
 
 			//モード切替
-			nowMode = ModeTitle::TriggerLightUp;
-
+			ChangeMode();
 		}
 	}
 }
@@ -218,6 +253,10 @@ static void UpdateLogoAfterimage(void) {
 static void UpdateLogo(void) {
 	CheckCollisionVSElecBullet();
 
+	if (logo.hitTimer.count > 0) {
+		logo.hitTimer.count--;
+	}
+
 	UpdateLogoAfterimage();
 }
 
@@ -241,7 +280,12 @@ static void DrawLogoAfterimage(void) {
 
 static void DrawLogo(void) {
 	Vector2 showPos = logo.pos;
-	if (nowMode != ModeTitle::MovePlayer) {
+
+	if (logo.hitTimer.count > 0) {
+		showPos.x += GetRand(-logo.shakeDurationHit, logo.shakeDurationHit);
+		showPos.y += GetRand(-logo.shakeDurationHit, logo.shakeDurationHit);
+	}
+	else if (nowMode != ModeTitle::MovePlayer) {
 		logo.shakeTimer.count++;
 		if (logo.shakeTimer.count >= logo.shakeTimer.time) {
 			logo.shakeTimer.count = 0;
@@ -355,6 +399,179 @@ static void DrawInst(void) {
 
 #pragma endregion
 
+#pragma region 関数: ボタン関係
+
+static void InitButton(void) {
+	creditsButton = {};
+	creditsButton.pos = creditsPos;
+	creditsButton.texture = GetTexture(TextureType::White1x1);
+
+	resetButton = {};
+	resetButton.pos = resetPos;
+	resetButton.texture = GetTexture(TextureType::White1x1);
+}
+
+static void ChangeModeByCredits(void) {
+	//モード切替
+	if (nowMode == ModeTitle::MovePlayer) {
+		nowMode = ModeTitle::TriggerLightUp;
+
+		PlaySe(SeType::DeadEnemy);
+
+	}
+	//シーン切り替え
+	else {
+		if (GetNowModeFade() != ModeFade::Standby) return;
+		ChangeScene(Scene::Credits);
+
+		PlaySe(SeType::Confirm);
+	}
+}
+
+static void ChangeModeByReset(void) {
+	//モード切替
+	if (nowMode == ModeTitle::MovePlayer) {
+		nowMode = ModeTitle::TriggerLightUp;
+
+		PlaySe(SeType::DeadEnemy);
+
+	}
+	//シーン切り替え
+	else {
+		if (GetNowModeFade() != ModeFade::Standby) return;
+		ChangeScene(Scene::ResetScore);
+
+		PlaySe(SeType::Confirm);
+	}
+}
+
+static void CheckCollisionButtonVSBullet(void) {
+	ElecBullet* elecBullet = GetElecBulletArray();
+	int elecBulletLimit = GetElecBulletLimit();
+
+	for (int j = 0; j < elecBulletLimit; j++) {
+		if (!elecBullet[j].isShoot) continue;
+
+		//CreditsButton
+		if (CheckCollisionCircleVSCircle(elecBullet[j].pos, elecBullet[j].hitRadius, creditsButton.pos, creditsButton.hitRadius)) {
+			BreakElecBullet(j);
+
+			//ホウデンの生成
+			for (int i = 0; i < 5; i++) {
+				SpawnElecShock(spawnShockPos[i], elecBullet[j].type, ElecShockOriginType::None, -1, ElecShockOriginType::None, -1);
+
+				Vector2 createPos = creditsButton.pos;
+				createPos.x += ToFloat(GetRand(ToInt(-logo.size.x), ToInt(logo.size.x)));
+				createPos.y += ToFloat(GetRand(ToInt(-logo.size.y), ToInt(logo.size.y)));
+
+				SpawnElecShock(createPos, elecBullet[j].type, ElecShockOriginType::None, -1, ElecShockOriginType::None, -1);
+			}
+
+			//hitTimerを起動
+			creditsButton.hitTimer.count = creditsButton.hitTimer.time;
+
+			//モード切替
+			ChangeModeByCredits();
+		}
+
+		//CreditsButton
+		if (CheckCollisionCircleVSCircle(elecBullet[j].pos, elecBullet[j].hitRadius, resetButton.pos, resetButton.hitRadius)) {
+			BreakElecBullet(j);
+
+			//ホウデンの生成
+			for (int i = 0; i < 5; i++) {
+				SpawnElecShock(spawnShockPos[i], elecBullet[j].type, ElecShockOriginType::None, -1, ElecShockOriginType::None, -1);
+
+				Vector2 createPos = resetButton.pos;
+				createPos.x += ToFloat(GetRand(ToInt(-logo.size.x), ToInt(logo.size.x)));
+				createPos.y += ToFloat(GetRand(ToInt(-logo.size.y), ToInt(logo.size.y)));
+
+				SpawnElecShock(createPos, elecBullet[j].type, ElecShockOriginType::None, -1, ElecShockOriginType::None, -1);
+			}
+
+			//hitTimerを起動
+			resetButton.hitTimer.count = resetButton.hitTimer.time;
+
+			//モード切替
+			ChangeModeByReset();
+		}
+	}
+}
+
+static void UpdateButton(void) {
+	CheckCollisionButtonVSBullet();
+
+	if (creditsButton.hitTimer.count > 0) {
+		creditsButton.hitTimer.count--;
+	}
+	if (resetButton.hitTimer.count > 0) {
+		resetButton.hitTimer.count--;
+	}
+
+}
+
+static void DrawButton(void) {
+	Vector2 showPos;
+	Texture texture;
+
+#pragma region CreditsButton
+
+	showPos = creditsButton.pos;
+
+	if (creditsButton.hitTimer.count > 0) {
+		showPos.x += GetRand(-creditsButton.shakeDurationHit, creditsButton.shakeDurationHit);
+		showPos.y += GetRand(-creditsButton.shakeDurationHit, creditsButton.shakeDurationHit);
+	} else if (nowMode != ModeTitle::MovePlayer) {
+		creditsButton.shakeTimer.count++;
+		if (creditsButton.shakeTimer.count >= creditsButton.shakeTimer.time) {
+			creditsButton.shakeTimer.count = 0;
+
+			showPos.x += GetRand(-creditsButton.shakeDuration, creditsButton.shakeDuration);
+			showPos.y += GetRand(-creditsButton.shakeDuration, creditsButton.shakeDuration);
+		}
+	}
+
+	//colorの変更
+	texture = creditsButton.texture;
+	if (nowMode == ModeTitle::MovePlayer) {
+		texture.color = creditsButton.lightOutColor;
+	}
+
+	DrawTextureUI(texture, showPos, creditsButton.size);
+
+#pragma endregion
+
+#pragma region resetButton
+
+	showPos = resetButton.pos;
+
+	if (resetButton.hitTimer.count > 0) {
+		showPos.x += GetRand(-resetButton.shakeDurationHit, resetButton.shakeDurationHit);
+		showPos.y += GetRand(-resetButton.shakeDurationHit, resetButton.shakeDurationHit);
+	} else if (nowMode != ModeTitle::MovePlayer) {
+		resetButton.shakeTimer.count++;
+		if (resetButton.shakeTimer.count >= resetButton.shakeTimer.time) {
+			resetButton.shakeTimer.count = 0;
+
+			showPos.x += GetRand(-resetButton.shakeDuration, resetButton.shakeDuration);
+			showPos.y += GetRand(-resetButton.shakeDuration, resetButton.shakeDuration);
+		}
+	}
+
+	//colorの変更
+	texture = resetButton.texture;
+	if (nowMode == ModeTitle::MovePlayer) {
+		texture.color = resetButton.lightOutColor;
+	}
+
+	DrawTextureUI(texture, showPos, resetButton.size);
+
+#pragma endregion
+
+}
+
+#pragma endregion
+
 #pragma region 暗転パネル
 
 static void InitBlackPanel(void) {
@@ -424,6 +641,8 @@ void InitTitle(void) {
 
 	InitLogo();
 	InitInst();
+	InitButton();
+
 	InitFlashPanel();
 	InitBlackPanel();
 }
@@ -433,9 +652,9 @@ void UpdateTitle(void) {
 	UpdateElecBullet();
 	UpdateEffect();
 
-	Confirm();
 	UpdateLogo();
 	UpdateInst();
+	UpdateButton();
 	UpdateFlashPanel();
 
 	UpdateTitleBackground();
@@ -451,6 +670,7 @@ void DrawTitle(void) {
 
 	DrawLogo();
 	DrawInst();
+	DrawButton();
 
 	DrawFlashPanel();
 	DrawEffect();

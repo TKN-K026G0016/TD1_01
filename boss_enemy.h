@@ -32,7 +32,7 @@ struct BossEnemy {
 	//当たり判定の大きさ
 	float hitRadius =	128.0f;
 	int remainLife = 150;
-	int remainLifeMax = 15;
+	int remainLifeMax = 150;
 
 	//<移動関係>
 	// 視界

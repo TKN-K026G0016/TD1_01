@@ -158,6 +158,12 @@ enum class TextureType {
 	//===============
 	GameoverIcon,
 
+	//===============
+	//Guide
+	//===============
+	ControllerGuide,
+	GaugeGuide,
+
 	Count
 };
 

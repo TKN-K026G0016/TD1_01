@@ -3,6 +3,7 @@
 #include "scene_manager.h"
 #include "score_data.h"
 #include "stage.h"
+#include "se.h"
 
 #include "tool.h"
 #include "texture.h"
@@ -32,7 +33,7 @@ struct CoverPanel {
 
 	//<イージング関係>
 	float easingT = 0.0f;
-	float easingSpeed = 0.02f;
+	float easingSpeed = 0.015f;
 	EasingMode easingMode = EasingMode::EaseIn;
 
 	int alpha = 0;
@@ -91,7 +92,7 @@ struct ScoreManager {
 
 	//イージング関係
 	float easingT = 0.0f;
-	float easingSpeed = 0.01f;
+	float easingSpeed = 0.008f;
 	EasingMode easingMode = EasingMode::EaseIn;
 };
 ScoreManager scoreManager;
@@ -258,14 +259,24 @@ static void InitScoreCount(void) {
 		scoreNumbers[i] = {};
 	}
 
+	scoreManager = {};
+
 	scoreManager.score = GetNowScore();
 
 	scoreNumberTexture = GetTexture(TextureType::ScoreNumbers);
 }
 
 static void UpdateScoreCount(void) {
+
+	if (CheckInputAction(InputAction::Confirm)) {
+		scoreManager.easingT = 1.0f;
+	}
+
 	//イージング処理
 	scoreManager.easingT += scoreManager.easingSpeed;
+
+	PlaySe(SeType::CountUpScore);
+
 	if (scoreManager.easingT >= 1.0f) {
 		scoreManager.easingT = 1.0f;
 		nowMode = ModeGameover::Select;
@@ -393,6 +404,8 @@ static void ChangeCursor(void) {
 			selectNum = ToInt(ModeGameoverSelect::Count) - 1;
 		}
 
+		PlaySe(SeType::MoveCursor);
+
 	} else if (CheckInputAction(InputAction::SelectDown)) {
 		selectNum++;
 
@@ -400,6 +413,8 @@ static void ChangeCursor(void) {
 		if (selectNum >= ToInt(ModeGameoverSelect::Count)) {
 			selectNum = 0;
 		}
+
+		PlaySe(SeType::MoveCursor);
 	}
 
 	//変更を適用
@@ -414,6 +429,8 @@ static void Confirm(void) {
 
 	if (CheckInputAction(InputAction::Confirm)) {
 		onceSelect = true;
+
+		PlaySe(SeType::Confirm);
 	}
 }
 
@@ -507,6 +524,8 @@ static void DrawButton(void) {
 
 void InitGameover(void) {
 	nowMode = ModeGameover::PanelFadeIn;
+
+	PlaySe(SeType::GameoverJingle);
 
 	InitButton();
 	InitCoverPanel();
