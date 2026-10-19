@@ -397,3 +397,14 @@ int GetEnemyBombLimit(void);
 /// <param name="enemy"></param>
 /// <param name="pow"></param>
 void DamageEnemyBomb(EnemyBomb& enemy, int pow);
+
+EnemySniper* GetEnemySniperArray(void);
+
+int GetEnemySniperLimit(void);
+
+/// <summary>
+/// EnemyBombへのダメージ処理
+/// </summary>
+/// <param name="enemy"></param>
+/// <param name="pow"></param>
+void DamageEnemySniper(EnemySniper& enemy, int pow, bool hitStopSwitch);

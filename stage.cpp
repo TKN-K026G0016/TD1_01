@@ -108,7 +108,7 @@ SpawnerData spawners[ToInt(Round::Count)][kMaxSpawner] = {
 		{ EnemyType::EnemyBasic, {150, 0} },
 		{ EnemyType::EnemySmallGroup, {160, 0} },
 		{ EnemyType::EnemyFormation, {280, 0} },
-		{ EnemyType::EnemySniper, {300, 0} },
+		{ EnemyType::EnemyShooter, {300, 0} },
 	},
 	//Round4
 	{
@@ -123,7 +123,7 @@ SpawnerData spawners[ToInt(Round::Count)][kMaxSpawner] = {
 		{ EnemyType::EnemyBasic, {120, 0} },
 		{ EnemyType::EnemySmallGroup, {60, 50} },
 		{ EnemyType::EnemyFormation, {250, 0} },
-		{ EnemyType::EnemySniper, {100, 0} },
+		{ EnemyType::EnemyShooter, {100, 0} },
 		{EnemyType::EnemyBomb, {300, 0}},
 	},
 
@@ -132,7 +132,7 @@ SpawnerData spawners[ToInt(Round::Count)][kMaxSpawner] = {
 		{ EnemyType::EnemyBasic, {150, 0} },
 		{ EnemyType::EnemySmallGroup, {200, 50} },
 		{ EnemyType::EnemyFormation, {250, 0} },
-		{ EnemyType::EnemySniper, {250, 0} },
+		{ EnemyType::EnemyShooter, {250, 0} },
 		//{EnemyType::EnemyBomb, {500, 0}},
 	},
 };

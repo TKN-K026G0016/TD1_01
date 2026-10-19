@@ -1090,10 +1090,10 @@ static void DrawEnemySniper(void) {
 void DeadAllEnemy(void) {
 	//ボスが死亡したら
 	if(!GetBossEnemyIsDead()) return;
-	// Sniper
+	// Shooter
 	for (int i = 0; i < kEnemyShooterLimit; i++) {
 		if (enemySniper[i].isAlive) {
-			DeadEnemySniper(i);
+			DeadEnemyShooter(i);
 		}
 	}
 
@@ -1129,6 +1129,13 @@ void DeadAllEnemy(void) {
 	for (int i = 0; i < kEnemyBombLimit; i++) {
 		if (enemyBomb[i].isAlive) {
 			DeadEnemyBomb(i);
+		}
+	}
+
+	// Sniper
+	for (int i = 0; i < kEnemySniperLimit; i++) {
+		if (enemySniper[i].isAlive) {
+			DeadEnemySniper(i);
 		}
 	}
 
@@ -1506,4 +1513,28 @@ void DamageEnemyBomb(EnemyBomb& enemy, int pow) {
 	CreateEnemyDamageEffect(enemy.pos);
 }
 
+EnemySniper* GetEnemySniperArray(void) {
+	return enemySniper;
+}
+
+int GetEnemySniperLimit(void) {
+	return kEnemySniperLimit;
+}
+
+void DamageEnemySniper(EnemySniper& enemy, int pow, bool hitStopSwitch) {
+	enemy.hp -= pow;
+
+	//フラッシュさせる
+	enemy.isFlash = true;
+	enemy.flashTimer.count = 0;
+
+	//ヒットストップの実装
+	if (hitStopSwitch) {
+		enemy.isHitStop = true;
+		enemy.hitStopTimer.count = 0;
+	}
+
+	//ダメージエフェクト
+	CreateEnemyDamageEffect(enemy.pos);
+}
 #pragma endregion

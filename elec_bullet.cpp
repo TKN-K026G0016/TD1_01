@@ -375,6 +375,14 @@ void SpawnElecShock(Vector2 pos, ElecBulletType type, ElecShockOriginType origin
 
 				break;
 			}
+			case ElecShockOriginType::EnemySniper: {
+
+				EnemySniper* enemySniper = GetEnemySniperArray();
+
+				originPos = enemySniper[originIndex2].pos;
+
+				break;
+			}
 			case ElecShockOriginType::BossEnemy: {
 
 				BossEnemy* BossEnemy = GetBossEnemy();

@@ -50,6 +50,7 @@ enum class ElecShockOriginType {
 	EnemyM,
 	EnemySmall,
 	EnemyBomb,
+	EnemySniper,
 
 	BossEnemy,
 
