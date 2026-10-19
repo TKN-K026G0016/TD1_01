@@ -102,7 +102,7 @@ void CheckCollisionLaserVSBossEnemy(void) {
 /// </summary>
 /// <param name=""></param>
 static void CheckCollisionElecBulletVSEnemy(void) {
-	EnemySniper* enemy1 = GetEnemySniperArray();
+	EnemyShooter* enemy1 = GetEnemySniperArray();
 	int enemy1Limit = GetEnemySniperLimit();
 
 	EnemyGuardian* enemy2 = GetEnemyGuardianArray();

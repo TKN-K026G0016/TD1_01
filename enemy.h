@@ -9,7 +9,7 @@ enum class EnemyType {
 	None,
 
 	//移動→射撃
-	EnemySniper,
+	EnemyShooter,
 	//ボス防御
 	EnemyGuardian,
 	//移動のみ
@@ -26,13 +26,15 @@ enum class EnemyType {
 	EnemySmallFarmation,
 	//ボム
 	EnemyBomb,
+	//長距離射撃
+	EnemySniper,
 
 
 	Count
 };
-#pragma region 構造体:EnemySniper
+#pragma region 構造体:EnemyShooter
 
-struct EnemySniper {
+struct EnemyShooter {
 	Vector2 pos = { 0, 0 };
 	Vector2 size = { 64, 64 };
 
@@ -281,6 +283,42 @@ struct EnemyBomb {
 
 #pragma endregion
 
+#pragma region 構造体:EnemySniper
+
+struct EnemySniper {
+	Vector2 pos = { 0, 0 };
+	Vector2 size = { 64, 64 };
+
+	//生存フラグ
+	bool isAlive = false;
+
+	int hp = 30;
+	int hpMax = 30;
+
+	float hitRadius = 20.0f;
+
+	//<射撃処理関係>
+	Timer shootLazerTimer = { 300, 0 };
+	Timer shootingLazerTimer = { 60, 0 };
+
+	//ショックの生成無視状態
+	bool isIgnoreShock = false;
+	//ショック生成無視タイマー
+	Timer ignoreSpawnShockTimer = { 20, 0 };
+
+	//<フラッシュ関係>
+	bool isFlash = false;
+	Timer flashTimer = { 7, 0 };
+	//<ヒットストップ関係>
+	bool isHitStop = false;
+	Timer hitStopTimer = { 10, 0 };
+
+
+
+	Texture texture = {};
+};
+#pragma endregion
+
 
 void InitEnemy(void);
 void UpdateEnemy(void);
@@ -293,16 +331,16 @@ void DrawEnemy(void);
 /// <param name="type"生成する種類></param>
 void SpawnEnemy(Vector2 pos, EnemyType type);
 
-EnemySniper* GetEnemySniperArray(void);
+EnemyShooter* GetEnemyShooterArray(void);
 
-int GetEnemySniperLimit(void);
+int GetEnemyShooterLimit(void);
 
 /// <summary>
 /// Enemy1へのダメージ処理
 /// </summary>
 /// <param name="enemy"></param>
 /// <param name="pow"></param>
-void DamageEnemySniper(EnemySniper& enemy, int pow, bool hitStopSwitch);
+void DamageEnemyShooter(EnemyShooter& enemy, int pow, bool hitStopSwitch);
 
 EnemyGuardian* GetEnemyGuardianArray(void);
 
