@@ -30,3 +30,5 @@ void ResetNowScore(void);
 /// ハイスコア更新処理
 /// </summary>
 void UpdateHighScore(void);
+
+void ResetHighScore(void);
