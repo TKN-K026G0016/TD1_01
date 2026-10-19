@@ -314,7 +314,7 @@ void SpawnElecShock(Vector2 pos, ElecBulletType type, ElecShockOriginType origin
 		} else if(type == ElecBulletType::Charge){
 			CreateElecShockChargedEffect(pos);
 			//Se
-			PlaySe(SeType::SpawnElecShock);
+			PlaySe(SeType::SpawnElecShockCharge);
 		}
 
 		//ラインエフェクトの生成
