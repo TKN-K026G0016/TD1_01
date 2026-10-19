@@ -43,7 +43,7 @@ static constexpr void (*DrawFuncs[ToInt(Scene::Count)])(void) = {
 };
 
 //現在のシーン
-static Scene nowScene = Scene::Guide;
+static Scene nowScene = Scene::Title;
 
 #pragma endregion
 
@@ -123,6 +123,9 @@ static void MoveFadePanel(void) {
 					break;
 				case FadeTarget::Gameover:
 					ChangeScene(Scene::Gameover);
+					break;
+				case FadeTarget::Guide:
+					ChangeScene(Scene::Guide);
 					break;
 				}
 			}

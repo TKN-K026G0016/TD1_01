@@ -152,8 +152,8 @@ void InitTexture(void) {
 		//===============
 		//Guide
 		//===============
-		{ Novice::LoadTexture("./resources/texture/ui/guide/controller_guide.png"), { 2048, 512 }, {0, 0}, 1, 0, WHITE },
-		{ Novice::LoadTexture("./resources/texture/ui/guide/gauge_guide.png"), { 1024, 512 }, {0, 0}, 0, 0, WHITE },
+		{ Novice::LoadTexture("./resources/texture/ui/guide/controller_guide.png"), { 1024, 512 }, {0, 0}, 1, 0, WHITE },
+		{ Novice::LoadTexture("./resources/texture/ui/guide/gauge_guide.png"), { 1024, 256 }, {0, 0}, 0, 0, WHITE },
 
 
 	};

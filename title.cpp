@@ -148,7 +148,7 @@ static void Confirm(void) {
 		}
 
 		ChangeModeFade(ModeFade::FadeOut);
-		ChangeFadeTarget(FadeTarget::Play);
+		ChangeFadeTarget(FadeTarget::Guide);
 		//PlaySe(SeType::Sample);
 	}
 }
