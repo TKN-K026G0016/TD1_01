@@ -66,6 +66,7 @@ ElecShock elecShock[kElecShockLimit] = {};
 
 //現在のコンボ数
 static int nowCombo = 0;
+
 //今回のゲームの最大コンボ数
 static int maxCombo = 0;
 //コンボ持続時間
@@ -86,6 +87,13 @@ int totalComboInCombo = 0;
 int scoreInCombo = 0;
 //スコア数による獲得スコアの倍率
 constexpr float kScoreMugByCombo = 0.01f;
+
+//
+int comboSoundSpan = 100;
+
+int jingle1Combo = 100;
+int jingle2Combo = 500;
+int jingle3Combo = 1000;
 
 #pragma endregion
 
@@ -220,6 +228,17 @@ static void UpdateShockCombo(void) {
 			//最大コンボ数更新処理
 			if (nowCombo > maxCombo) {
 				maxCombo = nowCombo;
+			}
+
+			//コンボ終了ジングル
+			if (nowCombo > jingle3Combo) {
+				PlaySe(SeType::ComboJingle1000);
+			}
+			else if (nowCombo > jingle2Combo) {
+				PlaySe(SeType::ComboJingle100);
+			}
+			else if (nowCombo > jingle1Combo) {
+				PlaySe(SeType::ComboJingle10);
 			}
 			
 			totalComboInCombo = 0;
@@ -429,13 +448,35 @@ void AddShockCombo(ElecBulletType type) {
 	//コンボ増加
 	int addCombo = (type == ElecBulletType::Normal) ? kAddCombo : kAddComboCharged;
 
+	int beforeCombo = nowCombo;
 	nowCombo += addCombo;
+	int afterCombo = nowCombo;
 
 	int recoveryComboTime = (type == ElecBulletType::Normal) ? kRecoveryComboTime : kRecoveryComboTimeCharged;
 	comboTimer.count -= recoveryComboTime;
 	if (comboTimer.count < 0) {
 		comboTimer.count = 0;
 	}
+
+#pragma region サウンド追加
+
+	// 10 の倍数を跨いだ瞬間に SE を鳴らす
+	int beforeTier = beforeCombo / comboSoundSpan;
+	int afterTier = afterCombo / comboSoundSpan;
+
+	if (beforeTier != afterTier) {
+		// SE の種類を段階的に変える
+		// combo_1.wav ～ combo_10.wav を使う例
+		int seIndex = afterTier;
+
+		// 上限を決める（例：10段階まで）
+		if (seIndex > 10) seIndex = 10;
+
+		PlaySe((SeType)(ToInt(SeType::Combo1) + (seIndex - 1)));
+	}
+
+#pragma endregion
+
 }
 
 int GetShockCombo(void) {
