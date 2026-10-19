@@ -3,6 +3,9 @@
 #include "enemy.h"
 #include "boss_enemy.h"
 #include "scene_manager.h"
+#include "score_data.h"
+#include "effect.h"
+#include "play_ui.h"
 
 #include "texture.h"
 #include "vector2.h"
@@ -155,14 +158,32 @@ BackGround backGround;
 
 #pragma region 演出関係
 
+//現在の開始演出処理
+ModeStartEffect nowModeStart = ModeStartEffect::WaitPlayerSpawn;
+
+//開始演出
+Timer waitPlayerTimer = { 60, 0 };
+//Readyの表示される時間
+Timer readyTelopTimer = { 100, 0 };
+//Goの表示される時間
+Timer goTelopTimer = { 30, 0 };
+
 //プレイヤー死亡後、ゲームオーバーへ向かうまでの時間
-Timer goToGameoverTimer = { 120, 0 };
+Timer goToGameoverTimer = { 150, 0 };
 
 //boss死亡後、クリアへ向かうまでの時間
-Timer goToClearTimer = { 120, 0 };
+Timer goToClearTimer = { 180, 0 };
 
+#pragma region データ: ボス警告
+
+static bool isWarningBoss = false;
+Timer warnBossTimer = { 300, 0 };
 
 #pragma endregion
+
+#pragma endregion
+
+
 
 #pragma region 関数: カメラ関係
 
@@ -255,6 +276,9 @@ static void InitRound(void) {
 /// ラウンドの変更処理
 /// </summary>
 static void ChangeRound(void) {
+	//開始演出中はカウントしない
+	if (nowModeStart != ModeStartEffect::Standby) return;
+
 	//経過時間の更新
 	CountTimeData(gameTime);
 
@@ -271,11 +295,12 @@ static void ChangeRound(void) {
 	if (totalGameTime >= totalNextRoundTime) {
 		nowRound = static_cast<Round>(nextRound);
 
-		//ボス生成
+		//ボスラウンドに入ったら
 		if (nowRound == Round::RoundBoss) {
-			SpawnBoss({ 1200, 720 });
+			//ボスの警告演出
+			isWarningBoss = true;
+			TriggerDangerDisplayEffect();
 		}
-
 	}
 
 #pragma endregion
@@ -337,6 +362,8 @@ Vector2 CreatePosOutCameraZone(void) {
 /// </summary>
 /// <param name=""></param>
 static void SpawnEnemyByRound(void) {
+	if (nowModeStart != ModeStartEffect::Standby) return;
+	if (GetBossEnemyIsDead()) return;
 
 	int round = ToInt(nowRound);
 	for (int i = 0; i < kMaxSpawner; i++) {
@@ -358,6 +385,44 @@ static void SpawnEnemyByRound(void) {
 
 #pragma region 関数: 演出関係
 
+static void InitStartEffect(void) {
+	nowModeStart = ModeStartEffect::WaitPlayerSpawn;
+	waitPlayerTimer.count = 0;
+}
+
+static void UpdateStartEffect(void) {
+	switch (nowModeStart) {
+	case ModeStartEffect::WaitPlayerSpawn: {
+		waitPlayerTimer.count++;
+		if (waitPlayerTimer.count >= waitPlayerTimer.time) {
+			waitPlayerTimer.count = 0;
+			nowModeStart = ModeStartEffect::Ready;
+		}
+
+		break;
+	}
+	case ModeStartEffect::Ready: {
+		readyTelopTimer.count++;
+		if (readyTelopTimer.count >= readyTelopTimer.time) {
+			readyTelopTimer.count = 0;
+			nowModeStart = ModeStartEffect::Go;
+		}
+
+		break;
+	}
+	case ModeStartEffect::Go: {
+		goTelopTimer.count++;
+		if (goTelopTimer.count >= goTelopTimer.time) {
+			goTelopTimer.count = 0;
+			nowModeStart = ModeStartEffect::Standby;
+		}
+
+		break;
+	}
+	}
+
+}
+
 static void InitGoSceneTimer(void) {
 	goToGameoverTimer.count = 0;
 	goToClearTimer.count = 0;
@@ -366,38 +431,66 @@ static void InitGoSceneTimer(void) {
 static void GoGameoverScene(void) {
 	//生存していたら、スキップ
 	if (GetPlayerIsAlive()) return;
-	//フェードアウトし始めたらスキップ
-	if (GetNowModeFade() != ModeFade::Standby) return;
-
-	goToGameoverTimer.count++;
-	if (goToGameoverTimer.count >= goToGameoverTimer.time) {
-		ChangeModeFade(ModeFade::FadeOut);
-		ChangeFadeTarget(FadeTarget::Gameover);
-	}
-}
-
-static void GoClearScene(void) {
-	////生存していたらスキップ
-	//if(GetBossEnemyIsAlive()) return;
-
 	////フェードアウトし始めたらスキップ
 	//if (GetNowModeFade() != ModeFade::Standby) return;
 
-	//goToClearTimer.count++;
-	//if (goToClearTimer.count >= goToClearTimer.time) {
-	//	ChangeModeFade(ModeFade::FadeOut);
-	//	ChangeFadeTarget(FadeTarget::Clear);
-	//}
+	goToGameoverTimer.count++;
+	if (goToGameoverTimer.count >= goToGameoverTimer.time) {
+		goToGameoverTimer.count = 0;
+		ChangeScene(Scene::Gameover);
+	}
+}
+
+static void InitWarningBoss(void) {
+	warnBossTimer.count = 0;
+	isWarningBoss = false;
+}
+
+static void UpdateWarningBoss(void) {
+	if (!isWarningBoss) return;
+
+	warnBossTimer.count++;
+	if (warnBossTimer.count >= warnBossTimer.time) {
+		warnBossTimer.count = 0;
+		isWarningBoss = false;
+
+		//ボスの生成処理
+		SpawnBoss({ 1200, 720 });
+		CancelDangerDisplayEffect();
+		CreateFlashPanel();
+	}
+
+}
+
+static void GoClearScene(void) {
+	/*if (nowRound != Round::RoundBoss) return;*/
+
+	//生存していたらスキップ
+	if(GetBossEnemyIsAlive() || !GetBossEnemyIsDead()) return;
+
+	//フェードアウトし始めたらスキップ
+	if (GetNowModeFade() != ModeFade::Standby) return;
+
+	goToClearTimer.count++;
+	if (goToClearTimer.count >= goToClearTimer.time) {
+		ChangeModeFade(ModeFade::FadeOut);
+		ChangeFadeTarget(FadeTarget::Clear);
+	}
 }
 
 #pragma endregion
 
 void InitStage(void) {
+	ResetNowScore();
+
 	InitCamera();
 	InitBackGround();
 	InitGoSceneTimer();
 
 	InitRound();
+
+	InitStartEffect();
+	InitWarningBoss();
 }
 
 void UpdateStage(void) {
@@ -410,8 +503,10 @@ void UpdateStage(void) {
 	SpawnEnemyByRound();
 
 	//演出関係
+	UpdateStartEffect();
 	GoGameoverScene();
 	GoClearScene();
+	UpdateWarningBoss();
 }
 
 void DrawStage(void) {
@@ -449,6 +544,14 @@ TimeData GetGameTimeData(void) {
 
 TimeData GetBossRoundTimeData(void) {
 	return changeRoundTime[ToInt(Round::Count) - 1];
+}
+
+ModeStartEffect GetNowModeStart(void) {
+	return nowModeStart;
+}
+
+bool GetIsWarningBoss(void) {
+	return isWarningBoss;
 }
 
 #pragma endregion

@@ -39,7 +39,7 @@ static constexpr void (*DrawFuncs[ToInt(Scene::Count)])(void) = {
 };
 
 //現在のシーン
-static Scene nowScene = Scene::Play;
+static Scene nowScene = Scene::Title;
 
 #pragma endregion
 
@@ -179,7 +179,12 @@ void DrawScene(void) {
 	if (nowScene == Scene::Pause) {
 		DrawPlay();
 		DrawPause();
-	} else {
+	}
+	else if (nowScene == Scene::Gameover) {
+		DrawPlay();
+		DrawGameover();
+	}
+	else {
 		DrawFuncs[ToInt(nowScene)]();
 	}
 
@@ -223,6 +228,10 @@ void ChangeModeFade(ModeFade mode) {
 /// <param name="target"></param>
 void ChangeFadeTarget(FadeTarget target) {
 	fadePanel.fadeTarget = target;
+}
+
+Scene GetNowScene(void) {
+	return nowScene;
 }
 
 #pragma endregion

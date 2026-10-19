@@ -4,6 +4,8 @@
 #include "enemy.h"
 #include "boss_enemy.h"
 #include "gem.h"
+#include "score_data.h"
+#include "scene_manager.h"
 
 #include "vector2.h"
 #include "timer.h"
@@ -11,6 +13,8 @@
 #include "texture.h"
 
 #include <math.h>
+
+static Scene nowScene = Scene::Play;
 
 #pragma region データ: ElecBullet
 //レベルごとの性能
@@ -60,11 +64,27 @@ ElecShock elecShock[kElecShockLimit] = {};
 #pragma region データ: ShockCombo関係
 
 //現在のコンボ数
-static int shockCombo = 0;
+static int nowCombo = 0;
 //今回のゲームの最大コンボ数
-static int maxShockCombo = 0;
+static int maxCombo = 0;
+//コンボ持続時間
+Timer comboTimer = { 150, 0 };
 
-Timer comboTimer = { 10, 0 };
+//通常弾のコンボ増加数
+int kAddCombo = 1;
+//チャージ弾のコンボ増加数
+int kAddComboCharged = 5;
+//通常弾でのコンボ回復量
+constexpr int kRecoveryComboTime = 3;
+//チャージ弾でのコンボ回復量
+constexpr int kRecoveryComboTimeCharged = 30;
+
+
+int totalComboInCombo = 0;
+//コンボ中に得たスコアの合計
+int scoreInCombo = 0;
+//スコア数による獲得スコアの倍率
+constexpr float kScoreMugByCombo = 0.01f;
 
 #pragma endregion
 
@@ -117,14 +137,26 @@ static void DrawBullet(void) {
 	for (int i = 0; i < kElecBulletLimit; i++) {
 		if (!elecBullet[i].isShoot) continue;
 
-		//残像の描画
-		for (int j = 1; j > -1; j--) {
-			Texture texture = elecBullet[i].texture;
-			texture.color = (texture.color & 0xFFFFFF00) | elecBullet[i].afterImageAlpha[j];
-			DrawTextureRotateObj(texture, elecBullet[i].prePos[j], elecBullet[i].size, elecBullet[i].moveTheta);
-		}
+		if (nowScene == Scene::Play) {
 
-		DrawTextureRotateObj(elecBullet[i].texture, elecBullet[i].pos, elecBullet[i].size, elecBullet[i].moveTheta);
+			//残像の描画
+			for (int j = 1; j > -1; j--) {
+				Texture texture = elecBullet[i].texture;
+				texture.color = (texture.color & 0xFFFFFF00) | elecBullet[i].afterImageAlpha[j];
+				DrawTextureRotateObj(texture, elecBullet[i].prePos[j], elecBullet[i].size, elecBullet[i].moveTheta);
+			}
+
+			DrawTextureRotateObj(elecBullet[i].texture, elecBullet[i].pos, elecBullet[i].size, elecBullet[i].moveTheta);
+		} else {
+			//残像の描画
+			for (int j = 1; j > -1; j--) {
+				Texture texture = elecBullet[i].texture;
+				texture.color = (texture.color & 0xFFFFFF00) | elecBullet[i].afterImageAlpha[j];
+				DrawTextureRotateUI(texture, elecBullet[i].prePos[j], elecBullet[i].size, elecBullet[i].moveTheta);
+			}
+
+			DrawTextureRotateUI(elecBullet[i].texture, elecBullet[i].pos, elecBullet[i].size, elecBullet[i].moveTheta);
+		}
 	}
 }
 
@@ -163,23 +195,34 @@ static void DrawElecShock(void) {
 #pragma region 関数: ショックコンボ
 
 static void InitShockCombo(void) {
-	shockCombo = 0;
-	maxShockCombo = 0;
+	nowCombo = 0;
+	maxCombo = 0;
 	comboTimer.count = 0;
 }
 
 static void UpdateShockCombo(void) {
 	//猶予時間がある際
-	if (shockCombo > 0) {
+	if (nowCombo > 0) {
 		comboTimer.count++;
 
 		//猶予時間が切れたら
 		if (comboTimer.count >= comboTimer.time) {
 			comboTimer.count = 0;
-			shockCombo = 0;
 
 			//コンボの終了をUIに知らせる
 			TriggerEndCombo();
+
+			//コンボ中の得点を加算する
+			AddScore(scoreInCombo);
+			scoreInCombo = 0;
+
+			//最大コンボ数更新処理
+			if (nowCombo > maxCombo) {
+				maxCombo = nowCombo;
+			}
+			
+			totalComboInCombo = 0;
+			nowCombo = 0;
 		}
 	}
 }
@@ -187,6 +230,8 @@ static void UpdateShockCombo(void) {
 #pragma endregion
 
 void InitElecBullet(void) {
+	nowScene = GetNowScene();
+
 	InitBullet();
 	InitElecShock();
 
@@ -282,11 +327,11 @@ void SpawnElecShock(Vector2 pos, ElecBulletType type, ElecShockOriginType origin
 
 				break;
 			}
-			case ElecShockOriginType::EnemySniper: {
+			case ElecShockOriginType::EnemyShooter: {
 				
-				EnemySniper* enemySniper = GetEnemySniperArray();
+				EnemyShooter* enemyShooter = GetEnemyShooterArray();
 
-				originPos = enemySniper[originIndex2].pos;
+				originPos = enemyShooter[originIndex2].pos;
 
 				break;
 			}
@@ -366,14 +411,38 @@ int GetElecShockLimit(void) {
 	return kElecShockLimit;
 }
 
-void AddShockCombo(void) {
+void AddShockCombo(ElecBulletType type) {
 	//コンボ増加
-	shockCombo++;
-	comboTimer.count = 0;
+	int addCombo = (type == ElecBulletType::Normal) ? kAddCombo : kAddComboCharged;
+
+	nowCombo += addCombo;
+
+	int recoveryComboTime = (type == ElecBulletType::Normal) ? kRecoveryComboTime : kRecoveryComboTimeCharged;
+	comboTimer.count -= recoveryComboTime;
+	if (comboTimer.count < 0) {
+		comboTimer.count = 0;
+	}
 }
 
 int GetShockCombo(void) {
-	return shockCombo;
+	return nowCombo;
 }
+
+int GetMaxCombo(void) {
+	return maxCombo;
+}
+
+Timer GetComboTimer(void) {
+	return comboTimer;
+}
+
+void AddScoreByDefeatEnemy(int defeatPoint) {
+	int point = (defeatPoint + totalComboInCombo) * ToInt((1.0f + ToFloat(nowCombo) * kScoreMugByCombo));
+	scoreInCombo += point;
+
+	totalComboInCombo += defeatPoint;
+}
+
+
 
 #pragma endregion

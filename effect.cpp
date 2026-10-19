@@ -1,12 +1,14 @@
 
 #include "effect.h"
 #include "player.h"
+#include "title_player.h"
 #include "vector2.h"
 #include "texture.h"
 #include "play_ui.h"
 #include "timer.h"
 #include "tool.h"
-
+#include "scene_manager.h"
+#include "common.h"
 
 #include <Novice.h>
 #define _USE_MATH_DEFINES
@@ -14,6 +16,8 @@
 #include <time.h>
 
 #pragma region データ: 共通
+
+static Scene nowScene = {};
 
 Texture whiteBoxTexture = {};
 Texture triangleTexture = {};
@@ -303,6 +307,8 @@ struct ExplodeEffect {
 
 	bool isShoot = false;
 
+	unsigned int color = WHITE;
+
 	Texture texture = {};
 };
 ExplodeEffect explodeEffect[kExplodeEffectLimit];
@@ -503,6 +509,30 @@ struct BombBlastEffect {
 BombBlastEffect bombBlastEffect[kBombExplosionEffectNumber][kBombBlastEffectNumber] = {};
 #pragma endregion
 
+#pragma region データ: フラッシュパネル
+
+struct FlashPanel {
+	Vector2 pos = kWindowCenter;
+	Vector2 size = { 1280, 720 };
+
+	bool isShoot = false;
+
+	//<イージング>
+	float easingT = 0.0f;
+	float easingSpeed = 0.05f;
+	float startFadeOutEasingT = 0.1f;
+	EasingMode easingMode = EasingMode::EaseOut;
+
+	//透明度
+	int alpha = 0;
+	int alphaMin = 0;
+	int alphaMax = 255;
+
+	Texture texture = {};
+};
+static FlashPanel flashPanel;
+
+#pragma endregion
 
 #pragma region 関数: ジェム取得effect
 
@@ -934,7 +964,12 @@ static void InitChargeOrbEffect(void) {
 
 static void UpdateChargeOrbEffect(void) {
 
-	Vector2 targetPos = GetPlayerShootPos();
+	Vector2 targetPos;
+	if (nowScene == Scene::Play) {
+		targetPos = GetPlayerShootPos();     // 本編プレイヤー
+	} else {
+		targetPos = GetTitlePlayerShootPos(); // タイトルプレイヤー
+	}
 
 	for (int i = 0; i < kChargeOrbEffectLimit; i++) {
 		if (!chargeOrbEffect[i].isShoot) continue;
@@ -979,7 +1014,11 @@ static void DrawChargeOrbEffect(void) {
 		Texture texture = chargeOrbEffect[i].texture;
 		texture.color = (chargeOrbEffect[i].color & 0xFFFFFF00) | chargeOrbEffect[i].alpha;
 
-		DrawTextureObj(texture, chargeOrbEffect[i].pos, size);
+		if (nowScene == Scene::Play) {
+			DrawTextureObj(texture, chargeOrbEffect[i].pos, size);
+		} else {
+			DrawTextureUI(texture, chargeOrbEffect[i].pos, size);
+		}
 	}
 }
 
@@ -1035,7 +1074,12 @@ static void UpdateChargeChipEffect(void) {
 
 #pragma region 公転処理
 
-		Vector2 shootPos = GetPlayerShootPos();
+		Vector2 shootPos;
+		if (nowScene == Scene::Play) {
+			shootPos = GetPlayerShootPos();     // 本編プレイヤー
+		} else {
+			shootPos = GetTitlePlayerShootPos(); // タイトルプレイヤー
+		}
 
 		chargeChipEffect[i].revolutionTheta += chargeChipEffect[i].revolutionSpeed;
 
@@ -1074,7 +1118,11 @@ static void DrawChargeChipEffect(void) {
 		Texture texture = chargeChipEffect[i].texture;
 		texture.color = (kPlayerChargedColor & 0xFFFFFF00) | chargeChipEffect[i].alpha;
 
-		DrawTextureRotateObj(texture, chargeChipEffect[i].pos, size, chargeChipEffect[i].rotateTheta);
+		if (nowScene == Scene::Play) {
+			DrawTextureRotateObj(texture, chargeChipEffect[i].pos, size, chargeChipEffect[i].rotateTheta);
+		} else {
+			DrawTextureRotateUI(texture, chargeChipEffect[i].pos, size, chargeChipEffect[i].rotateTheta);
+		}
 	}
 }
 
@@ -1125,16 +1173,24 @@ static void DrawExplodeEffect(void) {
 	for (int i = 0; i < kExplodeEffectLimit; i++) {
 		if (!explodeEffect[i].isShoot) continue;
 
-		DrawTextureObj(explodeEffect[i].texture, explodeEffect[i].pos, explodeEffect[i].size);
+		Texture texture = explodeEffect[i].texture;
+		texture.color = explodeEffect[i].color;
+
+		if (nowScene == Scene::Play) {
+			DrawTextureObj(texture, explodeEffect[i].pos, explodeEffect[i].size);
+		} else {
+			DrawTextureUI(texture, explodeEffect[i].pos, explodeEffect[i].size);
+		}
 	}
 }
 
-void CreateExplodeEffect(Vector2 pos) {
+void CreateExplodeEffect(Vector2 pos, unsigned int color) {
 	for (int i = 0; i < kExplodeEffectLimit; i++) {
 		if (explodeEffect[i].isShoot) continue;
 
 		explodeEffect[i].isShoot = true;
 		explodeEffect[i].pos = pos;
+		explodeEffect[i].color = color;
 
 		break;
 	}
@@ -1225,7 +1281,11 @@ void DrawTriangleEffect() {
 		Texture texture = triangleTexture;
 		texture.color = (triangleEffect[i].color & 0xFFFFFF00) | triangleEffect[i].alpha;
 
-		DrawTextureRotateObj(texture, triangleEffect[i].pos, triangleEffect[i].size, triangleEffect[i].rotateTheta);
+		if (nowScene == Scene::Play) {
+			DrawTextureRotateObj(texture, triangleEffect[i].pos, triangleEffect[i].size, triangleEffect[i].rotateTheta);
+		} else {
+			DrawTextureRotateUI(texture, triangleEffect[i].pos, triangleEffect[i].size, triangleEffect[i].rotateTheta);
+		}
 
 	}
 }
@@ -1316,7 +1376,11 @@ void DrawTriangleEffect2() {
 		Texture texture = triangleTexture;
 		texture.color = (triangleEffect2[i].color & 0xFFFFFF00) | triangleEffect2[i].alpha;
 
-		DrawTextureRotateObj(texture, triangleEffect2[i].pos, size, triangleEffect2[i].rotateTheta);
+		if (nowScene == Scene::Play) {
+			DrawTextureRotateObj(texture, triangleEffect2[i].pos, size, triangleEffect2[i].rotateTheta);
+		} else {
+			DrawTextureRotateUI(texture, triangleEffect2[i].pos, size, triangleEffect2[i].rotateTheta);
+		}
 
 	}
 }
@@ -1400,7 +1464,11 @@ void DrawCircleEffect() {
 		Texture texture = circleEffect[i].texture;
 		texture.color = (circleEffect[i].color & 0xFFFFFF00) | circleEffect[i].alpha;
 
-		DrawTextureObj(texture, circleEffect[i].pos, size);
+		if (nowScene == Scene::Play) {
+			DrawTextureObj(texture, circleEffect[i].pos, size);
+		} else {
+			DrawTextureUI(texture, circleEffect[i].pos, size);
+		}
 
 	}
 }
@@ -1607,6 +1675,25 @@ void CreateBombExplosionEffect(Vector2 pos, float endSizeValue, unsigned int col
 		bombExplosionEffect[i].endSizeValue = endSizeValue;
 		bombExplosionEffect[i].color = color;
 		bombExplosionEffect[i].easingT = 0.0f;
+
+		//爆風の初期化
+		bombBlastEffect[i][0].pos.x = pos.x + static_cast<float>((rand() % 374) - 374);
+		bombBlastEffect[i][0].pos.y = pos.y + static_cast<float>((rand() % 374) - 374);
+
+		bombBlastEffect[i][1].pos.x = pos.x + static_cast<float>((rand() % 374));
+		bombBlastEffect[i][1].pos.y = pos.y + static_cast<float>((rand() % 374));
+
+		bombBlastEffect[i][2].pos.x = pos.x + static_cast<float>((rand() % 374));
+		bombBlastEffect[i][2].pos.y = pos.y + static_cast<float>((rand() % 374) - 374);
+
+		bombBlastEffect[i][3].pos.x = pos.x + static_cast<float>((rand() % 374) - 374);
+		bombBlastEffect[i][3].pos.y = pos.y + static_cast<float>((rand() % 374));
+		for (int j = 0; j < kBombBlastEffectNumber; j++)
+		{
+			bombBlastEffect[i][j].endSizeValue = endSizeValue;
+			bombBlastEffect[i][j].color = color;
+			bombBlastEffect[i][j].easingT = 0.0f;
+		}
 	}
 }
 
@@ -1614,6 +1701,11 @@ static void InitBombExplosionEffect(void) {
 	for (int i = 0; i < kBombExplosionEffectNumber; i++) {
 		bombExplosionEffect[i] = {};
 		bombExplosionEffect[i].texture = GetTexture(TextureType::EffectExplosion);
+		for (int j = 0; j < kBombBlastEffectNumber; j++)
+		{
+			bombBlastEffect[i][j] = {};
+			bombBlastEffect[i][j].texture = GetTexture(TextureType::EffectCircle);
+		}
 	}
 }
 
@@ -1638,6 +1730,28 @@ void UpdateBombExplosionEffect() {
 
 			bombExplosionEffect[i].alpha = UpdateValueByEasing(kAlphaMax, kAlphaMin, t, EasingMode::EaseOut);
 		}
+		//if (bombExplosionEffect[i].easingT <= 0.5f) {
+		//	for (int j = 0; j < kBombBlastEffectNumber; j++)
+		//	{
+		//		//イージング
+		//		bombBlastEffect[i][j].easingT += bombBlastEffect[i][j].easingSpeed;
+		//		if (bombBlastEffect[i][j].easingT >= 1.0f) {
+		//			bombBlastEffect[i][j].appear = false;
+		//			bombBlastEffect[i][j].easingT = 1.0f;
+		//		}
+
+		//		//拡大処理
+		//		bombBlastEffect[i][j].sizeValue = UpdateValueByEasing(bombBlastEffect[i][j].startSizeValue, bombBlastEffect[i][j].endSizeValue, bombBlastEffect[i][j].easingT, EasingMode::EaseOut);
+
+		//		//フェード処理
+		//		if (bombBlastEffect[i][j].easingT >= bombBlastEffect[i][j].startFadeEasingT) {
+		//			float t = (bombBlastEffect[i][j].easingT - bombBlastEffect[i][j].startFadeEasingT) / (1.0f - bombBlastEffect[i][j].startFadeEasingT);
+		//			if (t > 1.0f) t = 1.0f;
+
+		//			bombBlastEffect[i][j].alpha = UpdateValueByEasing(kAlphaMax, kAlphaMin, t, EasingMode::EaseOut);
+		//		}
+		//	}
+		//}
 	}
 }
 
@@ -1651,11 +1765,69 @@ void DrawBombExplosionEffect() {
 		texture.color = (bombExplosionEffect[i].color & 0xFFFFFF00) | bombExplosionEffect[i].alpha;
 
 		DrawTextureObj(texture, bombExplosionEffect[i].pos, size);
+		
+		for (int j = 0; j < kBombBlastEffectNumber; j++)
+		{
+			Vector2 Blostsize = { bombBlastEffect[i][j].sizeValue,bombBlastEffect[i][j].sizeValue};
 
+			Texture Blosttexture = bombBlastEffect[i][j].texture;
+			Blosttexture.color = (bombBlastEffect[i][j].color & 0xFFFFFF00) | bombBlastEffect[i][j].alpha;
+
+			DrawTextureObj(texture, bombBlastEffect[i][j].pos, Blostsize);
+		}
 	}
 }
 #pragma endregion
+
+#pragma region 関数: フラッシュパネル
+
+static void InitFlashPanel(void) {
+	flashPanel = {};
+	flashPanel.texture = GetTexture(TextureType::White1x1);
+}
+
+static void UpdateFlashPanel(void) {
+	if (!flashPanel.isShoot) return;
+
+	flashPanel.easingT += flashPanel.easingSpeed;
+	if (flashPanel.easingT >= 1.0f) {
+		flashPanel.easingT = 1.0f;
+		flashPanel.isShoot = false;
+	}
+
+	if (flashPanel.easingT < flashPanel.startFadeOutEasingT) {
+		float t = (flashPanel.easingT - flashPanel.startFadeOutEasingT) / (1.0f - flashPanel.startFadeOutEasingT);
+		if (t > 1.0f) t = 1.0f;
+
+		flashPanel.alpha = UpdateValueByEasing(flashPanel.alphaMin, flashPanel.alphaMax, t, flashPanel.easingMode);
+	} else {
+		float t = (flashPanel.easingT - flashPanel.startFadeOutEasingT) / (1.0f - flashPanel.startFadeOutEasingT);
+		if (t > 1.0f) t = 1.0f;
+
+		flashPanel.alpha = UpdateValueByEasing(flashPanel.alphaMax, flashPanel.alphaMin, t, flashPanel.easingMode);
+	}
+
+}
+
+static void DrawFlashPanel(void) {
+	if (!flashPanel.isShoot) return;
+
+	Texture texture = flashPanel.texture;
+	texture.color = (texture.color & 0xFFFFFF00) | flashPanel.alpha;
+
+	DrawTextureUI(texture, flashPanel.pos, flashPanel.size);
+}
+
+void CreateFlashPanel(void) {
+	flashPanel.isShoot = true;
+	flashPanel.easingT = 0.0f;
+}
+
+#pragma endregion
+
 void InitEffect() {
+	nowScene = GetNowScene();
+
 	triangleTexture = GetTexture(TextureType::EffectTriangle);
 	whiteBoxTexture = GetTexture(TextureType::White1x1);
 
@@ -1679,10 +1851,13 @@ void InitEffect() {
 	InitPlayerFootprintsEffect();
 	InitElecLineEffect();
 	InitBombExplosionEffect();
+	InitFlashPanel();
+	
+	/*CreateBombExplosionEffect({100,100}, 768,WHITE);*/
 
 #ifdef _DEBUG
 
-	CreateJemEffect();
+	/*CreateJemEffect();*/
 
 	//CreateGageEffect();
 
@@ -1707,6 +1882,7 @@ void UpdateEffect() {
 	UpdatePlayerFootprintsEffect();
 	UpdateElecLineEffect();
 	UpdateBombExplosionEffect();
+	UpdateFlashPanel();
 }
 void DrawEffect() {
 	DrawGetEffect();
@@ -1728,8 +1904,14 @@ void DrawEffect() {
 void DrawEffectAsUI() {
 	DrawSmokeEffectAsUI();
 	DrawGageEffect();
+
+	DrawFlashPanel();
 }
 
 unsigned int GetPlayerColor(void) {
 	return kPlayerColor;
+}
+
+unsigned int GetEnemyColor(void) {
+	return kEnemyColor;
 }

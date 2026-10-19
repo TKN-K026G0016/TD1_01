@@ -30,14 +30,24 @@ enum class TextureType {
 	//===============
 	//Menu
 	//===============
+	MenuBackground,
 	ResumeIcon,
 	RetryIcon,
 	ExitIcon,
+	MenuCursor,
 
 	//===============
 	//Title
 	//===============
 	TitleLogo,
+	TitleInstShot,
+	TitleInstStart,
+
+	TitleLine,
+	TitleEffect,
+	TitleTriangle,
+	TitleBox,
+	TitleCircle,
 
 	//===============
 	//Play
@@ -107,7 +117,19 @@ enum class TextureType {
 	ProgressGaugeFrame,
 	ProgressGaugeMeter,
 
+	ComboIcon,
 	ComboNumbers,
+	ComboNumbersMeter,
+
+	ScoreNumbers,
+	ScoreIcon,
+
+	DisplayEffect,
+
+	ReadyTelop,
+	GoTelop,
+	
+	WarnBossTelop,
 
 	//effect
 	EffectSquare,
@@ -126,10 +148,15 @@ enum class TextureType {
 	//===============
 	//Clear
 	//===============
+	ClearIcon,
+	ClearScoreIcon,
+	ClearMaxComboIcon,
+	ClearBestScoreIcon,
 
 	//===============
 	//Gameover
 	//===============
+	GameoverIcon,
 
 	Count
 };
@@ -221,6 +248,8 @@ void DrawGaugeAsObj(Texture texture, Vector2 centerPos, Vector2 size, float rate
 /// <param name="size">サイズ</param>
 /// <param name="rate">ゲージの割合</param>
 void DrawGaugeAsUI(Texture texture, Vector2 centerPos, Vector2 size, float rate);
+
+void DrawGaugeYAsUI(Texture texture, Vector2 centerPos, Vector2 size, float rate);
 
 /// <summary>
 /// アニメーション変更処理(通常)

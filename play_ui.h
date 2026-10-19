@@ -19,3 +19,13 @@ Vector2 GetBossHpGaugeEndPos(void);
 /// コンボの終了を知らせる
 /// </summary>
 void TriggerEndCombo(void);
+
+void TriggerDisplayEffect(void);
+void TriggerDangerDisplayEffect(void);
+
+/// <summary>
+/// 危険エフェクトの削除処理
+/// </summary>
+void CancelDangerDisplayEffect(void);
+
+void TriggerGaugeShackByDamage(void);

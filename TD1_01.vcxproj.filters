@@ -89,6 +89,15 @@
     <Filter Include="timer">
       <UniqueIdentifier>{a1bfe540-e0e8-443f-be10-c137cebddcbd}</UniqueIdentifier>
     </Filter>
+    <Filter Include="score_data">
+      <UniqueIdentifier>{24d95b1b-31ea-423b-83c0-38df5a3d0ec1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="scene\title\title_background">
+      <UniqueIdentifier>{d8ac964a-51ce-4330-bd8b-8e775facb636}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="scene\title\title_player">
+      <UniqueIdentifier>{42e94264-0abe-4cef-9bc3-ebcdbff696fa}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp" />
@@ -163,6 +172,15 @@
     </ClCompile>
     <ClCompile Include="timer.cpp">
       <Filter>timer</Filter>
+    </ClCompile>
+    <ClCompile Include="score_data.cpp">
+      <Filter>score_data</Filter>
+    </ClCompile>
+    <ClCompile Include="title_background.cpp">
+      <Filter>scene\title\title_background</Filter>
+    </ClCompile>
+    <ClCompile Include="title_player.cpp">
+      <Filter>scene\title\title_player</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -318,6 +336,15 @@
     </ClInclude>
     <ClInclude Include="timer.h">
       <Filter>timer</Filter>
+    </ClInclude>
+    <ClInclude Include="score_data.h">
+      <Filter>score_data</Filter>
+    </ClInclude>
+    <ClInclude Include="title_background.h">
+      <Filter>scene\title\title_background</Filter>
+    </ClInclude>
+    <ClInclude Include="title_player.h">
+      <Filter>scene\title\title_player</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

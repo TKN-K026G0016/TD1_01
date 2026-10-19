@@ -56,7 +56,8 @@ void CreateChargeChipEffect();
 /// 爆発エフェクトの生成処理
 /// </summary>
 /// <param name="pos">生成座標</param>
-void CreateExplodeEffect(Vector2 pos);
+/// <param name="color">色</param>
+void CreateExplodeEffect(Vector2 pos, unsigned int color);
 
 /// <summary>
 ///三角形のエフェクト生成処理　
@@ -88,6 +89,10 @@ void CreateEnemyDamageEffect(Vector2 pos);
 void CreateEnemyDamageEffect(Vector2 pos);
 
 void CreatePlayerFootprintsEffect(Vector2 pos);
-void CreateBombExplosionEffect(Vector2 pos);
+void CreateBombExplosionEffect(Vector2 pos, float endSizeValue, unsigned int color);
+
+void CreateFlashPanel(void);
 
 unsigned int GetPlayerColor(void);
+
+unsigned int GetEnemyColor(void);

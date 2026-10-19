@@ -2,6 +2,7 @@
 #include "player.h"
 #include "stage.h"
 #include "enemy_bullet.h"
+#include "elec_bullet.h"
 #include "gem.h"
 #include "boss_enemy.h"
 #include "effect.h"
@@ -24,6 +25,8 @@ static EnemyShooter enemyShooter[kEnemyShooterLimit];
 int nowEnemyShooterIsAliveCount = 0;
 //ジェムの生成量
 constexpr int enemyShooterGemLimit = 4;
+//撃破時のスコア
+constexpr int kEnemyShooterDefeatScore = 150;
 
 #pragma endregion
 
@@ -32,6 +35,8 @@ constexpr int kEnemyGuardianLimit = 10;
 static EnemyGuardian enemyGuardian[kEnemyGuardianLimit];
 //ジェムの生成量
 constexpr int enemyGuardianGemLimit = 1;
+//撃破時のスコア
+constexpr int kEnemyGuardianDefeatScore = 150;
 
 #pragma endregion
 
@@ -44,6 +49,8 @@ constexpr int enemyBasicGemLimit = 2;
 constexpr int enemyFormationGemLimit = 1;
 //Formationの生成間隔
 constexpr int formationRange = 75;
+//撃破時のスコア
+constexpr int kEnemyBasicDefeatScore = 100;
 
 #pragma endregion
 
@@ -52,6 +59,8 @@ constexpr int kEnemyMLimit = 4;
 static EnemyM enemyM[kEnemyMLimit];
 //ジェムの生成量
 constexpr int enemyMGemLimit = 4;
+//撃破時のスコア
+constexpr int kEnemyMDefeatScore = 150;
 
 #pragma endregion
 
@@ -62,6 +71,8 @@ static EnemySmall enemySmall[kEnemySmallLimit];
 constexpr int enemySmallGemLimit = 1;
 //Formationの生成間隔
 constexpr int smallFormationRange = 50;
+//撃破時のスコア
+constexpr int kEnemySmallDefeatScore = 50;
 
 #pragma endregion
 
@@ -79,6 +90,8 @@ constexpr int kEnemyBombLimit = 10;
 static EnemyBomb enemyBomb[kEnemyBombLimit];
 //ジェムの生成量
 constexpr int enemyBombGemLimit = 3;
+//撃破時のスコア
+constexpr int kEnemyBombDefeatScore = 500;
 
 #pragma endregion
 
@@ -214,7 +227,7 @@ static void DeadEnemyShooter(int index) {
 	enemyShooter[index].isAlive = false;
 	enemyShooter[index].hp = enemyShooter[index].hpMax;
 
-	CreateExplodeEffect(enemyShooter[index].pos);
+	CreateExplodeEffect(enemyShooter[index].pos,WHITE);
 
 	nowEnemyShooterIsAliveCount--;
 
@@ -232,6 +245,8 @@ static void CheckDeadEnemyShooter(void) {
 			for (int j = 0; j < enemyShooterGemLimit;j++) {
 				SpawnGem(enemyShooter[i].pos, GemType::S);
 			}
+
+			AddScoreByDefeatEnemy(kEnemyShooterDefeatScore);
 		}
 	}
 }
@@ -325,11 +340,13 @@ static void UpdateFlashTimerEnemyGuardian(void) {
 	}
 }
 
-static void DeadEnemyguardian(int index) {
+static void DeadEnemyGuardian(int index) {
 	enemyGuardian[index].isAlive = false;
 	enemyGuardian[index].hp = enemyGuardian[index].hpMax;
 
-	CreateExplodeEffect(enemyGuardian[index].pos);
+	CreateExplodeEffect(enemyGuardian[index].pos, WHITE);
+
+	AddScoreByDefeatEnemy(kEnemyGuardianDefeatScore);
 }
 
 static void CheckDeadEnemyGuardian(void) {
@@ -337,7 +354,7 @@ static void CheckDeadEnemyGuardian(void) {
 		if (!enemyGuardian[i].isAlive) continue;
 
 		if (enemyGuardian[i].hp <= 0) {
-			DeadEnemyguardian(i);
+			DeadEnemyGuardian(i);
 
 			//ジェムの生成処理
 			for (int j = 0; j < enemyGuardianGemLimit; j++) {
@@ -456,7 +473,7 @@ static void CountIgnoreShockEnemyBasic(void) {
 }
 
 /// <summary>
-/// 
+/// フラッシュの経過時間計測処理
 /// </summary>
 /// <param name=""></param>
 static void UpdateFlashTimerEnemyBasic(void) {
@@ -489,7 +506,9 @@ static void DeadEnemyBasic(int index) {
 	enemyBasic[index].isAlive = false;
 	enemyBasic[index].hp = enemyBasic[index].hpMax;
 
-	CreateExplodeEffect(enemyBasic[index].pos);
+	CreateExplodeEffect(enemyBasic[index].pos, WHITE);
+
+	AddScoreByDefeatEnemy(kEnemyBasicDefeatScore);
 
 	/*spawner.spawnTimer.time = spawner.kSpawnTime * nowenemyBasicIsAliveCount;*/
 }
@@ -601,7 +620,9 @@ static void DeadEnemyM(int index) {
 	enemyM[index].isAlive = false;
 	enemyM[index].hp = enemyM[index].hpMax;
 
-	CreateExplodeEffect(enemyM[index].pos);
+	CreateExplodeEffect(enemyM[index].pos, WHITE);
+
+	AddScoreByDefeatEnemy(kEnemyMDefeatScore);
 }
 
 static void CheckDeadEnemyM(void) {
@@ -721,8 +742,10 @@ static void DeadEnemySmall(int index) {
 	enemySmall[index].isAlive = false;
 	enemySmall[index].hp = enemySmall[index].hpMax;
 
-	CreateExplodeEffect(enemySmall[index].pos);
+	CreateExplodeEffect(enemySmall[index].pos, WHITE);
 
+	AddScoreByDefeatEnemy(kEnemySmallDefeatScore);
+	
 	/*spawner.spawnTimer.time = spawner.kSpawnTime * nowenemyBasicIsAliveCount;*/
 }
 
@@ -826,7 +849,7 @@ static void DeadEnemyBomb(int index) {
 	enemyBomb[index].isAlive = false;
 	enemyBomb[index].hp = enemyBomb[index].hpMax;
 
-	CreateExplodeEffect(enemyBomb[index].pos);
+	CreateExplodeEffect(enemyBomb[index].pos, WHITE);
 }
 
 static void BurstEnemyBomb(void) {
@@ -902,6 +925,9 @@ static void CheckDeadEnemyBomb(void) {
 			for (int j = 0; j < enemyBombGemLimit; j++) {
 				SpawnGem(enemyBomb[i].pos, GemType::S);
 			}
+
+			AddScoreByDefeatEnemy(kEnemyBombDefeatScore);
+
 		}
 	}
 }
@@ -945,6 +971,8 @@ static void InitEnemySniper(void) {
 		enemySniper[i].texture = GetTexture(TextureType::EnemySniper);
 	}
 }
+#pragma region Enemy全滅処理
+
 
 static void ShootEnemyLazerSniper(void) {
 	for (int i = 0; i < kEnemySniperLimit; i++) {
@@ -1019,7 +1047,7 @@ static void DeadEnemySniper(int index) {
 	enemySniper[index].isAlive = false;
 	enemySniper[index].hp = enemySniper[index].hpMax;
 
-	CreateExplodeEffect(enemySniper[index].pos);
+	CreateExplodeEffect(enemySniper[index].pos,WHITE);
 
 	nowEnemySniperIsAliveCount--;
 
@@ -1059,6 +1087,57 @@ static void DrawEnemySniper(void) {
 #pragma endregion
 
 
+void DeadAllEnemy(void) {
+	//ボスが死亡したら
+	if(!GetBossEnemyIsDead()) return;
+	// Sniper
+	for (int i = 0; i < kEnemyShooterLimit; i++) {
+		if (enemySniper[i].isAlive) {
+			DeadEnemySniper(i);
+		}
+	}
+
+	// Guardian
+	for (int i = 0; i < kEnemyGuardianLimit; i++) {
+		if (enemyGuardian[i].isAlive) {
+			DeadEnemyGuardian(i);
+		}
+	}
+
+	// Basic
+	for (int i = 0; i < kEnemyBasicLimit; i++) {
+		if (enemyBasic[i].isAlive) {
+			DeadEnemyBasic(i);
+		}
+	}
+
+	// M
+	for (int i = 0; i < kEnemyMLimit; i++) {
+		if (enemyM[i].isAlive) {
+			DeadEnemyM(i);
+		}
+	}
+
+	// Small
+	for (int i = 0; i < kEnemySmallLimit; i++) {
+		if (enemySmall[i].isAlive) {
+			DeadEnemySmall(i);
+		}
+	}
+
+	// Bomb
+	for (int i = 0; i < kEnemyBombLimit; i++) {
+		if (enemyBomb[i].isAlive) {
+			DeadEnemyBomb(i);
+		}
+	}
+
+	return; // ★ 全滅後は敵処理をスキップ
+
+}
+
+#pragma endregion
+
 void InitEnemy(void) {
 	InitEnemyShooter();
 	InitEnemyGuardian();
@@ -1069,8 +1148,6 @@ void InitEnemy(void) {
 	InitEnemySniper();
 
 	GetMovablePos(spawner.spawnRange);
-
-	SpawnEnemy({ 100, 100 }, EnemyType::EnemyFormation);
 }
 
 void UpdateEnemy(void) {
@@ -1081,6 +1158,7 @@ void UpdateEnemy(void) {
 	UpdateHitStopTimerEnemyShooter();
 	CountIgnoreShockEnemyShooter();
 	ShootEnemyBulletShooter();
+	DeadAllEnemy();
 
 	//enemyGuardian
 	CheckDeadEnemyGuardian();

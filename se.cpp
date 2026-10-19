@@ -21,6 +21,16 @@ void InitSe(void) {
 	SE temp[ToInt(SeType::Count)] = {
 		//Sample
 		{Novice::LoadAudio("./NoviceResources/fanfare.wav"), 1.0f},
+
+		//menu
+
+		//player
+
+		//enemy
+
+		//ui
+		{Novice::LoadAudio("./resources/sound/se/ui/countup_score.wav"), 0.4f},
+
 	};
 
 	memcpy(ses, temp, sizeof(ses));

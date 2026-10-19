@@ -44,7 +44,7 @@ enum class ElecShockOriginType {
 
 	Gem,
 
-	EnemySniper,
+	EnemyShooter,
 	EnemyGuardian,
 	EnemyBasic,
 	EnemyM,
@@ -140,12 +140,27 @@ ElecShock* GetElecShockArray(void);
 /// <returns></returns>
 int GetElecShockLimit(void);
 
+
 /// <summary>
 /// ショックコンボの増加処理
 /// </summary>
-void AddShockCombo(void);
+/// <param name="type">チャージ弾か</param>
+void AddShockCombo(ElecBulletType type);
 
 /// <summary>
 /// ショックコンボを取得
 /// </summary>
 int GetShockCombo(void);
+
+/// <summary>
+/// 最大コンボ数取得
+/// </summary>
+int GetMaxCombo(void);
+
+Timer GetComboTimer(void);
+
+/// <summary>
+/// 敵撃破時のスコア取得処理
+/// </summary>
+/// <param name="defeatPoint">撃破スコア</param>
+void AddScoreByDefeatEnemy(int defeatPoint);

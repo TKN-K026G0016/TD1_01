@@ -16,8 +16,8 @@
 /// playerLaserとenemyの判定
 /// </summary>
 static void CheckCollisionLaserVSEnemy(void) {
-	EnemySniper* enemy1 = GetEnemySniperArray();
-	int enemy1Limit = GetEnemySniperLimit();
+	EnemyShooter* enemy1 = GetEnemyShooterArray();
+	int enemy1Limit = GetEnemyShooterLimit();
 
 	EnemyGuardian* enemy2 = GetEnemyGuardianArray();
 	int enemy2Limit = GetEnemyGuardianLimit();
@@ -102,8 +102,8 @@ void CheckCollisionLaserVSBossEnemy(void) {
 /// </summary>
 /// <param name=""></param>
 static void CheckCollisionElecBulletVSEnemy(void) {
-	EnemyShooter* enemy1 = GetEnemySniperArray();
-	int enemy1Limit = GetEnemySniperLimit();
+	EnemyShooter* enemy1 = GetEnemyShooterArray();
+	int enemy1Limit = GetEnemyShooterLimit();
 
 	EnemyGuardian* enemy2 = GetEnemyGuardianArray();
 	int enemy2Limit = GetEnemyGuardianLimit();
@@ -133,11 +133,11 @@ static void CheckCollisionElecBulletVSEnemy(void) {
 			if (CheckCollisionCircleVSCircle(enemy1[i].pos, enemy1[i].hitRadius, elecBullet[j].pos, elecBullet[j].hitRadius)) {
 				BreakElecBullet(j);
 				//ホウデンの生成
-				SpawnElecShock(enemy1[i].pos, elecBullet[j].type, ElecShockOriginType::EnemySniper, i, ElecShockOriginType::None, -1);
+				SpawnElecShock(enemy1[i].pos, elecBullet[j].type, ElecShockOriginType::EnemyShooter, i, ElecShockOriginType::None, -1);
 
 				bool hitStopSwitch = (elecBullet[j].type == ElecBulletType::Normal) ? false: true;
 
-				DamageEnemySniper(enemy1[i], elecBullet[j].pow, hitStopSwitch);
+				DamageEnemyShooter(enemy1[i], elecBullet[j].pow, hitStopSwitch);
 			}
 		}
 	}
@@ -278,8 +278,8 @@ void CheckCollisionElecBulletVSBossEnemy(void) {
 /// </summary>
 /// <param name=""></param>
 static void CheckCollisionElecShockVSEnemy(void) {
-	EnemySniper* enemy1 = GetEnemySniperArray();
-	int enemy1Limit = GetEnemySniperLimit();
+	EnemyShooter* enemy1 = GetEnemyShooterArray();
+	int enemy1Limit = GetEnemyShooterLimit();
 
 	EnemyGuardian* enemy2 = GetEnemyGuardianArray();
 	int enemy2Limit = GetEnemyGuardianLimit();
@@ -310,7 +310,7 @@ static void CheckCollisionElecShockVSEnemy(void) {
 
 				//ホウデンの生成
 				if (!enemy1[i].isIgnoreShock) {
-					SpawnElecShock(enemy1[i].pos, elecShock[j].type, ElecShockOriginType::EnemySniper, i, elecShock[j].originType, elecShock[j].originIndex);
+					SpawnElecShock(enemy1[i].pos, elecShock[j].type, ElecShockOriginType::EnemyShooter, i, elecShock[j].originType, elecShock[j].originIndex);
 					enemy1[i].isIgnoreShock = true;
 				}
 				//ダメージ判定()
@@ -318,10 +318,10 @@ static void CheckCollisionElecShockVSEnemy(void) {
 
 					bool hitStopSwitch = (elecShock[j].type == ElecBulletType::Normal) ? false : true;
 
-					DamageEnemySniper(enemy1[i], elecShock[j].pow, hitStopSwitch);
+					DamageEnemyShooter(enemy1[i], elecShock[j].pow, hitStopSwitch);
 
 					//コンボ
-					AddShockCombo();
+					AddShockCombo(elecShock[j].type);
 				}
 			}
 
@@ -353,7 +353,7 @@ static void CheckCollisionElecShockVSEnemy(void) {
 
 
 					//コンボ
-					AddShockCombo();
+					AddShockCombo(elecShock[j].type);
 				}
 			}
 		}
@@ -384,7 +384,7 @@ static void CheckCollisionElecShockVSEnemy(void) {
 
 					DamageEnemyBasic(enemyBasic[i], elecShock[j].pow, hitStopSwitch);
 					//コンボ
-					AddShockCombo();
+					AddShockCombo(elecShock[j].type);
 				}
 			}
 		}
@@ -412,7 +412,7 @@ static void CheckCollisionElecShockVSEnemy(void) {
 					DamageEnemySmall(enemySmall[i], elecShock[j].pow);
 
 					//コンボ
-					AddShockCombo();
+					AddShockCombo(elecShock[j].type);
 				}
 			}
 
@@ -442,7 +442,7 @@ static void CheckCollisionElecShockVSEnemy(void) {
 
 
 					//コンボ
-					AddShockCombo();
+					AddShockCombo(elecShock[j].type);
 				}
 			}
 
@@ -472,7 +472,7 @@ static void CheckCollisionElecShockVSEnemy(void) {
 
 
 					//コンボ
-					AddShockCombo();
+					AddShockCombo(elecShock[j].type);
 				}
 			}
 
@@ -508,7 +508,7 @@ void CheckCollisionElecShockVSBossEnemy(void) {
 				DamageBossEnemy(pow);
 
 				//コンボ
-				AddShockCombo();
+				AddShockCombo(elecShock[i].type);
 			}
 		}
 	}

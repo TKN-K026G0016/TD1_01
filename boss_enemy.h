@@ -25,10 +25,14 @@ struct BossEnemy {
 
 	//<生存関係>
 	bool isAlive = false;
+	bool isDead = false;
+	//ボス撃破後の演出時間
+	Timer deadTimer = { 300, 0 };
+
 	//当たり判定の大きさ
 	float hitRadius =	128.0f;
 	int remainLife = 150;
-	int remainLifeMax = 150;
+	int remainLifeMax = 15;
 
 	//<移動関係>
 	// 視界
@@ -86,6 +90,7 @@ struct Attack2Enemy2Pos {
 void SpawnBoss(Vector2 pos);
 
 bool GetBossEnemyIsAlive(void);
+bool GetBossEnemyIsDead(void);
 Vector2 GetBossEnemyPos(void);
 float GetBossEnemyRotateTheta(void);
 int GetBossEnemyRemainLife(void);

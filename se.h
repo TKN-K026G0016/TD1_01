@@ -13,6 +13,15 @@
 
 enum class SeType {
 	Sample,
+	//menu
+
+	//player
+
+	//enemy
+
+	//ui
+	CountUpScore,
+
 
 	Count
 };

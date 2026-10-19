@@ -4,10 +4,13 @@
 #include "boss_enemy.h"
 #include "stage.h"
 #include "effect.h"
+#include "score_data.h"
+#include "se.h"
 
 #include "vector2.h"
 #include "timer.h"
 #include "tool.h"
+#include "common.h"
 #include "texture.h"
 
 #include <Novice.h>
@@ -27,8 +30,13 @@ LifeIcon lifeIcon;
 
 #pragma region データ: エネルギーゲージ
 
+static constexpr bool kGaugeShakeSwitch = true;
+Timer gaugeShakeDamageTimer = { 10, 10 };
+
 struct EnergyGaugeFrame {
 	Vector2 pos = { 640, 80 };
+	Vector2 viewPos = { 640, 80 };
+
 	Vector2 size = { 512, 100 };
 
 	//デンリョク不足警告表示のタイミング
@@ -94,7 +102,7 @@ MiniEnergyGauge miniEnergyGauge;
 
 struct BossHpGaugeFrame {
 	Vector2 pos = { 640, 680 };
-	Vector2 size = { 768, 32 };
+	Vector2 size = { 720, 32 };
 
 	Texture texture = {};
 };
@@ -145,7 +153,7 @@ LaserPowRate laserPowRate;
 static constexpr bool kShowProgressGaugeSwitch = true;
 struct ProgressGauge {
 	Vector2 pos = { 640, 680 };
-	Vector2 size = { 768, 32 };
+	Vector2 size = { 720, 32 };
 
 	//ボスラウンドまでの時間
 	int bossRoundTime = 0;
@@ -156,7 +164,7 @@ struct ProgressGauge {
 ProgressGauge progressGauge;
 
 struct ProgressGaugeIcon {
-	Vector2 pos = {0.0f, progressGauge.pos.y };
+	Vector2 pos = { 0.0f, progressGauge.pos.y };
 	Vector2 size = { 32, 32 };
 
 	Vector2 startPos = { progressGauge.pos.x - progressGauge.size.x / 2, progressGauge.pos.y };
@@ -177,31 +185,179 @@ struct ShockComboNumbers {
 	Vector2 startPos = { 1200, 630 };
 	Vector2 interval = { -80.0f, 0.0f };
 
+	float offsetY = 85.0f;
+
 	int animNum = 0;
 };
 ShockComboNumbers comboNumbers[kComboNumbersLimit];
+Texture comboNumbersTexture = {};
+Texture comboNumbersMeterTexture = {};
 
 
-
-struct ShockCombo {
+struct ShockComboIcon {
 	//コンボ数
-	int combo = 0;
+	int nowCombo = 0;
+	float gaugeRate = 0.0f;
+
+	//アイコン座標
+	Vector2 pos = { 1120, 580 };
+	Vector2 size = { 160, 80 };
+
+
+	float easingT = 0.0f;
+	float easingSpeed = 0.05f;
+
+	Vector2 startPos = { 1160, 550 };
+	Vector2 endPos = { 1160, 800 };
 
 	//前のコンボを見せている状態
 	bool isShowPreCombo = false;
 	Timer showPreComboTimer = { 60, 0 };
-
 	//透明の時間
 	bool isInvisible = false;
-	Timer invisibleTimer = { 7, 0 };
+	Timer invisibleTimer = { 3, 0 };
+
+	Texture texture = {};
 };
-ShockCombo shockCombo;
+ShockComboIcon comboIcon;
 
-
-Texture comboNumbersTexture = {};
-
+constexpr int kStartViewCombo = 10;
+constexpr int kStartDisplayEffectCombo = 50;
 
 #pragma endregion
+
+#pragma region データ: スコア
+
+static constexpr int kScoreNumbersLimit = 9;
+struct ScoreNumbers {
+	Vector2 size = { 28, 56 };
+
+	Vector2 startPos = { 30, 680 };
+	Vector2 interval = { 26, 0 };
+
+	int animNum = 0;
+};
+ScoreNumbers scoreNumbers[kScoreNumbersLimit];
+
+struct ScoreIcon {
+	Vector2 pos = { 30, 30 };
+
+	//表示の数値
+	int showScore = 0;
+
+	//イージング関係
+	float easingT = 0.0f;
+	float easingSpeed = 0.008f;
+
+	//イージングを使うかどうかの判定値
+	int threshold = 1000;
+
+	int startScore = 0;
+	int endScore = 0;
+
+};
+ScoreIcon scoreIcon;
+Texture scoreNumbersTexture = {};
+
+#pragma endregion
+
+#pragma region データ: 画面エフェクト
+
+struct DisplayEffect {
+	Vector2 pos = kWindowCenter;
+
+	bool isShoot = false;
+
+	//イージング
+	float easingT = 0.0f;
+	float easingSpeed = 0.02f;
+
+	//サイズ関係
+	Vector2 size = {};
+	Vector2 minSize = { 1280, 720 };
+	Vector2 maxSize = { 1440, 810 };
+
+	//透明度関係
+	int alpha = 50;
+	int alphaMax = 50;
+	int alphaMin = 10;
+
+	//縮小中フラグ
+	bool isScaleDown = true;
+
+	unsigned int color = GetPlayerColor();
+};
+DisplayEffect displayEffect = {};
+
+struct DangerDisplayEffect {
+	Vector2 pos = kWindowCenter;
+
+	bool isShoot = false;
+
+	//イージング
+	float easingT = 0.0f;
+	float easingSpeed = 0.02f;
+
+	//サイズ関係
+	Vector2 size = {};
+	Vector2 minSize = { 1280, 720 };
+	Vector2 maxSize = { 1440, 810 };
+
+	//透明度関係
+	int alpha = 50;
+	int alphaMax = 50;
+	int alphaMin = 10;
+
+	//縮小中フラグ
+	bool isScaleDown = true;
+
+	unsigned int color = GetEnemyColor();
+};
+DangerDisplayEffect dangerDisplayEffect = {};
+
+Texture displayEffectTexture = {};
+
+#pragma endregion
+
+#pragma region データ: 開始演出
+
+struct StartTelop {
+	Vector2 pos = { 640, 550 };
+	Vector2 size = { 512, 128 };
+};
+StartTelop startTelop;
+Texture readyTexture = {};
+Texture goTexture = {};
+
+#pragma endregion
+
+#pragma region データ: ボス警告演出
+
+struct WarningBossTelop {
+	Vector2 pos = { 640, 590 };
+	Vector2 size = { 512, 128 };
+
+	//振動関係
+	Timer shakeTimer = { 10, 0 };
+	int shakeDuration = 3;
+
+	//イージング関係
+	float easingT = 0.0f;
+	float easingSpeed = 0.03f;
+	bool isFadeIn = true;
+	EasingMode easingMode = EasingMode::EaseInOut;
+
+	//透明度関係
+	int alpha = 0;
+	int alphaMin = 0;
+	int alphaMax = 190;
+
+	Texture texture = {};
+};
+WarningBossTelop bossTelop;
+
+#pragma endregion
+
 
 #pragma region 関数: ライフアイコン
 
@@ -215,7 +371,7 @@ static void DrawLifeIcon(void) {
 	int remainLife = GetPlayerHp();
 
 	for (int i = 0; i < remainLife; i++) {
-		Vector2 posS = { lifeIcon.startPos.x  + (lifeIcon.size.x + lifeIcon.intervalX) * i, lifeIcon.startPos.y };
+		Vector2 posS = { lifeIcon.startPos.x + (lifeIcon.size.x + lifeIcon.intervalX) * i, lifeIcon.startPos.y };
 
 		DrawTextureUI(lifeIcon.texture, posS, lifeIcon.size);
 	}
@@ -273,8 +429,7 @@ static void UpdateEnergyGauge(void) {
 					energyGaugeDelayMeter.easingT,
 					EasingMode::EaseIn
 				);
-		}
-		else {
+		} else {
 			energyGaugeDelayMeter.gaugeRate = nowRate;
 			energyGaugeDelayMeter.easingT = 0.0f;
 		}
@@ -288,28 +443,54 @@ static void UpdateEnergyGauge(void) {
 
 #pragma region GaugeEffectの生成
 
-	energyGaugeFrame.createGaugeEffectTimer.count++;
-	if (energyGaugeFrame.createGaugeEffectTimer.count >= energyGaugeFrame.createGaugeEffectTimer.time) {
-		energyGaugeFrame.createGaugeEffectTimer.count = 0;
+	if (remainEnergy <= energyGaugeFrame.warnDeadEnergy) {
+		energyGaugeFrame.createGaugeEffectTimer.count++;
+		if (energyGaugeFrame.createGaugeEffectTimer.count >= energyGaugeFrame.createGaugeEffectTimer.time) {
+			energyGaugeFrame.createGaugeEffectTimer.count = 0;
 
-		CreateGageEffect(GetEnergyGaugeEndPos(), GetPlayerColor());
+			CreateGageEffect(GetEnergyGaugeEndPos(), GetPlayerColor());
+		}
 	}
 
 #pragma endregion
 
-#pragma region 点滅処理
+#pragma region 点滅処理&振動
 
 	//警告表示のラインを下回るor故障状態時
-	if (remainEnergy <= energyGaugeFrame.warnDeadEnergy /*|| GetPlayerNowState() != PlayerState::Normal*/) {
+	if (remainEnergy <= energyGaugeFrame.warnDeadEnergy) {
 		UpdateAnimation(energyGaugeFrame.texture);
 		UpdateAnimation(miniEnergyGauge.frameTexture);
-	}
-	else {
+
+		//振動処理
+		if (kGaugeShakeSwitch) {
+			energyGaugeFrame.viewPos.x = energyGaugeFrame.pos.x + GetRand(-2, 2);
+			energyGaugeFrame.viewPos.y = energyGaugeFrame.pos.y + GetRand(-2, 2);
+		}
+
+		//displayEFfect
+		TriggerDangerDisplayEffect();
+
+	} else {
 		energyGaugeFrame.texture.animNum = 0;
 		energyGaugeFrame.texture.animChangeTimer.count = 0;
 
 		miniEnergyGauge.frameTexture.animNum = 0;
 		miniEnergyGauge.frameTexture.animChangeTimer.count = 0;
+
+		energyGaugeFrame.viewPos = energyGaugeFrame.pos;
+
+		CancelDangerDisplayEffect();
+	}
+
+	//ダメージによる振動処理
+	if (gaugeShakeDamageTimer.count <= gaugeShakeDamageTimer.time) {
+		gaugeShakeDamageTimer.count++;
+
+		if (kGaugeShakeSwitch) {
+			energyGaugeFrame.viewPos.x = energyGaugeFrame.pos.x + GetRand(-4, 4);
+			energyGaugeFrame.viewPos.y = energyGaugeFrame.pos.y + GetRand(-4, 4);
+		}
+
 	}
 
 #pragma endregion
@@ -348,11 +529,11 @@ static void UpdateEnergyGauge(void) {
 static void DrawEnergyGauge(void) {
 	//通常ゲージ
 	//フレーム
-	DrawTextureUI(energyGaugeFrame.texture, energyGaugeFrame.pos, energyGaugeFrame.size);
+	DrawTextureUI(energyGaugeFrame.texture, energyGaugeFrame.viewPos, energyGaugeFrame.size);
 	//delayメーター
-	DrawGaugeAsUI(energyGaugeDelayMeter.texture, energyGaugeFrame.pos, energyGaugeFrame.size, energyGaugeDelayMeter.gaugeRate);
+	DrawGaugeAsUI(energyGaugeDelayMeter.texture, energyGaugeFrame.viewPos, energyGaugeFrame.size, energyGaugeDelayMeter.gaugeRate);
 	//メーター
-	DrawGaugeAsUI(energyGaugeMeter.texture, energyGaugeFrame.pos, energyGaugeFrame.size, energyGaugeMeter.gaugeRate);
+	DrawGaugeAsUI(energyGaugeMeter.texture, energyGaugeFrame.viewPos, energyGaugeFrame.size, energyGaugeMeter.gaugeRate);
 
 	//ミニゲージ
 	//フレーム
@@ -468,8 +649,6 @@ static void DrawPowRate(void) {
 
 static void InitProgressGauge(void) {
 	if (!kShowProgressGaugeSwitch) return;
-	//ボスが出たら出現しない
-	if (GetBossEnemyIsAlive()) return;
 
 	progressGauge.frameTexture = GetTexture(TextureType::ProgressGauge);
 	progressGaugeIcon.texture = GetTexture(TextureType::ProgressGaugeIcon);
@@ -482,7 +661,7 @@ static void UpdateProgressGauge(void) {
 	//ボスが出たら出現しない
 	if (GetBossEnemyIsAlive()) return;
 
-	progressGauge.gaugeRate = ToFloat(ConvertTimeDataToInt(GetGameTimeData())) / ToFloat( progressGauge.bossRoundTime);
+	progressGauge.gaugeRate = ToFloat(ConvertTimeDataToInt(GetGameTimeData())) / ToFloat(progressGauge.bossRoundTime);
 
 	//アイコンの移動
 	progressGaugeIcon.pos.x = UpdateValueByEasing(progressGaugeIcon.startPos.x, progressGaugeIcon.endPos.x, progressGauge.gaugeRate, EasingMode::Linear);
@@ -499,60 +678,89 @@ static void DrawProgressGauge(void) {
 
 #pragma endregion
 
-#pragma region 関数: 連鎖表示
+#pragma region 関数: コンボ表示
 
 static void InitShockCombo(void) {
 	for (int i = 0; i < kComboNumbersLimit; i++) {
 		comboNumbers[i] = {};
 	}
 	comboNumbersTexture = GetTexture(TextureType::ComboNumbers);
+	comboNumbersMeterTexture = GetTexture(TextureType::ComboNumbersMeter);
+
+	comboIcon = {};
+	comboIcon.texture = GetTexture(TextureType::ComboIcon);
 }
 
 static void UpdateShockCombo(void) {
-	//表示の更新
-	if (!shockCombo.isShowPreCombo) {
-		shockCombo.combo = GetShockCombo();
+
+	//gaugeRateの更新
+	Timer comboTimer = GetComboTimer();
+	comboIcon.gaugeRate = 1.0f - ToFloat(comboTimer.count) / ToFloat(comboTimer.time);
+
+	//コンボ持続中
+	if (!comboIcon.isShowPreCombo) {
+		comboIcon.nowCombo = GetShockCombo();
 
 		for (int i = 0; i < kComboNumbersLimit; i++) {
-			comboNumbers[i].animNum = GetValueAtDigit(shockCombo.combo, i);
+			comboNumbers[i].animNum = GetValueAtDigit(comboIcon.nowCombo, i);
 		}
 	}
+	//コンボ終了後
 	else {
-		//点滅処理
-		shockCombo.invisibleTimer.count++;
-		if (shockCombo.invisibleTimer.count >= shockCombo.invisibleTimer.time) {
-			shockCombo.invisibleTimer.count = 0;
 
-			if (!shockCombo.isInvisible) {
-				shockCombo.isInvisible = true;
+#pragma region 点滅処理
+		comboIcon.invisibleTimer.count++;
+		if (comboIcon.invisibleTimer.count >= comboIcon.invisibleTimer.time) {
+			comboIcon.invisibleTimer.count = 0;
+
+			if (!comboIcon.isInvisible) {
+				comboIcon.isInvisible = true;
 			} else {
-				shockCombo.isInvisible = false;
+				comboIcon.isInvisible = false;
 			}
 		}
+#pragma endregion
 
-		shockCombo.showPreComboTimer.count++;
-		if (shockCombo.showPreComboTimer.count >= shockCombo.showPreComboTimer.time) {
-			shockCombo.showPreComboTimer.count = 0;
-			shockCombo.isShowPreCombo = false;
+		//表示後、上に移動する処理
+		comboIcon.showPreComboTimer.count++;
+		if (comboIcon.showPreComboTimer.count >= comboIcon.showPreComboTimer.time) {
 
-			shockCombo.isInvisible = false;
-			shockCombo.invisibleTimer.count = 0;
+			//一定時間表示したら上へ向かう
+			comboIcon.easingT += comboIcon.easingSpeed;
+			if (comboIcon.easingT >= 1.0f) {
+				comboIcon.easingT = 0.0f;
+
+				comboIcon.showPreComboTimer.count = 0;
+				comboIcon.isShowPreCombo = false;
+
+				comboIcon.isInvisible = false;
+				comboIcon.invisibleTimer.count = 0;
+				comboIcon.nowCombo = 0;
+			}
 		}
 	}
+
+	comboIcon.pos = MoveByEasing(comboIcon.startPos, comboIcon.endPos, comboIcon.easingT, EasingMode::EaseIn);
+
+	if (comboIcon.nowCombo >= kStartDisplayEffectCombo) {
+		TriggerDisplayEffect();
+	} else {
+		displayEffect.isShoot = false;
+	}
+
 }
 
 static void DrawShockCombo(void) {
 
-	if (shockCombo.isInvisible) return;
+	if (comboIcon.isInvisible) return;
 
 	int digits = 0;
-	if (shockCombo.combo < 3) {
+	//表示しない
+	if (comboIcon.nowCombo < kStartViewCombo) {
 		return;
-	}
-	else if (shockCombo.combo < 10) {
+	} else if (comboIcon.nowCombo < 10) {
 		digits = 1;
-	} 
-	else if(shockCombo.combo < 100){
+	} else if (comboIcon.nowCombo < 100) {
 		digits = 2;
 	} else {
 		digits = 3;
@@ -560,14 +768,254 @@ static void DrawShockCombo(void) {
 
 	//scoreNumbers
 	for (int i = 0; i < digits; i++) {
-		Vector2 pos = { comboNumbers[i].startPos.x + comboNumbers[i].interval.x * i, comboNumbers[i].startPos.y };
+		Vector2 pos = { comboNumbers[i].startPos.x + comboNumbers[i].interval.x * i, comboIcon.pos.y + comboNumbers[i].offsetY };
 
 		Texture texture = comboNumbersTexture;
 		texture.animNum = comboNumbers[i].animNum;
 
+		Texture meterTexture = comboNumbersMeterTexture;
+		meterTexture.animNum = comboNumbers[i].animNum;
+
 		DrawTextureUI(texture, pos, comboNumbers[i].size);
+		DrawGaugeYAsUI(meterTexture, pos, comboNumbers[i].size, comboIcon.gaugeRate);
+	}
+	//ComboIconの表示
+	DrawTextureUI(comboIcon.texture, comboIcon.pos, comboIcon.size);
+
+}
+
+#pragma endregion
+
+#pragma region 関数: スコア
+
+static void InitScore(void) {
+	for (int i = 0; i < kScoreNumbersLimit; i++) {
+		scoreNumbers[i] = {};
+	}
+	scoreNumbersTexture = GetTexture(TextureType::ScoreNumbers);
+}
+
+static void UpdateScore(void) {
+
+	int nowScore = GetNowScore();
+	int diff = nowScore - scoreIcon.showScore;
+
+	//一定値以上得点を得ていたら、
+	if (diff >= scoreIcon.threshold) {
+		//イージング開始時のみstartScoreを更新
+		if (scoreIcon.easingT == 0.0f) {
+			scoreIcon.startScore = scoreIcon.showScore;
+			scoreIcon.endScore = nowScore;
+		}
+
+		scoreIcon.easingT += scoreIcon.easingSpeed;
+		if (scoreIcon.easingT > 1.0f) {
+			scoreIcon.easingT = 1.0f;
+		}
+
+		scoreIcon.showScore = UpdateValueByEasing(scoreIcon.startScore, scoreIcon.endScore, scoreIcon.easingT, EasingMode::Linear);
+
+		PlaySe(SeType::CountUpScore);
+
+	} else {
+		scoreIcon.showScore = nowScore;
+		scoreIcon.easingT = 0.0f;
+
 	}
 
+	for (int i = 0; i < kScoreNumbersLimit; i++) {
+		scoreNumbers[i].animNum = GetValueAtDigit(scoreIcon.showScore, i);
+	}
+}
+
+static void DrawScore(void) {
+	for (int i = 0; i < kScoreNumbersLimit; i++) {
+		Vector2 pos = { scoreNumbers[i].startPos.x + scoreNumbers[i].interval.x * (kScoreNumbersLimit - i - 1), scoreNumbers[i].startPos.y };
+
+		Texture texture = scoreNumbersTexture;
+		texture.animNum = scoreNumbers[i].animNum;
+
+		DrawTextureUI(texture, pos, scoreNumbers[i].size);
+
+		//scoreIconの表示
+		//DrawTextureUI(scoreIcon.texture, scoreIcon.pos, scoreIcon.size);
+	}
+
+	//Novice::ScreenPrintf(30, 30, "Score: %07d", GetNowScore());
+}
+
+#pragma endregion
+
+#pragma region 関数: DisplayEffect
+
+static void InitDisplayEffect(void) {
+	displayEffect = {};
+	displayEffectTexture = GetTexture(TextureType::DisplayEffect);
+}
+
+static void UpdateDisplayEffect(void) {
+
+	//イージング処理
+	if (displayEffect.isScaleDown && displayEffect.isShoot) {
+		displayEffect.easingT += displayEffect.easingSpeed;
+		if (displayEffect.easingT >= 1.0f) {
+  			displayEffect.easingT = 1.0f;
+			displayEffect.isScaleDown = false;
+		}
+	} else {
+		displayEffect.easingT -= displayEffect.easingSpeed;
+		if (displayEffect.easingT <= 0.0f) {
+			displayEffect.easingT = 0.0f;
+			displayEffect.isScaleDown = true;
+		}
+	}
+
+	//拡大処理
+	displayEffect.size = MoveByEasing(displayEffect.maxSize, displayEffect.minSize, displayEffect.easingT, EasingMode::EaseIn);
+	//透明度の処理
+	displayEffect.alpha = UpdateValueByEasing(displayEffect.alphaMin, displayEffect.alphaMax, displayEffect.easingT, EasingMode::EaseIn);
+}
+
+static void DrawDisplayEffect(void) {
+	if (!displayEffect.isShoot && displayEffect.alpha <= displayEffect.alphaMin) return;
+
+	Texture texture = displayEffectTexture;
+	texture.color = (displayEffect.color & 0xFFFFFF00) | displayEffect.alpha;
+
+	DrawTextureUI(texture, displayEffect.pos, displayEffect.size);
+}
+
+void TriggerDisplayEffect(void) {
+	if (displayEffect.isShoot) return;
+
+	displayEffect.isShoot = true;
+	displayEffect.easingT = 0.0f;
+	displayEffect.isScaleDown = true;
+
+}
+
+static void InitDangerDisplayEffect(void) {
+	dangerDisplayEffect = {};
+	displayEffectTexture = GetTexture(TextureType::DisplayEffect);
+}
+
+static void UpdateDangerDisplayEffect(void) {
+
+	//イージング処理
+	if (dangerDisplayEffect.isScaleDown && dangerDisplayEffect.isShoot) {
+		dangerDisplayEffect.easingT += dangerDisplayEffect.easingSpeed;
+		if (dangerDisplayEffect.easingT >= 1.0f) {
+			dangerDisplayEffect.easingT = 1.0f;
+			dangerDisplayEffect.isScaleDown = false;
+		}
+	} 
+	else {
+		dangerDisplayEffect.easingT -= dangerDisplayEffect.easingSpeed;
+		if (dangerDisplayEffect.easingT <= 0.0f) {
+			dangerDisplayEffect.easingT = 0.0f;
+			dangerDisplayEffect.isScaleDown = true;
+		}
+	}
+
+	//拡大処理
+	dangerDisplayEffect.size = MoveByEasing(dangerDisplayEffect.maxSize, dangerDisplayEffect.minSize, dangerDisplayEffect.easingT, EasingMode::EaseIn);
+	//透明度の処理
+	dangerDisplayEffect.alpha = UpdateValueByEasing(dangerDisplayEffect.alphaMin, dangerDisplayEffect.alphaMax, dangerDisplayEffect.easingT, EasingMode::EaseIn);
+}
+
+static void DrawDangerDisplayEffect(void) {
+	if (!dangerDisplayEffect.isShoot && dangerDisplayEffect.alpha <= dangerDisplayEffect.alphaMin) return;
+
+	Texture texture = displayEffectTexture;
+	texture.color = (dangerDisplayEffect.color & 0xFFFFFF00) | dangerDisplayEffect.alpha;
+
+	DrawTextureUI(texture, dangerDisplayEffect.pos, dangerDisplayEffect.size);
+}
+
+void TriggerDangerDisplayEffect(void) {
+	if (dangerDisplayEffect.isShoot) return;
+
+	dangerDisplayEffect.isShoot = true;
+	dangerDisplayEffect.easingT = 0.0f;
+	dangerDisplayEffect.isScaleDown = true;
+
+}
+
+void CancelDangerDisplayEffect(void) {
+	if (!dangerDisplayEffect.isShoot) return;
+
+	dangerDisplayEffect.isShoot = false;
+}
+
+#pragma endregion
+
+#pragma region 関数: 開始演出
+
+static void InitStartTelop(void) {
+	startTelop = {};
+	readyTexture = GetTexture(TextureType::ReadyTelop);
+	goTexture = GetTexture(TextureType::GoTelop);
+}
+
+static void UpdateStartTelop(void) {
+
+}
+
+static void DrawStartTelop(void) {
+	ModeStartEffect nowMode = GetNowModeStart();
+
+	if (nowMode == ModeStartEffect::WaitPlayerSpawn || nowMode == ModeStartEffect::Standby) return;
+
+	Texture texture;
+	texture = (nowMode == ModeStartEffect::Ready) ? readyTexture : goTexture;
+
+	DrawTextureUI(texture, startTelop.pos, startTelop.size);
+}
+
+#pragma endregion
+
+#pragma region 関数: ボス警告演出
+
+static void InitBossTelop(void) {
+	bossTelop = {};
+	bossTelop.texture = GetTexture(TextureType::WarnBossTelop);
+}
+
+static void UpdateBossTelop(void) {
+
+	//媒介変数の更新
+	if (bossTelop.isFadeIn && GetIsWarningBoss()) {
+		bossTelop.easingT += bossTelop.easingSpeed;
+		if (bossTelop.easingT >= 1.0f) {
+			bossTelop.easingT = 1.0f;
+			bossTelop.isFadeIn = false;
+		}
+	} else {
+		bossTelop.easingT -= bossTelop.easingSpeed;
+		if (bossTelop.easingT <= 0.0f) {
+			bossTelop.easingT = 0.0f;
+			bossTelop.isFadeIn = true;
+
+
+		}
+	}
+
+	//フェード処理
+	bossTelop.alpha = UpdateValueByEasing(bossTelop.alphaMin, bossTelop.alphaMax, bossTelop.easingT, bossTelop.easingMode);
+}
+
+static void DrawBossTelop(void) {
+	if (!GetIsWarningBoss() && bossTelop.alpha <= 0) return;
+
+	//振動処理
+	Vector2 showPos;
+	showPos.x = bossTelop.pos.x + ToFloat(GetRand(-bossTelop.shakeDuration, bossTelop.shakeDuration));
+	showPos.y = bossTelop.pos.y + ToFloat(GetRand(-bossTelop.shakeDuration, bossTelop.shakeDuration));
+
+	Texture texture = bossTelop.texture;
+	texture.color = (texture.color & 0xFFFFFF00) | bossTelop.alpha;
+
+	DrawTextureUI(texture, showPos, bossTelop.size);
 }
 
 #pragma endregion
@@ -578,23 +1026,40 @@ void InitPlayUI(void) {
 	InitBossHpGauge();
 	InitProgressGauge();
 	InitShockCombo();
+	InitScore();
+	InitDisplayEffect();
+	InitDangerDisplayEffect();
+	InitStartTelop();
+	InitBossTelop();
 }
 
-void UpdatePlayUI(void){
+void UpdatePlayUI(void) {
 	UpdateEnergyGauge();
 	UpdateBossHpGauge();
 	UpdatePowRate();
 	UpdateProgressGauge();
 	UpdateShockCombo();
+	UpdateScore();
+	UpdateDisplayEffect();
+	UpdateDangerDisplayEffect();
+	UpdateStartTelop();
+	UpdateBossTelop();
 }
 
 void DrawPlayUI(void) {
+	DrawDisplayEffect();
+	DrawDangerDisplayEffect();
+
 	DrawLifeIcon();
 	DrawEnergyGauge();
 	DrawBossHpGauge();
 	DrawPowRate();
 	DrawProgressGauge();
 	DrawShockCombo();
+	DrawStartTelop();
+	DrawBossTelop();
+
+	DrawScore();
 }
 
 #pragma region 関数: 外部参照関係
@@ -614,8 +1079,12 @@ Vector2 GetBossHpGaugeEndPos(void) {
 }
 
 void TriggerEndCombo(void) {
-	shockCombo.isShowPreCombo = true;
-	shockCombo.showPreComboTimer.count = 0;
+	comboIcon.isShowPreCombo = true;
+	comboIcon.showPreComboTimer.count = 0;
+}
+
+void TriggerGaugeShackByDamage(void) {
+	gaugeShakeDamageTimer.count = 0;
 }
 
 #pragma endregion

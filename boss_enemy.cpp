@@ -118,11 +118,20 @@ DataShootLaser dataShootLaser;
 
 #pragma endregion
 
+#pragma region データ: 撃破演出
+Timer createExploseTimer = { 30, 0 };
+int createExploseTimerMax = 30;
+int createExploseTimerMin =4;
+
+Vector2i createExploseRange = { 300, 300 };
+
+#pragma endregion
+
 Vector2 playerPos;
 
-
+#pragma region 関数: 行動パターン関係
 void StatesCount(void) {
-	if (!bossEnemy.isAlive) return;
+	if (!bossEnemy.isAlive || bossEnemy.isDead) return;
 
 	if (bossEnemy.nowsSates == BossStates::Normal) {
 		statesTimer.normal.count++;
@@ -147,7 +156,7 @@ void StatesCount(void) {
 }
 
 void MoveNormal(void) {
-	if (!bossEnemy.isAlive) return;
+	if (!bossEnemy.isAlive || bossEnemy.isDead) return;
 
 	if (bossEnemy.nowsSates == BossStates::Normal) {
 		playerPos = GetPlayerPos();
@@ -184,7 +193,7 @@ void MoveNormal(void) {
 }
 
 void MoveAttack1(void) {
-	if (!bossEnemy.isAlive) return;
+	if (!bossEnemy.isAlive || bossEnemy.isDead) return;
 
 	playerPos = GetPlayerPos();
 	if (bossEnemy.nowsSates == BossStates::Attack1) {
@@ -196,7 +205,7 @@ void MoveAttack1(void) {
 }
 
 void MoveAttack2(void) {
-	if (!bossEnemy.isAlive) return;
+	if (!bossEnemy.isAlive || bossEnemy.isDead) return;
 
 	if (bossEnemy.nowsSates == BossStates::Attack2) {
 		playerPos = GetPlayerPos();
@@ -234,7 +243,7 @@ void MoveAttack2(void) {
 }
 
 void MoveAttack3(void) {
-	if (!bossEnemy.isAlive) return;
+	if (!bossEnemy.isAlive || bossEnemy.isDead) return;
 
 	if (bossEnemy.nowsSates == BossStates::Attack3) {
 
@@ -361,6 +370,10 @@ void MoveAttack3(void) {
 	}
 }
 
+#pragma endregion
+
+#pragma region 関数: 死亡判定関係
+
 /// <summary>
 /// デンゲキショックを無視する状態カウント
 /// </summary>
@@ -390,16 +403,61 @@ static void UpdateFlashTimer(void) {
 }
 
 void DeathBossEnemy(void) {
-	if (!bossEnemy.isAlive) return;
+	if (!bossEnemy.isAlive || bossEnemy.isDead) return;
 
 	if (bossEnemy.remainLife <= 0) {
-		bossEnemy.isAlive = false;
+		bossEnemy.isDead = true;
 	}
 
 }
 
+#pragma endregion
+
+#pragma region 関数: 死亡後の演出関係
+
+
+static void MoveAfterDead(void) {
+	if (!bossEnemy.isAlive || !bossEnemy.isDead) return;
+
+	bossEnemy.deadTimer.count++;
+	if (bossEnemy.deadTimer.count >= bossEnemy.deadTimer.time) {
+		bossEnemy.deadTimer.count = 0;
+		bossEnemy.isAlive = false;
+
+		//最後に5発爆発
+		for (int i = 0; i < 8; i++) {
+			Vector2 createPos;
+			createPos.x = bossEnemy.pos.x + ToFloat(GetRand(-createExploseRange.x / 2, createExploseRange.x / 2));
+			createPos.y = bossEnemy.pos.y + ToFloat(GetRand(-createExploseRange.y / 2, createExploseRange.y / 2));
+			CreateExplodeEffect(createPos, WHITE);
+			CreateFlashPanel();
+		}
+	}
+
+	//爆発演出
+	createExploseTimer.count++;
+	if (createExploseTimer.count >= createExploseTimer.time) {
+		createExploseTimer.count = 0;
+		if (createExploseTimer.time > createExploseTimerMin) {
+			createExploseTimer.time-= 5;
+			if (createExploseTimer.time < createExploseTimerMin) {
+				createExploseTimer.time = createExploseTimerMin;
+			}
+		}
+
+		Vector2 createPos;
+		createPos.x = bossEnemy.pos.x + ToFloat(GetRand(-createExploseRange.x / 2, createExploseRange.x / 2));
+		createPos.y = bossEnemy.pos.y + ToFloat(GetRand(-createExploseRange.y / 2, createExploseRange.y / 2));
+		CreateExplodeEffect(createPos, WHITE);
+	}
+
+}
+
+#pragma endregion
+
 void InitBossEnemy(void) {
 	bossEnemy = {};
+	createExploseTimer.time = createExploseTimerMax;
 
 	//ステージの中心座標を取得(shootLaser時のため)
 	Vector2 movablePos[2];
@@ -413,9 +471,13 @@ void InitBossEnemy(void) {
 		bossBomb[i].burstTexture = GetTexture(TextureType::BossBomBurstRange);
 	}
 
+	//SpawnBoss({ 500, 500 });
+
 }
 
 void UpdateBossEnemy(void) {
+	DeathBossEnemy();
+
 	StatesCount();
 
 	MoveNormal();
@@ -426,7 +488,9 @@ void UpdateBossEnemy(void) {
 	CountIgnoreElecShock();
 	UpdateFlashTimer();
 
-	DeathBossEnemy();
+
+
+	MoveAfterDead();
 };
 void DrawBossEnemy(void) {
 	if (bossEnemy.isAlive == true) {
@@ -451,6 +515,11 @@ void SpawnBoss(Vector2 pos) {
 bool GetBossEnemyIsAlive(void) {
 	return bossEnemy.isAlive;
 }
+
+bool GetBossEnemyIsDead(void) {
+	return bossEnemy.isDead;
+}
+
 Vector2 GetBossEnemyPos(void) {
 	return bossEnemy.pos;
 }
@@ -476,6 +545,9 @@ BossEnemy* GetBossEnemy(void) {
 
 void DamageBossEnemy(int pow) {
 	bossEnemy.remainLife -= pow;
+	if (bossEnemy.remainLife <= 0) {
+		bossEnemy.remainLife = 0;
+	}
 
 	bossEnemy.isFlash = true;
 	bossEnemy.flashTimer.count = 0;
