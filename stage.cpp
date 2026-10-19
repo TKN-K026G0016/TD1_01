@@ -117,13 +117,14 @@ SpawnerData spawners[ToInt(Round::Count)][kMaxSpawner] = {
 		//{ EnemyType::EnemyFormation, {280, 0} },
 		//{ EnemyType::EnemySniper, {300, 0} },
 		{EnemyType::EnemyBomb, {300, 300}},
+		{EnemyType::EnemyM,{180,0}},
 	},
 	//Round5
 	{
 		{ EnemyType::EnemyBasic, {120, 0} },
 		{ EnemyType::EnemySmallGroup, {60, 50} },
 		{ EnemyType::EnemyFormation, {250, 0} },
-		{ EnemyType::EnemyShooter, {100, 0} },
+		{ EnemyType::EnemyShooter, {150, 0} },
 		{EnemyType::EnemyBomb, {300, 0}},
 	},
 
@@ -466,7 +467,7 @@ static void GoClearScene(void) {
 	/*if (nowRound != Round::RoundBoss) return;*/
 
 	//生存していたらスキップ
-	if(GetBossEnemyIsAlive() || !GetBossEnemyIsDead()) return;
+	if (GetBossEnemyIsAlive() || !GetBossEnemyIsDead()) return;
 
 	//フェードアウトし始めたらスキップ
 	if (GetNowModeFade() != ModeFade::Standby) return;
