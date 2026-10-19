@@ -5,6 +5,7 @@
 #include "elec_bullet.h"
 #include "title_background.h"
 #include "effect.h"
+#include "se.h"
 
 #include "tool.h"
 #include "texture.h"
@@ -362,6 +363,8 @@ static void CheckBreakScore(void) {
 		//演出実装
 		CreateFlashPanel();
 
+		PlaySe(SeType::BreakScoreJingle);
+
 		scoreManager.breakScore = true;
 	}
 
@@ -451,6 +454,8 @@ static void ChangeCursor(void) {
 			selectNum = ToInt(ModeClearSelect::Count) - 1;
 		}
 
+		PlaySe(SeType::MoveCursor);
+
 	} else if (CheckInputAction(InputAction::SelectDown)) {
 		selectNum++;
 
@@ -458,6 +463,8 @@ static void ChangeCursor(void) {
 		if (selectNum >= ToInt(ModeClearSelect::Count)) {
 			selectNum = 0;
 		}
+
+		PlaySe(SeType::MoveCursor);
 	}
 
 	//変更を適用
@@ -485,6 +492,8 @@ static void Confirm(void) {
 			break;
 		}
 		}
+
+		PlaySe(SeType::Confirm);
 	}
 }
 
@@ -559,6 +568,8 @@ static void DrawButton(void) {
 
 void InitClear(void) {
 	nowMode = ModeClear::IconFrameIn;
+
+	PlaySe(SeType::StageClearJingle);
 
 	InitIcon();
 	InitScore();
