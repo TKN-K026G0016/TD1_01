@@ -873,6 +873,7 @@ static void BurstEnemyBomb(void) {
 				if (playerDistance <= enemyBomb[i].burstRadius) {
 					PlayerDamage(enemyBomb[i].pos, enemyBomb[i].pow);
 				}
+				CreateBombExplosionEffect(enemyBomb[i].pos, 768, WHITE);
 				for (int j = 0;j < gemLimit;j++) {
 					if (!gem[j].isAlive)continue;
 
