@@ -452,7 +452,7 @@ static void MoveEnemyBasic(void) {
 		}
 		enemyBasic[i].pos.x += cosf(enemyBasic[i].moveTheta) * enemyBasic[i].moveSpeed;
 		enemyBasic[i].pos.y += sinf(enemyBasic[i].moveTheta) * enemyBasic[i].moveSpeed;
-		if ((enemyBasic[i].pos.x < 0 || enemyBasic[i].pos.x>2560 || enemyBasic[i].pos.y < 0 || enemyBasic[i].pos.y>1440)&&!enemyBasic[i].thetaUpDate) {
+		if ((enemyBasic[i].pos.x < -640 || enemyBasic[i].pos.x>3200 || enemyBasic[i].pos.y < -360 || enemyBasic[i].pos.y>1800)&&!enemyBasic[i].thetaUpDate) {
 			Vector2 targetPos = GetPlayerPos();
 			float disX = targetPos.x - enemyBasic[i].pos.x;
 			float disY = targetPos.y - enemyBasic[i].pos.y;
