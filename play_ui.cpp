@@ -181,7 +181,7 @@ ProgressGaugeIcon progressGaugeIcon;
 
 #pragma region データ: ショックコンボ
 
-constexpr int kComboNumbersLimit = 3;
+constexpr int kComboNumbersLimit = 4;
 struct ShockComboNumbers {
 	Vector2 size = { 68, 128 };
 
@@ -224,7 +224,7 @@ struct ShockComboIcon {
 };
 ShockComboIcon comboIcon;
 
-constexpr int kStartViewCombo = 10;
+constexpr int kStartViewCombo = 100;
 constexpr int kStartDisplayEffectCombo = 50;
 
 #pragma endregion
@@ -491,7 +491,9 @@ static void UpdateEnergyGauge(void) {
 
 		//energyGaugeFrame.alarmSeTimer.count = 0;
 
-		CancelDangerDisplayEffect();
+		if (!GetIsWarningBoss()) {
+			CancelDangerDisplayEffect();
+		}
 	}
 
 	//ダメージによる振動処理
@@ -770,12 +772,10 @@ static void DrawShockCombo(void) {
 	//表示しない
 	if (comboIcon.nowCombo < kStartViewCombo) {
 		return;
-	} else if (comboIcon.nowCombo < 10) {
-		digits = 1;
-	} else if (comboIcon.nowCombo < 100) {
-		digits = 2;
-	} else {
+	} else if (comboIcon.nowCombo < 1000) {
 		digits = 3;
+	} else {
+		digits = 4;
 	}
 
 	//scoreNumbers
@@ -871,7 +871,7 @@ static void UpdateDisplayEffect(void) {
 	if (displayEffect.isScaleDown && displayEffect.isShoot) {
 		displayEffect.easingT += displayEffect.easingSpeed;
 		if (displayEffect.easingT >= 1.0f) {
-  			displayEffect.easingT = 1.0f;
+			displayEffect.easingT = 1.0f;
 			displayEffect.isScaleDown = false;
 		}
 	} else {
@@ -928,8 +928,7 @@ static void UpdateDangerDisplayEffect(void) {
 				PlaySe(SeType::WarningBossAlarm);
 			}
 		}
-	} 
-	else {
+	} else {
 		dangerDisplayEffect.easingT -= dangerDisplayEffect.easingSpeed;
 		if (dangerDisplayEffect.easingT <= 0.0f) {
 			dangerDisplayEffect.easingT = 0.0f;
@@ -1005,6 +1004,8 @@ static void UpdateBossTelop(void) {
 
 	//媒介変数の更新
 	if (bossTelop.isFadeIn && GetIsWarningBoss()) {
+		TriggerDangerDisplayEffect();
+
 		bossTelop.easingT += bossTelop.easingSpeed;
 		if (bossTelop.easingT >= 1.0f) {
 			bossTelop.easingT = 1.0f;
@@ -1013,6 +1014,7 @@ static void UpdateBossTelop(void) {
 			/*PlaySe(SeType::WarningBossAlarm);*/
 
 		}
+
 	} else {
 		bossTelop.easingT -= bossTelop.easingSpeed;
 		if (bossTelop.easingT <= 0.0f) {
