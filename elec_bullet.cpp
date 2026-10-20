@@ -70,7 +70,7 @@ static int nowCombo = 0;
 //今回のゲームの最大コンボ数
 static int maxCombo = 0;
 //コンボ持続時間
-Timer comboTimer = { 150, 0 };
+Timer comboTimer = { 100, 0 };
 
 //通常弾のコンボ増加数
 int kAddCombo = 1;
@@ -328,12 +328,16 @@ void SpawnElecShock(Vector2 pos, ElecBulletType type, ElecShockOriginType origin
 		if (type == ElecBulletType::Normal) {
 			CreateElecShockEffect(pos);
 			//Se
-			PlaySe(SeType::SpawnElecShock);
+			if (CheckIsPlayingSe(SeType::SpawnElecShock)) {
+				PlaySe(SeType::SpawnElecShock);
+			}
 
 		} else if(type == ElecBulletType::Charge){
 			CreateElecShockChargedEffect(pos);
 			//Se
-			PlaySe(SeType::SpawnElecShockCharge);
+			if (CheckIsPlayingSe(SeType::SpawnElecShockCharge)) {
+				PlaySe(SeType::SpawnElecShockCharge);
+			}
 		}
 
 		//ラインエフェクトの生成

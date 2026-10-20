@@ -171,7 +171,7 @@ constexpr float kEnergyMax = 100.0f;
 constexpr float kEnergyMin = 0.0f;
 //エネルギーゲージの中間
 constexpr float kEnergyCenter = (kEnergyMax - kEnergyMin) / 2;
-constexpr float kFirstEnergy = 75.0f;
+constexpr float kFirstEnergy = kEnergyMax;
 
 //エネルギー消費量(常時)
 constexpr float kConsumptionEnergy = 0.05f;
